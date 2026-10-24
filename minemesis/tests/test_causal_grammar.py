@@ -160,3 +160,156 @@ def test_negative_control_revelation_requires_death() -> None:
             scale=Scale.INDIVIDUAL,
         )
     assert "Revelation requires citing the Death whose truth is revealed" in str(exc_info.value)
+
+
+def test_negative_control_death_cannot_cite_death_without_feud() -> None:
+    """
+    Negative control (Grammar diff): Death citing Death is rejected unless it also cites Feud (revenge).
+    """
+    log = EventLog()
+    e_d1 = log.append(
+        tick=1,
+        location="set_oakhaven",
+        event_type=EventType.DEATH,
+        participants={"target": "char_1"},
+        causes=[],
+        intent=Intent.ACCIDENTAL,
+        scale=Scale.INDIVIDUAL,
+    )
+    with pytest.raises(CausalGrammarError) as exc_info:
+        log.append(
+            tick=2,
+            location="set_oakhaven",
+            event_type=EventType.DEATH,
+            participants={"actor": "char_2", "target": "char_3"},
+            causes=[e_d1.id],  # Death citing Death without Feud
+            intent=Intent.INTENTIONAL,
+            scale=Scale.INDIVIDUAL,
+        )
+    assert "Death can only cite another Death if it also cites a Feud" in str(exc_info.value)
+
+
+def test_negative_control_settlement_collapse_requires_crisis_cause() -> None:
+    """
+    Negative control: SettlementCollapse cannot be root and cannot cite Birth.
+    """
+    log = EventLog()
+    with pytest.raises(CausalGrammarError) as exc_info:
+        log.append(
+            tick=1,
+            location="set_oakhaven",
+            event_type=EventType.SETTLEMENT_COLLAPSE,
+            participants={"settlement": "set_oakhaven"},
+            causes=[],  # Root not allowed
+            intent=Intent.ACCIDENTAL,
+            scale=Scale.AGGREGATE,
+        )
+    assert "cannot be a root event" in str(exc_info.value)
+
+    e_birth = log.append(
+        tick=2,
+        location="set_oakhaven",
+        event_type=EventType.BIRTH,
+        participants={"child": "char_1"},
+        causes=[],
+        intent=Intent.INTENTIONAL,
+        scale=Scale.INDIVIDUAL,
+    )
+    with pytest.raises(CausalGrammarError) as exc_info2:
+        log.append(
+            tick=3,
+            location="set_oakhaven",
+            event_type=EventType.SETTLEMENT_COLLAPSE,
+            participants={"settlement": "set_oakhaven"},
+            causes=[e_birth.id],
+            intent=Intent.ACCIDENTAL,
+            scale=Scale.AGGREGATE,
+        )
+    assert "cannot cite cause Event" in str(exc_info2.value)
+
+
+def test_negative_control_migration_requires_collapse_or_scarcity() -> None:
+    """
+    Negative control: Migration cannot be root and must cite SettlementCollapse, Famine, or Raid.
+    """
+    log = EventLog()
+    with pytest.raises(CausalGrammarError) as exc_info:
+        log.append(
+            tick=1,
+            location="set_oakhaven",
+            event_type=EventType.MIGRATION,
+            participants={"source": "set_oakhaven", "destination": "set_riverbend"},
+            causes=[],  # Root not allowed
+            intent=Intent.INTENTIONAL,
+            scale=Scale.AGGREGATE,
+        )
+    assert "cannot be a root event" in str(exc_info.value)
+
+
+def test_positive_control_revenge_and_collapse_migration() -> None:
+    """
+    Positive control: Valid revenge killing (Death citing [Death, Feud]),
+    valid SettlementCollapse citing Famine, and valid Migration citing SettlementCollapse.
+    """
+    log = EventLog()
+    d1 = log.append(
+        tick=1,
+        location="set_oakhaven",
+        event_type=EventType.DEATH,
+        participants={"target": "char_1"},
+        causes=[],
+        intent=Intent.ACCIDENTAL,
+        scale=Scale.INDIVIDUAL,
+    )
+    feud = log.append(
+        tick=2,
+        location="set_oakhaven",
+        event_type=EventType.FEUD,
+        participants={"instigator": "char_2", "target": "char_3"},
+        causes=[d1.id],
+        intent=Intent.INTENTIONAL,
+        scale=Scale.INDIVIDUAL,
+    )
+    # Revenge killing: Death citing both original Death and Feud
+    rev_death = log.append(
+        tick=3,
+        location="set_riverbend",
+        event_type=EventType.DEATH,
+        participants={"actor": "char_2", "target": "char_3"},
+        causes=[d1.id, feud.id],
+        intent=Intent.INTENTIONAL,
+        scale=Scale.INDIVIDUAL,
+        payload={"cause_of_death": "Revenge"},
+    )
+    assert rev_death.id == 2
+
+    # Famine -> SettlementCollapse -> Migration
+    famine = log.append(
+        tick=4,
+        location="set_oakhaven",
+        event_type=EventType.FAMINE,
+        participants={"settlement": "set_oakhaven"},
+        causes=[],
+        intent=Intent.ACCIDENTAL,
+        scale=Scale.AGGREGATE,
+    )
+    collapse = log.append(
+        tick=5,
+        location="set_oakhaven",
+        event_type=EventType.SETTLEMENT_COLLAPSE,
+        participants={"settlement": "set_oakhaven"},
+        causes=[famine.id],
+        intent=Intent.ACCIDENTAL,
+        scale=Scale.AGGREGATE,
+    )
+    migration = log.append(
+        tick=6,
+        location="set_oakhaven",
+        event_type=EventType.MIGRATION,
+        participants={"source": "set_oakhaven", "destination": "set_riverbend"},
+        causes=[collapse.id],
+        intent=Intent.INTENTIONAL,
+        scale=Scale.AGGREGATE,
+        payload={"migrants": ["char_2"]},
+    )
+    assert migration.id == 5

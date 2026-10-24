@@ -45,34 +45,6 @@ def process_life_cycle(
         if char.alive:
             char.age_ticks += 1
 
-    # 1b. Annual homesteading migration check (extinction protection, Section 4.5)
-    # If any settlement drops to <= 4 citizens, a young adult from an overcrowded settlement migrates
-    if tick % 12 == 0:
-        for s_id, s in settlements.items():
-            local_cnt = len([c for c in characters.values() if c.alive and c.settlement_id == s_id])
-            if local_cnt <= 4:
-                # Find most crowded settlement
-                crowded = sorted(
-                    [
-                        other_s for other_id, other_s in settlements.items()
-                        if other_id != s_id and len([c for c in characters.values() if c.alive and c.settlement_id == other_id]) >= 12
-                    ],
-                    key=lambda s_cand: len([c for c in characters.values() if c.alive and c.settlement_id == s_cand.id]),
-                    reverse=True,
-                )
-                if crowded:
-                    source_s = crowded[0]
-                    candidates = [
-                        c for c in characters.values()
-                        if c.alive and c.settlement_id == source_s.id and c.spouse_id is None and 18 <= c.age_years <= 35
-                    ]
-                    if candidates:
-                        migrant = keyed_choice(seed, "pioneer_migrant", f"{s_id}_{tick}", tick, candidates)
-                        if migrant.id in source_s.member_ids:
-                            source_s.member_ids.remove(migrant.id)
-                        migrant.settlement_id = s_id
-                        s.member_ids.append(migrant.id)
-
     # 2. Check Marriages
     singles_m = [c for c in characters.values() if c.alive and c.spouse_id is None and c.sex == "M" and c.age_years >= 18]
     singles_f = [c for c in characters.values() if c.alive and c.spouse_id is None and c.sex == "F" and c.age_years >= 18]
@@ -99,16 +71,37 @@ def process_life_cycle(
                 threshold = 0.05 if m.settlement_id == f.settlement_id else 0.025
                 if roll < threshold:
                     causes: list[int] = []
+                    is_alliance = False
                     route_key = tuple(sorted([m.settlement_id, f.settlement_id]))
+
                     if m.settlement_id != f.settlement_id:
-                        if route_key in active_trade_route_events:
+                        # Genuine alliance condition: check for a recent Peace between these two settlements (within 12 ticks)
+                        for past_evt in reversed(event_log.all_events()[-30:]):
+                            if past_evt.type == EventType.PEACE and (tick - past_evt.tick) <= 12:
+                                p_parties = {past_evt.participants_dict.get("initiator"), past_evt.participants_dict.get("target")}
+                                if p_parties == {m.settlement_id, f.settlement_id}:
+                                    causes.append(past_evt.id)
+                                    is_alliance = True
+                                    break
+
+                        # Or cite opening of diplomatic trade route
+                        if not causes and route_key in active_trade_route_events:
                             causes.append(active_trade_route_events[route_key])
-                        else:
-                            for past_evt in reversed(event_log.all_events()):
-                                if past_evt.type == EventType.PEACE:
-                                    if m.settlement_id in past_evt.location or f.settlement_id in past_evt.location:
-                                        causes.append(past_evt.id)
-                                        break
+
+                    relocation_info: dict[str, str] | None = None
+                    s_m = settlements[m.settlement_id]
+                    s_f = settlements[f.settlement_id]
+
+                    # Standard marriage relocation follows a fixed rule (patrilocal) and is recorded in payload
+                    if s_m.id != s_f.id:
+                        chosen = s_m
+                        leaving = s_f
+                        moving_char = f
+                        relocation_info = {
+                            "moved_char_id": moving_char.id,
+                            "from_settlement_id": leaving.id,
+                            "to_settlement_id": chosen.id,
+                        }
 
                     evt = event_log.append(
                         tick=tick,
@@ -119,44 +112,25 @@ def process_life_cycle(
                         intent=Intent.INTENTIONAL,
                         scale=Scale.INDIVIDUAL,
                         payload={
-                            "description": f"Marriage of {m.full_name} and {f.full_name}",
+                            "description": f"Marriage of {m.full_name} and {f.full_name}" + (" (Alliance Marriage)" if is_alliance else ""),
                             "spouse1_name": m.full_name,
                             "spouse2_name": f.full_name,
+                            "is_alliance": is_alliance,
+                            "relocation": relocation_info,
                         },
                     )
                     m.spouse_id = f.id
                     f.spouse_id = m.id
 
-                    s_m = settlements[m.settlement_id]
-                    s_f = settlements[f.settlement_id]
-                    if s_m.id != s_f.id:
-                        m_pop = len([c for c in characters.values() if c.alive and c.settlement_id == s_m.id])
-                        f_pop = len([c for c in characters.values() if c.alive and c.settlement_id == s_f.id])
+                    if relocation_info is not None:
+                        if f.id in s_f.member_ids:
+                            s_f.member_ids.remove(f.id)
+                        f.settlement_id = s_m.id
+                        s_m.member_ids.append(f.id)
 
-                        # Young couple settles in the less populated settlement (homesteading opportunity)
-                        if m_pop < f_pop:
-                            chosen = s_m
-                            leaving = s_f
-                            moving_char = f
-                        elif f_pop < m_pop:
-                            chosen = s_f
-                            leaving = s_m
-                            moving_char = m
-                        else:
-                            if keyed_float(seed, "matrilocal_roll", f"{m.id}_{f.id}", tick) < 0.5:
-                                chosen = s_m
-                                leaving = s_f
-                                moving_char = f
-                            else:
-                                chosen = s_f
-                                leaving = s_m
-                                moving_char = m
-
-                        if moving_char.settlement_id != chosen.id:
-                            if moving_char.id in leaving.member_ids:
-                                leaving.member_ids.remove(moving_char.id)
-                            moving_char.settlement_id = chosen.id
-                            chosen.member_ids.append(moving_char.id)
+                    marriage_key = tuple(sorted([m.id, f.id]))
+                    marriage_events[marriage_key] = evt.id
+                    break
 
                     marriage_key = tuple(sorted([m.id, f.id]))
                     marriage_events[marriage_key] = evt.id

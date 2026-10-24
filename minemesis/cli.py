@@ -15,6 +15,7 @@ from minemesis.core.history_printer import (
     format_causal_chain,
     format_linear_history,
     get_deepest_causal_chain_metrics,
+    get_deepest_conflict_chain_metrics,
 )
 from minemesis.core.types import EventType
 from minemesis.systems.simulation import Simulation
@@ -92,10 +93,12 @@ def run_single(args: argparse.Namespace) -> None:
 
     # Causal chain demonstration
     best_id, depth, distinct_types = get_deepest_causal_chain_metrics(sim.event_log)
+    c_best_id, c_depth, c_distinct_types = get_deepest_conflict_chain_metrics(sim.event_log)
     target_id = args.event_id if args.event_id is not None else best_id
 
     print(f"\n--- Deepest Causal Story Analysis (Event #{target_id}) ---")
-    print(f"Causal Depth: {depth} | Distinct Event Types on Path: {distinct_types}")
+    print(f"Longest Causal Depth: {depth} | Distinct Event Types on Path: {distinct_types}")
+    print(f"Conflict Causal Depth: {c_depth} | Distinct Conflict Event Types on Path: {c_distinct_types}")
     print(format_causal_chain(sim.event_log, target_id))
 
     if args.export_dot:
@@ -118,20 +121,22 @@ def run_single(args: argparse.Namespace) -> None:
 
 
 def run_batch(args: argparse.Namespace) -> None:
-    print(f"=== Minemesis Batch Analytics (Milestone 0.5) ===")
+    print(f"=== Minemesis Batch Analytics (Milestone 0.5.1) ===")
     print(f"Evaluating {args.seeds} seeds over {args.years} simulated years...")
     seed_list = [42 + i * 17 for i in range(args.seeds)]
-    summary = run_batch_analytics(seeds=seed_list, years=args.years, out_dir=args.out)
+    summary = run_batch_analytics(seeds=seed_list, years=args.years, out_dir=args.out, filename_prefix="milestone_0_5")
     print(f"\nBatch completed. Summary written to {args.out}/milestone_0_5_summary.md")
     print(f"Runs CSV written to {args.out}/milestone_0_5_runs.csv")
     print(f"Full metrics JSON written to {args.out}/milestone_0_5_metrics.json")
     print("\n--- Summary Snippet ---")
-    print(f"Extinct Settlements: {summary['total_extinct_settlements']}")
+    print(f"World Extinctions: {summary['world_extinctions']}")
+    print(f"Settlement Collapses: {summary['total_settlement_collapses']}")
     print(f"Zero Feud Share: {summary['zero_feud_share']:.1%}")
     print(f"Active Feud at Year 100 Share: {summary['active_feud_at_end_share']:.1%}")
     print(f"Routine Share (Mean): {summary['routine_share']['mean']:.1%}")
     print(f"Median Feuds: {summary['feuds']['median']} (Mean {summary['feuds']['mean']})")
-    print(f"Median Deepest Chain Distinct Types: {summary['distinct_types_on_deepest_path']['median']}")
+    print(f"Median Conflict Chain Depth: {summary['conflict_causal_depth']['median']} (Distinct Types: {summary['distinct_types_on_conflict_path']['median']})")
+    print(f"Median Longest Chain Depth: {summary['max_causal_depth']['median']} (Distinct Types: {summary['distinct_types_on_deepest_path']['median']})")
 
 
 def run_cli() -> None:

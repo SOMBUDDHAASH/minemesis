@@ -43,6 +43,7 @@ def process_conflicts_and_economy(
     trade_routes: dict[tuple[str, str], TradeRoute],
     active_trade_route_events: dict[tuple[str, str], int],
     last_raid_ticks: dict[tuple[str, str], int],
+    collapsed_settlements: Set[str],
     beliefs_by_character: dict[str, dict[int, Belief]],
     memories: list[Memory],
     superseded_memory_ids: Set[int],
@@ -62,36 +63,52 @@ def process_conflicts_and_economy(
     settlement_keys = sorted(settlements.keys())
 
     # =========================================================================
-    # 1. SCARCITY, ECONOMY & FAMINE (Section 4.5)
+    # 1. SCARCITY, FAMINE & WEALTH ECONOMICS (Milestone 0.5.1 Section 3c)
     # =========================================================================
     month_of_year = (tick % 12) + 1
     if month_of_year in (12, 1, 2):
-        season_mult = 0.35  # Winter dormancy
+        season_mult = 0.40  # Winter dormancy
     elif month_of_year in (9, 10, 11):
-        season_mult = 1.60  # Harvest Autumn
+        season_mult = 1.45  # Harvest Autumn
     else:
-        season_mult = 1.10  # Spring / Summer
+        season_mult = 1.15  # Spring / Summer
 
     for s_id in settlement_keys:
         s = settlements[s_id]
-        pop = max(1, len([c for c in living_chars if c.settlement_id == s_id]))
+        local_living = [c for c in living_chars if c.settlement_id == s_id]
+        pop = len(local_living)
+        if pop == 0:
+            continue
 
         noise = 0.90 + 0.20 * keyed_float(seed, "food_noise", s_id, tick)
-        food_produced = int(pop * s.farmland * season_mult * 1.30 * noise)
+        food_produced = int(pop * s.farmland * season_mult * 1.15 * noise)
         s.food += food_produced
 
-        food_consumed = int(pop * 0.95)
-        s.food = max(0, s.food - food_consumed)
+        food_consumed = max(1, int(pop * 1.0))
+        s.food -= food_consumed
 
-        s.ore += int(pop * s.ore_richness * 0.4)
-        s.wood += int(pop * s.forest * 0.5)
+        # Wealth production from mining & timber resources (Section 2d fix)
+        workers = max(1, len([c for c in local_living if 16 <= c.age_years <= 60]))
+        wealth_produced = int(workers * s.ore_richness * 0.35) + int(workers * s.forest * 0.15)
+        s.wealth += wealth_produced
 
-        # Famine check: food at 0 for 2 consecutive months during winter
-        if s.food <= 2:
+        # Storage cap & spoilage (Section 3c)
+        # Cap scales with population: ~3 years of consumption (36 ticks * 1 food) + 150 buffer
+        storage_cap = pop * 36 + 150
+        if s.food > storage_cap:
+            excess = s.food - storage_cap
+            spoilage = int(excess * 0.15)  # 15% monthly spoilage on excess
+            s.food -= spoilage
+
+        if s.food < 0:
+            s.food = 0
+            s.consecutive_starvation_ticks += 1
+        elif s.food <= 2:
             s.consecutive_starvation_ticks += 1
         else:
             s.consecutive_starvation_ticks = max(0, s.consecutive_starvation_ticks - 1)
 
+        # Famine check: 2 consecutive months of severe depletion
         if s.consecutive_starvation_ticks >= 2:
             famine_roll = keyed_float(seed, "famine_event", s_id, tick)
             if famine_roll < 0.20:
@@ -113,7 +130,6 @@ def process_conflicts_and_economy(
                 )
                 s.consecutive_starvation_ticks = 0
 
-                local_living = [c for c in living_chars if c.settlement_id == s_id]
                 if len(local_living) > 4:
                     vulnerable = [c for c in local_living if c.age_years >= 60 or c.age_years <= 12]
                     starve_victim = keyed_choice(seed, "starve_victim", s_id, tick, vulnerable or local_living)
@@ -225,18 +241,21 @@ def process_conflicts_and_economy(
                     active_trade_route_events[route_key] = evt.id
 
             if route.active:
+                # Bilateral trade: surplus food sold for wealth (Section 2d & 3c)
                 if s1.food > s2.food + 20 and s1.food > 30:
-                    transfer = min(10, (s1.food - s2.food) // 3)
+                    transfer = min(12, (s1.food - s2.food) // 3)
+                    payment = min(s2.wealth, max(1, transfer // 4))
+                    s2.wealth -= payment
+                    s1.wealth += payment
                     s1.food -= transfer
                     s2.food += transfer
-                    s2.wealth = max(0, s2.wealth - 2)
-                    s1.wealth += 2
                 elif s2.food > s1.food + 20 and s2.food > 30:
-                    transfer = min(10, (s2.food - s1.food) // 3)
+                    transfer = min(12, (s2.food - s1.food) // 3)
+                    payment = min(s1.wealth, max(1, transfer // 4))
+                    s1.wealth -= payment
+                    s2.wealth += payment
                     s2.food -= transfer
                     s1.food += transfer
-                    s1.wealth = max(0, s1.wealth - 2)
-                    s2.wealth += 2
 
     # =========================================================================
     # 3. LEADERSHIP & SUCCESSION CRISES (Section 4.5)
@@ -455,6 +474,7 @@ def process_conflicts_and_economy(
                         "victim_name": target.full_name,
                         "actor_name": instigator.full_name,
                         "revenge": True,
+                        "cause_of_death": "Revenge",
                         "feud_id": feud.id,
                     },
                 )
@@ -708,3 +728,116 @@ def process_conflicts_and_economy(
                             "reconciliation_type": "Negotiated Treaty",
                         },
                     )
+
+    # =========================================================================
+    # 8. SETTLEMENT COLLAPSE & MIGRATION (Milestone 0.5.1 Section 3b)
+    # =========================================================================
+    # When a settlement falls to the collapse threshold (population <= 4 and > 0),
+    # emit SettlementCollapse with antecedent causes (Raid, Famine, Feud, Death, SuccessionCrisis),
+    # then emit Migration moving survivors to the nearest surviving settlement.
+    for s_id in settlement_keys:
+        if s_id in collapsed_settlements:
+            continue
+        s = settlements[s_id]
+        survivors = [c for c in characters.values() if c.alive and c.settlement_id == s_id]
+        if 0 < len(survivors) <= 4:
+            # Check if there are viable surviving destinations
+            viable_destinations = [
+                other_s for other_id, other_s in settlements.items()
+                if other_id != s_id and other_id not in collapsed_settlements and len([c for c in characters.values() if c.alive and c.settlement_id == other_id]) > 0
+            ]
+            if not viable_destinations:
+                # The last surviving settlement in the world does not collapse
+                continue
+
+            collapse_causes: list[int] = []
+            for past_evt in reversed(event_log.all_events()):
+                if past_evt.type in (EventType.RAID, EventType.FAMINE, EventType.FEUD, EventType.DEATH, EventType.SUCCESSION_CRISIS):
+                    is_relevant = (
+                        past_evt.location == s_id
+                        or past_evt.participants_dict.get("initiator") == s_id
+                        or past_evt.participants_dict.get("target") == s_id
+                        or past_evt.participants_dict.get("settlement") == s_id
+                        or any(c.id in (past_evt.participants_dict.get("actor"), past_evt.participants_dict.get("target")) for c in survivors)
+                    )
+                    if is_relevant:
+                        collapse_causes.append(past_evt.id)
+                        break
+
+            if not collapse_causes:
+                for past_evt in reversed(event_log.all_events()):
+                    if past_evt.type in (EventType.RAID, EventType.FAMINE, EventType.FEUD, EventType.DEATH, EventType.SUCCESSION_CRISIS):
+                        collapse_causes.append(past_evt.id)
+                        break
+
+            if not collapse_causes:
+                continue
+
+            collapsed_settlements.add(s_id)
+
+            collapse_evt = event_log.append(
+                tick=tick,
+                location=s_id,
+                event_type=EventType.SETTLEMENT_COLLAPSE,
+                participants={"settlement": s_id},
+                causes=collapse_causes,
+                intent=Intent.ACCIDENTAL,
+                scale=Scale.AGGREGATE,
+                payload={
+                    "description": f"{s.name} collapsed as population dwindled to {len(survivors)} citizens under sustained pressure.",
+                    "settlement_id": s_id,
+                    "remaining_population": len(survivors),
+                    "trigger_cause_id": collapse_causes[0],
+                },
+            )
+
+            if viable_destinations:
+                def dest_score(dest: Settlement) -> float:
+                    dist = ((s.x - dest.x) ** 2 + (s.y - dest.y) ** 2) ** 0.5
+                    avg_trust = 0.0
+                    cnt = 0
+                    dest_members = [c for c in characters.values() if c.alive and c.settlement_id == dest.id]
+                    for surv in survivors:
+                        for dm in dest_members[:5]:
+                            avg_trust += get_relationship(surv.id, dm.id).trust
+                            cnt += 1
+                    trust_val = (avg_trust / cnt) if cnt > 0 else 0.0
+                    return -dist + trust_val * 2.0
+
+                viable_destinations.sort(key=dest_score, reverse=True)
+                dest_s = viable_destinations[0]
+
+                migrant_ids = [c.id for c in survivors]
+                event_log.append(
+                    tick=tick,
+                    location=s_id,
+                    event_type=EventType.MIGRATION,
+                    participants={"source": s_id, "destination": dest_s.id},
+                    causes=[collapse_evt.id],
+                    intent=Intent.INTENTIONAL,
+                    scale=Scale.AGGREGATE,
+                    payload={
+                        "description": f"Survivors of {s.name} ({len(survivors)} citizens) migrated to {dest_s.name} following settlement collapse #{collapse_evt.id}.",
+                        "source_settlement_id": s_id,
+                        "destination_settlement_id": dest_s.id,
+                        "migrants": migrant_ids,
+                    },
+                )
+
+                # Move survivors while preserving beliefs, memories, and kinship
+                for c in survivors:
+                    if c.id in s.member_ids:
+                        s.member_ids.remove(c.id)
+                    c.settlement_id = dest_s.id
+                    dest_s.member_ids.append(c.id)
+
+                dest_s.food += s.food
+                dest_s.wealth += s.wealth
+                s.food = 0
+                s.wealth = 0
+                s.leader_id = None
+
+                for r_key, route in list(trade_routes.items()):
+                    if s_id in r_key and route.active:
+                        route.active = False
+                        active_trade_route_events.pop(r_key, None)

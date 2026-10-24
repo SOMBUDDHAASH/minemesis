@@ -25,6 +25,25 @@ class GrammarRule:
     validator: Callable[[Sequence[EventType]], tuple[bool, str]] | None = None
 
 
+def _validate_death(cause_types: Sequence[EventType]) -> tuple[bool, str]:
+    if EventType.DEATH in cause_types:
+        if EventType.FEUD not in cause_types:
+            return False, "Death can only cite another Death if it also cites a Feud (revenge killing)."
+    return True, ""
+
+
+def _validate_settlement_collapse(cause_types: Sequence[EventType]) -> tuple[bool, str]:
+    if not any(t in (EventType.RAID, EventType.FAMINE, EventType.FEUD, EventType.DEATH, EventType.SUCCESSION_CRISIS) for t in cause_types):
+        return False, "SettlementCollapse must cite at least one of Raid, Famine, Feud, Death, or SuccessionCrisis."
+    return True, ""
+
+
+def _validate_migration(cause_types: Sequence[EventType]) -> tuple[bool, str]:
+    if not any(t in (EventType.SETTLEMENT_COLLAPSE, EventType.FAMINE, EventType.RAID) for t in cause_types):
+        return False, "Migration must cite at least one of SettlementCollapse, Famine, or Raid."
+    return True, ""
+
+
 def _validate_feud(cause_types: Sequence[EventType]) -> tuple[bool, str]:
     if not any(t in (EventType.DEATH, EventType.RAID) for t in cause_types):
         return False, "Feud must cite at least one Death or Raid as the inciting offence."
@@ -81,7 +100,9 @@ CAUSE_GRAMMAR: Mapping[EventType, GrammarRule] = {
             EventType.FAMINE,
             EventType.FEUD,
             EventType.DEATH,
+            EventType.SUCCESSION_CRISIS,
         }),
+        validator=_validate_death,
     ),
     EventType.FEUD: GrammarRule(
         root_allowed=False,
@@ -139,6 +160,26 @@ CAUSE_GRAMMAR: Mapping[EventType, GrammarRule] = {
         root_allowed=False,
         allowed_cause_types=frozenset({EventType.DEATH}),
         validator=_validate_succession_crisis,
+    ),
+    EventType.SETTLEMENT_COLLAPSE: GrammarRule(
+        root_allowed=False,
+        allowed_cause_types=frozenset({
+            EventType.RAID,
+            EventType.FAMINE,
+            EventType.FEUD,
+            EventType.DEATH,
+            EventType.SUCCESSION_CRISIS,
+        }),
+        validator=_validate_settlement_collapse,
+    ),
+    EventType.MIGRATION: GrammarRule(
+        root_allowed=False,
+        allowed_cause_types=frozenset({
+            EventType.SETTLEMENT_COLLAPSE,
+            EventType.FAMINE,
+            EventType.RAID,
+        }),
+        validator=_validate_migration,
     ),
 }
 

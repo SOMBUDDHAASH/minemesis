@@ -48,6 +48,66 @@ def get_distinct_event_types_on_path(event_log: EventLog, path: Sequence[int]) -
     return {event_log.get(e_id).type for e_id in path}
 
 
+CONFLICT_EVENT_TYPES = frozenset({
+    EventType.DEATH,
+    EventType.FEUD,
+    EventType.RAID,
+    EventType.FAMINE,
+    EventType.SUCCESSION_CRISIS,
+    EventType.PEACE,
+    EventType.REVELATION,
+})
+
+
+def get_longest_conflict_path(event_log: EventLog, event_id: int) -> list[int]:
+    """
+    Returns the list of Event IDs along the longest conflict causal path ending at event_id.
+    Edges and nodes are strictly restricted to CONFLICT_EVENT_TYPES:
+    Death, Feud, Raid, Famine, SuccessionCrisis, Peace, Revelation.
+    """
+    evt = event_log.get(event_id)
+    if evt.type not in CONFLICT_EVENT_TYPES:
+        return []
+
+    valid_causes = [c_id for c_id in evt.causes if event_log.get(c_id).type in CONFLICT_EVENT_TYPES]
+    if not valid_causes:
+        return [event_id]
+
+    longest_ancestor: list[int] = []
+    for c_id in valid_causes:
+        ancestor_path = get_longest_conflict_path(event_log, c_id)
+        if len(ancestor_path) > len(longest_ancestor):
+            longest_ancestor = ancestor_path
+
+    return longest_ancestor + [event_id]
+
+
+def get_deepest_conflict_chain_metrics(event_log: EventLog) -> tuple[int, int, int]:
+    """
+    Scans the entire event log and returns:
+    (event_id_with_deepest_conflict_path, conflict_path_depth, distinct_conflict_types_count)
+    Depth is defined as the number of conflict edges (len(path) - 1).
+    """
+    best_id = -1
+    best_depth = -1
+    best_types_count = 0
+
+    for evt in event_log.all_events():
+        if evt.type not in CONFLICT_EVENT_TYPES:
+            continue
+        path = get_longest_conflict_path(event_log, evt.id)
+        if not path:
+            continue
+        depth = len(path) - 1
+        distinct_types = len(get_distinct_event_types_on_path(event_log, path))
+        if depth > best_depth or (depth == best_depth and distinct_types > best_types_count):
+            best_id = evt.id
+            best_depth = depth
+            best_types_count = distinct_types
+
+    return best_id, max(0, best_depth), best_types_count
+
+
 def get_deepest_causal_chain_metrics(event_log: EventLog) -> tuple[int, int, int]:
     """
     Scans the entire event log and returns:

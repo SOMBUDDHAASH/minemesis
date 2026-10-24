@@ -24,6 +24,8 @@ class EventType(str, Enum):
     TRADE_ROUTE_BROKEN = "TradeRouteBroken"
     CHIEF_CHANGED = "ChiefChanged"
     SUCCESSION_CRISIS = "SuccessionCrisis"
+    SETTLEMENT_COLLAPSE = "SettlementCollapse"
+    MIGRATION = "Migration"
 
     # Alias for backwards compatibility
     FEUD_BEGINS = "Feud"

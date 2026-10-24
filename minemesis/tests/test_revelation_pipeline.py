@@ -157,3 +157,24 @@ def test_negative_control_rejected_correction_leaves_hatred_intact() -> None:
         superseded_memory_ids=superseded_memory_ids,
     )
     assert rel_still.hatred >= 80.0, f"Hatred must persist when correction is rejected, got {rel_still.hatred}"
+
+
+def test_revelation_pipeline_across_5_seeds() -> None:
+    """
+    Behavioural test across 5 seeds: Verifies that Revelation events occur with genuine witness paths.
+    """
+    from minemesis.systems.simulation import Simulation
+    test_seeds = [42, 101, 200, 777, 2026]
+    total_revelations = 0
+
+    for s in test_seeds:
+        sim = Simulation(seed=s)
+        sim.run_years(100)
+        revs = [e for e in sim.event_log.all_events() if e.type == EventType.REVELATION]
+        total_revelations += len(revs)
+        for r in revs:
+            assert "witness" in r.participants_dict, "Revelation must cite eyewitness"
+            assert "recipient" in r.participants_dict, "Revelation must cite recipient"
+            assert len(r.causes) >= 1, "Revelation must cite cause death"
+
+    assert total_revelations >= 1, f"Expected revelations across 5 seeds, got {total_revelations}"

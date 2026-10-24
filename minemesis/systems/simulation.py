@@ -46,6 +46,7 @@ class Simulation:
 
         self.active_feuds: list[ActiveFeud] = []
         self.marriage_events: dict[tuple[str, str], int] = {}
+        self.collapsed_settlements: set[str] = set()
         
         # Monotonic counters
         self.char_counter = [len(self.characters)]
@@ -174,6 +175,7 @@ class Simulation:
             trade_routes=self.trade_routes,
             active_trade_route_events=self.active_trade_route_events,
             last_raid_ticks=self.last_raid_ticks,
+            collapsed_settlements=self.collapsed_settlements,
             beliefs_by_character=self.beliefs_by_character,
             memories=self.memories,
             superseded_memory_ids=self.superseded_memory_ids,
