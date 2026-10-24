@@ -212,6 +212,43 @@ Diff of implemented `CAUSE_GRAMMAR` against brief Table 4.1:
     ```
   - *Rationale*: Routine annual celebrations were demoted from log-flooding events (which constituted 38% of all events) to persistent cultural state updates. Only first celebrations and post-dormancy resumptions are logged as events, bringing `LocalCustomCelebrated` volume from ~1,200 events to ~12 events per run.
 
+### Step 6. 100-Seed Validation Pass (50 Training + 50 Hold-out C)
+- **Validation Dataset**:
+  - 50 Training Seeds: `0` through `49`.
+  - 50 Hold-out C Seeds: `3000` through `3049` (single-use blind evaluation cohort).
+- **Core Metric Results**:
+  - **Demographic Reconciliation**: **100/100 (100.0%)** PASS. Across all 100 seeds, `final_living == initial_living + births - deaths` holds with 0 discrepancies.
+  - **World Survival Rate**: **100/100 (100.0%)** PASS (Target $\ge 80\%$). Zero world extinctions across all 100 seeds.
+  - **Birth Stalls ($\ge 10$ consecutive years without births)**: **0/100 (0.0%)** PASS. The widow/widower remarriage fix completely resolved demographic stall spirals.
+  - **Conflict Causal Depth**: Min 1, Median 6, Max 14. 99% of runs achieve conflict causal depth $\ge 3$.
+  - **Event Share Distribution**: Demotion of celebration and conversion spam restored balance. `LocalCustomCelebrated` is 1.21–1.24% (down from 38%), and `Conversion` is 6.74–7.00% (down from 41%). Births constitute 22.03–22.97%, and Books constitute 17.40–17.65%.
+- **Benchmark Run Artifacts**:
+  - Exported complete readable histories for Hold-out C runs: Highest (Seed 3036, Depth 12), Median (Seed 3026, Depth 6), and Lowest (Seed 3013, Depth 1).
+  - Exported Mermaid causal DAG for Seed 3036 (`reports/m052_causal_dag_highest.mmd`).
+
+### Step 7. Story Viewer and Standing Rule
+- **Standing Rule Enacted**:
+  - At the end of every milestone from now on, the standalone Story Viewer must be rebuilt, release notes generated with a 5-line plain-English summary and 3 things to look for, and the compiled `.exe` self-test must pass.
+- **Architectural Boundary Enforcement**:
+  - `viewer/` is an independent, read-only presentation layer.
+  - `minemesis` NEVER imports `viewer` (validated by AST parsing test `test_minemesis_package_never_imports_viewer` with negative control).
+  - `viewer` draws zero RNG numbers from the simulation, preserving 100% byte-identical determinism.
+- **Story Viewer Features Delivered (8 Tabs)**:
+  1. *Story Tab*: Chronological prose grouped by year, color-coded badges, clickable `"↳ because: ..."` antecedent clauses, filter toggles (hide routine demographics, tally conflicts, settlement/type dropdowns, search, jump to year, raw event mode).
+  2. *Why Tab*: Causal DAG inspection back to unprovoked root causes and forward to downstream consequences.
+  3. *Threads Tab*: Automatically extracted conflict storylines ($\ge 3$ events) with titles and chronological episode breakdowns.
+  4. *People Tab*: Character roster, biographical profile, family tree, and prominent **Truth vs. Belief Audit** comparing perceived intentions against ground truth reality.
+  5. *World Tab*: Settlement demographics, dynamic population canvas chart over 100 years, crisis logs, and event share audit table.
+  6. *Books Tab*: Library browser and Minecraft-style manuscript page reader with historiographical perspective disclosure.
+  7. *Religion Tab*: Theological doctrines, holy sites, schisms, and religious evolution events.
+  8. *Changes Tab*: Release notes, 5-line summary, and standing rule compliance.
+- **Compilation & Packaging**:
+  - Executable compiled via PyInstaller: `releases/MinemesisViewer-m0.5.2.exe` and `releases/MinemesisViewer-latest.exe`.
+  - Folder distribution: `releases/MinemesisViewer-m0.5.2-folder.zip`.
+  - Showcase runs pre-generated for seeds `[42, 2029, 2030, 2043, 2011]` into `releases/m0.5.2/`.
+  - CLI flags `--version` and `--selftest` verified directly on compiled `.exe`.
+
+
 
 
 

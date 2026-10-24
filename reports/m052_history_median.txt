@@ -1,0 +1,1424 @@
+======================================================================
+  MINEMESIS CHRONICLE - MEDIAN CAUSAL DEPTH (SEED 3026, DEPTH 6)
+======================================================================
+
+--- YEAR 01 ---
+  * Gareth Rivers and Sylvia Crowley were wed in Oakhaven.
+  * Caleb Rivers was born to Tobias Rivers and Astrid Rivers in Oakhaven.
+  * Cedric Blackwood was born to Silas Blackwood and Brenna Blackwood in Riverbend.
+  * A bilateral commercial and diplomatic trade route was opened between Unknown Settlement and Unknown Settlement.
+  * A bilateral commercial and diplomatic trade route was opened between Unknown Settlement and Unknown Settlement.
+  * Arthur Ironwood penned 'The Book of Way of the Sovereign Peak', a ReligiousText preserved in the archives of Ironpeak.
+  * Lyra Ironwood penned 'The Chronicles of the Immortals', a ReligiousText preserved in the archives of Ironpeak.
+  * The people of Ironpeak celebrated the seasonal custom of 'Ironpeak Spring River Immersion'.
+  * The people of Oakhaven celebrated the seasonal custom of 'Oakhaven Spring River Immersion'.
+  * The people of Riverbend celebrated the seasonal custom of 'Riverbend Spring River Immersion'.
+  * Silas Stone and Kaelen Blackwood were wed in Riverbend.
+  * Eldrin Stone and Thalia Blackwood were wed in Riverbend.
+  * The people of Ironpeak celebrated the seasonal custom of 'Ironpeak Midsummer Harvest Festival'.
+  * The people of Oakhaven celebrated the seasonal custom of 'Oakhaven Midsummer Harvest Festival'.
+  * The people of Riverbend celebrated the seasonal custom of 'Riverbend Midsummer Harvest Festival'.
+  * Briony Blackwood was born to Silas Blackwood and Brenna Blackwood in Riverbend.
+  * Rowan Ironwood and Freya Ashford were wed in Ironpeak.
+  * Eldrin Stone completed a holy pilgrimage across the land to worship at 'Undying Peak Sanctuary'.
+  * Rowan Ironwood penned 'The Personal Journal of Rowan Ironwood', a PersonalJournal preserved in the archives of Ironpeak.
+      [because: Rowan Ironwood and Freya Ashford were wed in Ironpeak (Year 1, #16)]
+  * Aldous Stone was born to Eldrin Stone and Thalia Blackwood in Riverbend.
+      [because: Eldrin Stone and Thalia Blackwood were wed in Riverbend (Year 1, #11)]
+  * The people of Ironpeak celebrated the seasonal custom of 'Ironpeak Autumn Ancestor Vigil'.
+  * The people of Oakhaven celebrated the seasonal custom of 'Oakhaven Autumn Ancestor Vigil'.
+  * The people of Riverbend celebrated the seasonal custom of 'Riverbend Autumn Ancestor Vigil'.
+  * Kaelen Rivers was born to Tobias Rivers and Astrid Rivers in Oakhaven.
+  * The people of Ironpeak celebrated the seasonal custom of 'Ironpeak Winter Hero Remembrance Day'.
+  * The people of Oakhaven celebrated the seasonal custom of 'Oakhaven Winter Hero Remembrance Day'.
+  * The people of Riverbend celebrated the seasonal custom of 'Riverbend Winter Hero Remembrance Day'.
+  * the church absorbed the holy trait of 'sacred virtue' through contact with neighboring tradition.
+
+--- YEAR 02 ---
+  * Rowan Ironwood and Morwen Ashford were wed in Ironpeak.
+  * the church absorbed the holy trait of 'sacred virtue' through contact with neighboring tradition.
+
+--- YEAR 03 ---
+  * Aldous Rivers was born to Gareth Rivers and Sylvia Crowley in Oakhaven.
+      [because: Gareth Rivers and Sylvia Crowley were wed in Oakhaven (Year 1, #0)]
+  * Silas Stone died in a forestry accident with Rowan Ironwood at Riverbend.
+  * Caleb Ashford converted from rel_1 to rel_2 in Ironpeak (Marriage).
+  * Bram Rivers and Kaelen Blackwood were wed in Oakhaven, with Kaelen Blackwood relocating to Oakhaven.
+  * A bitter blood feud was declared by Eldrin Stone against Rowan Ironwood in Riverbend.
+      [because: Silas Stone died in a forestry accident with Rowan Ironwood at Riverbend (Year 3, #31)]
+  * Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties.
+      [because: A bitter blood feud was declared by Eldrin Stone against Rowan Ironwood in Riverbend (Year 3, #34)]
+  * Eldrin Stone penned 'Council Record of Feud at set_riverbend', a LegalRecord preserved in the archives of Riverbend.
+      [because: A bitter blood feud was declared by Eldrin Stone against Rowan Ironwood in Riverbend (Year 3, #34)]
+  * The municipal archive in Ironpeak was desecrated during a raid, destroying or damaging 3 manuscripts.
+      [because: Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties (Year 3, #35)]
+  * The trade corridor between Unknown Settlement and Unknown Settlement was severed due to conflict.
+      [because: A bitter blood feud was declared by Eldrin Stone against Rowan Ironwood in Riverbend (Year 3, #34)]
+
+--- YEAR 04 ---
+  * Arthur Ironwood was born to Rowan Ironwood and Morwen Ashford in Ironpeak.
+      [because: Rowan Ironwood and Morwen Ashford were wed in Ironpeak (Year 2, #28)]
+  * Arthur Ironwood completed a holy pilgrimage across the land to worship at 'Sovereign Peak Sanctuary'.
+  * Caleb Ashford died in a forestry accident with Kaelen Stone at Ironpeak.
+  * The holy sanctuary of 'The Grand Temple of Pure Spirit' was founded and consecrated to Way of the Sovereign Peak in Oakhaven.
+  * Eldrin Stone penned 'The Life and Deeds of Kaelen Stone', a Biography preserved in the archives of Riverbend.
+      [because: Caleb Ashford died in a forestry accident with Kaelen Stone at Ironpeak (Year 4, #41)]
+  * Kaelen Stone penned 'The Personal Journal of Kaelen Stone', a PersonalJournal preserved in the archives of Riverbend.
+      [because: Caleb Ashford died in a forestry accident with Kaelen Stone at Ironpeak (Year 4, #41)]
+  * A bilateral commercial and diplomatic trade route was opened between Unknown Settlement and Unknown Settlement.
+
+--- YEAR 05 ---
+  * Astrid Stone was born to Eldrin Stone and Thalia Blackwood in Riverbend.
+      [because: Eldrin Stone and Thalia Blackwood were wed in Riverbend (Year 1, #11)]
+  * Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties.
+      [because: A bitter blood feud was declared by Eldrin Stone against Rowan Ironwood in Riverbend (Year 3, #34)]
+  * The municipal archive in Ironpeak was desecrated during a raid, destroying or damaging 1 manuscripts.
+      [because: Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties (Year 5, #47)]
+  * Rowan Ironwood was slain in revenge by Eldrin Stone in Ironpeak.
+      [because: Silas Stone died in a forestry accident with Rowan Ironwood at Riverbend (Year 3, #31); and A bitter blood feud was declared by Eldrin Stone against Rowan Ironwood in Riverbend (Year 3, #34)]
+
+--- YEAR 06 ---
+  * Briony Crowley was born to Cedric Crowley and Isolde Crowley in Oakhaven.
+  * The ancient tradition of 'indigenous folk spirit' was officially canonized into Way of the Sovereign Peak in Ironpeak.
+
+--- YEAR 07 ---
+  * Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties.
+      [because: A bitter blood feud was declared by Eldrin Stone against Rowan Ironwood in Riverbend (Year 3, #34)]
+  * Lyra Ironwood was slain defending Ironpeak during a border raid.
+      [because: Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties (Year 7, #52)]
+  * The municipal archive in Ironpeak was desecrated during a raid, destroying or damaging 1 manuscripts.
+      [because: Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties (Year 7, #52)]
+  * Arthur Ironwood and Freya Ashford were wed in Ironpeak.
+  * Gideon Ashford and Morwen Stone were wed in Ironpeak, with Morwen Stone relocating to Ironpeak.
+  * Silas Ashford was born to Gideon Ashford and Morwen Stone in Ironpeak.
+      [because: Gideon Ashford and Morwen Stone were wed in Ironpeak, with Morwen Stone relocating to Ironpeak (Year 7, #56)]
+  * Gideon Stone was born to Eldrin Stone and Thalia Blackwood in Riverbend.
+      [because: Eldrin Stone and Thalia Blackwood were wed in Riverbend (Year 1, #11)]
+  * Caleb Rivers was born to Gareth Rivers and Sylvia Crowley in Oakhaven.
+      [because: Gareth Rivers and Sylvia Crowley were wed in Oakhaven (Year 1, #0)]
+
+--- YEAR 08 ---
+  * Corin Blackwood converted from rel_2 to rel_1 in Riverbend (TradeRoute).
+  * Lyra Rivers was born to Gareth Rivers and Sylvia Crowley in Oakhaven.
+      [because: Gareth Rivers and Sylvia Crowley were wed in Oakhaven (Year 1, #0)]
+  * Unknown Person emerged as a venerated Mystic of the faith in Oakhaven.
+  * The ancient tradition of 'indigenous folk spirit' was officially canonized into Way of the Sovereign Peak in Ironpeak.
+  * Aldous Crowley and Briony Rivers were wed in Oakhaven.
+
+--- YEAR 09 ---
+  * Rowan Crowley was born to Aldous Crowley and Briony Rivers in Oakhaven.
+      [because: Aldous Crowley and Briony Rivers were wed in Oakhaven (Year 8, #64)]
+  * The ancient tradition of 'indigenous folk spirit' was officially canonized into Way of the Sovereign Peak in Oakhaven.
+  * Corin Blackwood and Sylvia Crowley were wed in Riverbend, with Sylvia Crowley relocating to Riverbend.
+  * Bram Blackwood was born to Corin Blackwood and Sylvia Crowley in Riverbend.
+      [because: Corin Blackwood and Sylvia Crowley were wed in Riverbend, with Sylvia Crowley relocating to Riverbend (Year 9, #67)]
+  * Eleni Ironwood died in a forestry accident with Eldrin Stone at Ironpeak.
+  * Kaelen Stone penned 'The Personal Journal of Kaelen Stone', a PersonalJournal preserved in the archives of Riverbend.
+      [because: Eleni Ironwood died in a forestry accident with Eldrin Stone at Ironpeak (Year 9, #69)]
+
+--- YEAR 10 ---
+  * The holy sanctuary of 'The Grand Temple of Dawn' was founded and consecrated to Way of the Undying Peak in Oakhaven.
+
+--- YEAR 11 ---
+  * Arthur Ironwood penned 'The Great Chronicle of Ironpeak', a HistoricalChronicle preserved in the archives of Ironpeak.
+      [because: A bilateral commercial and diplomatic trade route was opened between Unknown Settlement and Unknown Settlement (Year 1, #3); and A bilateral commercial and diplomatic trade route was opened between Unknown Settlement and Unknown Settlement (Year 1, #4)]
+  * Eldrin Stone penned 'The Great Chronicle of Riverbend', a HistoricalChronicle preserved in the archives of Riverbend.
+      [because: Cedric Blackwood was born to Silas Blackwood and Brenna Blackwood in Riverbend (Year 1, #2); and The people of Riverbend celebrated the seasonal custom of 'Riverbend Spring River Immersion' (Year 1, #9); and Silas Stone and Kaelen Blackwood were wed in Riverbend (Year 1, #10)]
+  * Cedric Crowley penned 'Chronicle of House Crowley', a FamilyHistory preserved in the archives of Oakhaven.
+      [because: Gareth Rivers and Sylvia Crowley were wed in Oakhaven (Year 1, #0); and Aldous Rivers was born to Gareth Rivers and Sylvia Crowley in Oakhaven (Year 3, #30); and Briony Crowley was born to Cedric Crowley and Isolde Crowley in Oakhaven (Year 6, #50)]
+  * Arthur Ironwood penned 'Chronicle of House Ironwood', a FamilyHistory preserved in the archives of Ironpeak.
+      [because: Rowan Ironwood and Morwen Ashford were wed in Ironpeak (Year 2, #28); and Arthur Ironwood was born to Rowan Ironwood and Morwen Ashford in Ironpeak (Year 4, #39)]
+  * Silas Ashford was born to Gideon Ashford and Morwen Stone in Ironpeak.
+      [because: Gideon Ashford and Morwen Stone were wed in Ironpeak, with Morwen Stone relocating to Ironpeak (Year 7, #56)]
+  * Aldous Crowley was born to Aldous Crowley and Briony Rivers in Oakhaven.
+      [because: Aldous Crowley and Briony Rivers were wed in Oakhaven (Year 8, #64)]
+  * Theron Blackwood was born to Corin Blackwood and Sylvia Crowley in Riverbend.
+      [because: Corin Blackwood and Sylvia Crowley were wed in Riverbend, with Sylvia Crowley relocating to Riverbend (Year 9, #67)]
+  * Sari Stone was born to Eldrin Stone and Thalia Blackwood in Riverbend.
+      [because: Eldrin Stone and Thalia Blackwood were wed in Riverbend (Year 1, #11)]
+  * Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties.
+      [because: A bitter blood feud was declared by Eldrin Stone against Rowan Ironwood in Riverbend (Year 3, #34)]
+  * The municipal archive in Ironpeak was desecrated during a raid, destroying or damaging 3 manuscripts.
+      [because: Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties (Year 11, #80)]
+
+--- YEAR 12 ---
+  * Theron Blackwood completed a holy pilgrimage across the land to worship at 'The Grand Temple of Pure Spirit'.
+  * Caleb Ironwood was born to Rowan Ironwood and Morwen Ashford in Ironpeak.
+      [because: Rowan Ironwood and Morwen Ashford were wed in Ironpeak (Year 2, #28)]
+  * Theron Blackwood completed a holy pilgrimage across the land to worship at 'Sovereign Peak Sanctuary'.
+  * Caleb Ironwood completed a holy pilgrimage across the land to worship at 'The Grand Temple of Pure Spirit'.
+  * The ancient tradition of 'indigenous folk spirit' was officially canonized into Way of the Sovereign Peak in Oakhaven.
+
+--- YEAR 13 ---
+  * Thalia Ashford was born to Gideon Ashford and Morwen Stone in Ironpeak.
+      [because: Gideon Ashford and Morwen Stone were wed in Ironpeak, with Morwen Stone relocating to Ironpeak (Year 7, #56)]
+  * Theron Blackwood completed a holy pilgrimage across the land to worship at 'Sovereign Peak Sanctuary'.
+  * Kaelen Stone died in a forestry accident with Freya Ashford at Riverbend.
+  * Arthur Ironwood penned 'The Personal Journal of Arthur Ironwood', a PersonalJournal preserved in the archives of Ironpeak.
+      [because: Kaelen Stone died in a forestry accident with Freya Ashford at Riverbend (Year 13, #89)]
+  * The ancient tradition of 'indigenous folk spirit' was officially canonized into Way of the Sovereign Peak in Riverbend.
+  * Theron Blackwood emerged as a venerated Prophet of the faith in Riverbend.
+
+--- YEAR 14 ---
+  * Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties.
+      [because: A bitter blood feud was declared by Eldrin Stone against Rowan Ironwood in Riverbend (Year 3, #34)]
+  * Gareth Stone and Maeve Ashford were wed in Riverbend, with Maeve Ashford relocating to Riverbend.
+  * A peace treaty was ratified between Eldrin Stone and Arthur Ironwood in Riverbend, bringing an end to hostilities.
+      [because: A bitter blood feud was declared by Eldrin Stone against Rowan Ironwood in Riverbend (Year 3, #34); and Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties (Year 14, #93)]
+  * Eldrin Stone penned 'The Treaty and Concord of set_riverbend', a LegalRecord preserved in the archives of Riverbend.
+      [because: A peace treaty was ratified between Eldrin Stone and Arthur Ironwood in Riverbend, bringing an end to hostilities (Year 14, #95)]
+  * A bitter blood feud was declared by Morwen Stone against Eldrin Stone in Ironpeak.
+      [because: Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties (Year 3, #35)]
+  * Arthur Ironwood penned 'Council Record of Feud at set_ironpeak', a LegalRecord preserved in the archives of Ironpeak.
+      [because: A bitter blood feud was declared by Morwen Stone against Eldrin Stone in Ironpeak (Year 14, #97)]
+
+--- YEAR 15 ---
+  * The ancient tradition of 'indigenous folk spirit' was officially canonized into Way of the Sovereign Peak in Riverbend.
+  * Silas Ashford was born to Gideon Ashford and Morwen Stone in Ironpeak.
+      [because: Gideon Ashford and Morwen Stone were wed in Ironpeak, with Morwen Stone relocating to Ironpeak (Year 7, #56)]
+  * Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties.
+      [because: A bitter blood feud was declared by Morwen Stone against Eldrin Stone in Ironpeak (Year 14, #97)]
+  * The municipal archive in Riverbend was desecrated during a raid, destroying or damaging 1 manuscripts.
+      [because: Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties (Year 15, #101)]
+
+--- YEAR 16 ---
+  * Eldrin Rivers was born to Bram Rivers and Kaelen Blackwood in Oakhaven.
+      [because: Bram Rivers and Kaelen Blackwood were wed in Oakhaven, with Kaelen Blackwood relocating to Oakhaven (Year 3, #33)]
+  * the council declared the doctrines of the dissenters to be anathema and heresy.
+  * A theological schism split Way of the Undying Peak, establishing the reformed sect as an independent faith in Ironpeak.
+  * Theron Blackwood completed a holy pilgrimage across the land to worship at 'Sovereign Peak Sanctuary'.
+
+--- YEAR 17 ---
+  * Silas Ashford completed a holy pilgrimage across the land to worship at 'The Grand Temple of Dawn'.
+  * Silas Blackwood passed away peacefully of old age in Riverbend.
+  * Eldrin Stone penned 'The Life and Deeds of Silas Blackwood', a Biography preserved in the archives of Riverbend.
+      [because: Silas Blackwood passed away peacefully of old age in Riverbend (Year 17, #108)]
+
+--- YEAR 18 ---
+  * Theron Blackwood completed a holy pilgrimage across the land to worship at 'The Grand Temple of Pure Spirit'.
+  * 'Sovereign Peak Sanctuary' in Oakhaven was elevated to the rank of LocalShrine due to influx of devout pilgrims.
+  * Theron Blackwood completed a holy pilgrimage across the land to worship at 'Sovereign Peak Sanctuary'.
+  * Theron Blackwood was born to Corin Blackwood and Sylvia Crowley in Riverbend.
+      [because: Corin Blackwood and Sylvia Crowley were wed in Riverbend, with Sylvia Crowley relocating to Riverbend (Year 9, #67)]
+
+--- YEAR 19 ---
+  * Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties.
+      [because: A bitter blood feud was declared by Morwen Stone against Eldrin Stone in Ironpeak (Year 14, #97)]
+  * The municipal archive in Riverbend was desecrated during a raid, destroying or damaging 1 manuscripts.
+      [because: Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties (Year 19, #114)]
+  * Gareth Stone passed away peacefully of old age in Riverbend.
+  * Eldrin Stone assumed leadership as Chief of Riverbend.
+      [because: Gareth Stone passed away peacefully of old age in Riverbend (Year 19, #116)]
+  * Eldrin Stone penned 'The Life and Deeds of Gareth Stone', a Biography preserved in the archives of Riverbend.
+      [because: Gareth Stone passed away peacefully of old age in Riverbend (Year 19, #116)]
+  * Eldrin Stone penned 'The Personal Journal of Eldrin Stone', a PersonalJournal preserved in the archives of Riverbend.
+      [because: Gareth Stone passed away peacefully of old age in Riverbend (Year 19, #116)]
+  * Caleb Rivers and Brenna Blackwood were wed in Oakhaven, with Brenna Blackwood relocating to Oakhaven.
+
+--- YEAR 20 ---
+  * Aldous Stone and Maeve Ashford were wed in Riverbend.
+  * Gareth Rivers died in a forestry accident with Morwen Ashford at Oakhaven.
+
+--- YEAR 21 ---
+  * Arthur Ironwood penned 'The Great Chronicle of Ironpeak', a HistoricalChronicle preserved in the archives of Ironpeak.
+      [because: Silas Ashford was born to Gideon Ashford and Morwen Stone in Ironpeak (Year 11, #76)]
+  * Arthur Ironwood penned 'Folklore and Traditions of Ironpeak', a LocalFolklore preserved in the archives of Ironpeak.
+  * Eldrin Stone penned 'The Great Chronicle of Riverbend', a HistoricalChronicle preserved in the archives of Riverbend.
+      [because: Theron Blackwood was born to Corin Blackwood and Sylvia Crowley in Riverbend (Year 11, #78); and Sari Stone was born to Eldrin Stone and Thalia Blackwood in Riverbend (Year 11, #79)]
+  * Cedric Crowley penned 'Chronicle of House Crowley', a FamilyHistory preserved in the archives of Oakhaven.
+      [because: Gareth Rivers and Sylvia Crowley were wed in Oakhaven (Year 1, #0); and Aldous Rivers was born to Gareth Rivers and Sylvia Crowley in Oakhaven (Year 3, #30); and Briony Crowley was born to Cedric Crowley and Isolde Crowley in Oakhaven (Year 6, #50)]
+  * Arthur Ironwood penned 'Chronicle of House Ironwood', a FamilyHistory preserved in the archives of Ironpeak.
+      [because: Rowan Ironwood and Morwen Ashford were wed in Ironpeak (Year 2, #28); and Arthur Ironwood was born to Rowan Ironwood and Morwen Ashford in Ironpeak (Year 4, #39)]
+  * Eldrin Stone penned 'Chronicle of House Stone', a FamilyHistory preserved in the archives of Riverbend.
+      [because: Eldrin Stone and Thalia Blackwood were wed in Riverbend (Year 1, #11); and Aldous Stone was born to Eldrin Stone and Thalia Blackwood in Riverbend (Year 1, #19); and A bitter blood feud was declared by Eldrin Stone against Rowan Ironwood in Riverbend (Year 3, #34)]
+  * Corin Blackwood died in a forestry accident with Kaelen Rivers at Riverbend.
+  * Cedric Blackwood and Kaelen Rivers were wed in Riverbend, with Kaelen Rivers relocating to Riverbend.
+  * Cedric Blackwood penned 'The Personal Journal of Cedric Blackwood', a PersonalJournal preserved in the archives of Riverbend.
+      [because: Cedric Blackwood and Kaelen Rivers were wed in Riverbend, with Kaelen Rivers relocating to Riverbend (Year 21, #130)]
+  * Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties.
+      [because: A bitter blood feud was declared by Morwen Stone against Eldrin Stone in Ironpeak (Year 14, #97)]
+  * Morwen Ashford converted from rel_1 to rel_sect_3 in Ironpeak (Missionary).
+  * The municipal archive in Riverbend was desecrated during a raid, destroying or damaging 5 manuscripts.
+      [because: Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties (Year 21, #132)]
+  * Brenna Blackwood passed away peacefully of old age in Oakhaven.
+  * Caleb Rivers and Sylvia Crowley were wed in Oakhaven.
+
+--- YEAR 22 ---
+  * Maeve Ironwood was born to Rowan Ironwood and Morwen Ashford in Ironpeak.
+      [because: Rowan Ironwood and Morwen Ashford were wed in Ironpeak (Year 2, #28)]
+  * Aldous Stone died in a forestry accident with Arthur Ironwood at Riverbend.
+  * Rowan Ironwood penned 'The Life and Deeds of Arthur Ironwood', a Biography preserved in the archives of Ironpeak.
+      [because: Aldous Stone died in a forestry accident with Arthur Ironwood at Riverbend (Year 22, #138)]
+
+--- YEAR 23 ---
+  * Aldous Rivers and Maeve Ashford were wed in Oakhaven, with Maeve Ashford relocating to Oakhaven.
+  * Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties.
+      [because: A bitter blood feud was declared by Morwen Stone against Eldrin Stone in Ironpeak (Year 14, #97)]
+  * The municipal archive in Riverbend was desecrated during a raid, destroying or damaging 6 manuscripts.
+      [because: Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties (Year 23, #141)]
+  * Arthur Ironwood and Sylvia Crowley were wed in Ironpeak, with Sylvia Crowley relocating to Ironpeak.
+  * Maeve Ashford passed away peacefully of old age in Oakhaven.
+  * Lyra Ironwood was born to Arthur Ironwood and Freya Ashford in Ironpeak.
+      [because: Arthur Ironwood and Freya Ashford were wed in Ironpeak (Year 7, #55)]
+
+--- YEAR 24 ---
+  * Rowan Ironwood died in a forestry accident with Silas Ashford at Ironpeak.
+  * the council declared the doctrines of the dissenters to be anathema and heresy.
+  * A theological schism split Way of the Sovereign Peak, establishing the reformed sect as an independent faith in Oakhaven.
+  * the council declared the doctrines of the dissenters to be anathema and heresy.
+  * A theological schism split Ascendant Way of the Sovereign Peak, establishing the reformed sect as an independent faith in Oakhaven.
+  * Tobias Rivers passed away peacefully of old age in Oakhaven.
+  * Bram Rivers assumed leadership as Chief of Oakhaven.
+      [because: Tobias Rivers passed away peacefully of old age in Oakhaven (Year 24, #151)]
+  * Cedric Crowley penned 'The Life and Deeds of Tobias Rivers', a Biography preserved in the archives of Oakhaven.
+      [because: Tobias Rivers passed away peacefully of old age in Oakhaven (Year 24, #151)]
+  * Aldous Rivers and Astrid Stone were wed in Oakhaven, with Astrid Stone relocating to Oakhaven.
+  * Isolde Crowley passed away peacefully of old age in Oakhaven.
+  * Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties.
+      [because: A bitter blood feud was declared by Morwen Stone against Eldrin Stone in Ironpeak (Year 14, #97)]
+  * Astrid Stone penned 'The Life and Deeds of Isolde Crowley', a Biography preserved in the archives of Oakhaven.
+      [because: Isolde Crowley passed away peacefully of old age in Oakhaven (Year 24, #155)]
+  * The municipal archive in Riverbend was desecrated during a raid, destroying or damaging 2 manuscripts.
+      [because: Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties (Year 24, #156)]
+  * Caleb Rivers converted from rel_1 to rel_sect_5 in Oakhaven (Missionary).
+
+--- YEAR 25 ---
+  * Caleb Ironwood was born to Arthur Ironwood and Freya Ashford in Ironpeak.
+      [because: Arthur Ironwood and Freya Ashford were wed in Ironpeak (Year 7, #55)]
+  * Cedric Crowley and Astrid Rivers were wed in Oakhaven.
+  * Silas Ashford and Briony Blackwood were wed in Ironpeak, with Briony Blackwood relocating to Ironpeak.
+  * Astrid Ashford was born to Silas Ashford and Briony Blackwood in Ironpeak.
+      [because: Silas Ashford and Briony Blackwood were wed in Ironpeak, with Briony Blackwood relocating to Ironpeak (Year 25, #162)]
+  * Aldous Blackwood was born to Cedric Blackwood and Kaelen Rivers in Riverbend.
+      [because: Cedric Blackwood and Kaelen Rivers were wed in Riverbend, with Kaelen Rivers relocating to Riverbend (Year 21, #130)]
+  * Silas Ashford penned 'The Personal Journal of Silas Ashford', a PersonalJournal preserved in the archives of Ironpeak.
+      [because: Silas Ashford and Briony Blackwood were wed in Ironpeak, with Briony Blackwood relocating to Ironpeak (Year 25, #162)]
+  * Arthur Ironwood passed away peacefully of old age in Ironpeak.
+  * Sylvia Crowley assumed leadership as Chief of Ironpeak.
+      [because: Arthur Ironwood passed away peacefully of old age in Ironpeak (Year 25, #166)]
+
+--- YEAR 26 ---
+  * Thalia Ashford was born to Silas Ashford and Briony Blackwood in Ironpeak.
+      [because: Silas Ashford and Briony Blackwood were wed in Ironpeak, with Briony Blackwood relocating to Ironpeak (Year 25, #162)]
+  * Caleb Rivers and Briony Crowley were wed in Oakhaven.
+  * the council declared the doctrines of the dissenters to be anathema and heresy.
+  * A theological schism split Way of the Sovereign Peak, establishing the reformed sect as an independent faith in Oakhaven.
+  * Tobias Blackwood was born to Cedric Blackwood and Kaelen Rivers in Riverbend.
+      [because: Cedric Blackwood and Kaelen Rivers were wed in Riverbend, with Kaelen Rivers relocating to Riverbend (Year 21, #130)]
+  * Gideon Stone and Freya Ashford were wed in Riverbend, with Freya Ashford relocating to Riverbend.
+  * Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties.
+      [because: A bitter blood feud was declared by Morwen Stone against Eldrin Stone in Ironpeak (Year 14, #97)]
+  * Theron Blackwood converted from rel_1 to rel_sect_5 in Riverbend (TradeRoute).
+  * Astrid Stone converted from rel_1 to rel_sect_6 in Oakhaven (Missionary).
+  * The municipal archive in Riverbend was desecrated during a raid, destroying or damaging 1 manuscripts.
+      [because: Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties (Year 26, #174)]
+
+--- YEAR 27 ---
+  * the church absorbed the holy trait of 'sacred virtue' through contact with neighboring tradition.
+  * Astrid Rivers passed away peacefully of old age in Oakhaven.
+  * Astrid Rivers emerged as a venerated Martyr of the faith in Oakhaven.
+      [because: Astrid Rivers passed away peacefully of old age in Oakhaven (Year 27, #179)]
+  * The heroic legend of Astrid Rivers was recorded into the living mythology of Ascendant Ascendant Way of the Sovereign Peak.
+      [because: Astrid Rivers passed away peacefully of old age in Oakhaven (Year 27, #179)]
+  * Astrid Stone penned 'The Life and Deeds of Astrid Rivers', a Biography preserved in the archives of Oakhaven.
+      [because: Astrid Rivers passed away peacefully of old age in Oakhaven (Year 27, #179)]
+  * Rowan Crowley and Lyra Rivers were wed in Oakhaven.
+  * Sari Stone converted from rel_1 to rel_sect_5 in Riverbend (SaintCultVeneration).
+  * Rowan Crowley penned 'The Personal Journal of Rowan Crowley', a PersonalJournal preserved in the archives of Oakhaven.
+      [because: Rowan Crowley and Lyra Rivers were wed in Oakhaven (Year 27, #183)]
+  * Astrid Stone died in a forestry accident with Briony Crowley at Oakhaven.
+  * Cedric Crowley penned 'The Personal Journal of Cedric Crowley', a PersonalJournal preserved in the archives of Oakhaven.
+      [because: Astrid Stone died in a forestry accident with Briony Crowley at Oakhaven (Year 27, #186)]
+  * Aldous Rivers and Morwen Ashford were wed in Oakhaven, with Morwen Ashford relocating to Oakhaven.
+
+--- YEAR 28 ---
+  * Bram Crowley was born to Rowan Crowley and Lyra Rivers in Oakhaven.
+      [because: Rowan Crowley and Lyra Rivers were wed in Oakhaven (Year 27, #183)]
+  * Kaelen Ashford was born to Silas Ashford and Briony Blackwood in Ironpeak.
+      [because: Silas Ashford and Briony Blackwood were wed in Ironpeak, with Briony Blackwood relocating to Ironpeak (Year 25, #162)]
+  * Kaelen Ashford completed a holy pilgrimage across the land to worship at 'The Grand Temple of Dawn'.
+  * Astrid Crowley was born to Rowan Crowley and Lyra Rivers in Oakhaven.
+      [because: Rowan Crowley and Lyra Rivers were wed in Oakhaven (Year 27, #183)]
+  * Aldous Rivers converted from rel_sect_6 to rel_sect_3 in Oakhaven (Marriage).
+  * Lyra Rivers converted from rel_1 to rel_sect_6 in Oakhaven (Missionary).
+  * Astrid Crowley emerged as a venerated Prophet of the faith in Oakhaven.
+  * the council declared the doctrines of the dissenters to be anathema and heresy.
+  * A theological schism split Revival Way of the Undying Peak, establishing the reformed sect as an independent faith in Ironpeak.
+  * Lyra Blackwood was born to Cedric Blackwood and Kaelen Rivers in Riverbend.
+      [because: Cedric Blackwood and Kaelen Rivers were wed in Riverbend, with Kaelen Rivers relocating to Riverbend (Year 21, #130)]
+
+--- YEAR 29 ---
+  * Silas Ashford died in a forestry accident with Thalia Blackwood at Ironpeak.
+  * Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties.
+      [because: A bitter blood feud was declared by Morwen Stone against Eldrin Stone in Ironpeak (Year 14, #97)]
+  * Eldrin Stone penned 'The Life and Deeds of Thalia Blackwood', a Biography preserved in the archives of Riverbend.
+      [because: Silas Ashford died in a forestry accident with Thalia Blackwood at Ironpeak (Year 29, #199)]
+  * Eldrin Stone penned 'The Personal Journal of Eldrin Stone', a PersonalJournal preserved in the archives of Riverbend.
+      [because: Silas Ashford died in a forestry accident with Thalia Blackwood at Ironpeak (Year 29, #199)]
+  * The municipal archive in Riverbend was desecrated during a raid, destroying or damaging 6 manuscripts.
+      [because: Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties (Year 29, #200)]
+  * Gideon Ashford converted from rel_sect_3 to rel_sect_5 in Ironpeak (SaintCultVeneration).
+  * Brenna Rivers was born to Caleb Rivers and Briony Crowley in Oakhaven.
+      [because: Caleb Rivers and Briony Crowley were wed in Oakhaven (Year 26, #169)]
+  * Eldrin Blackwood was born to Cedric Blackwood and Kaelen Rivers in Riverbend.
+      [because: Cedric Blackwood and Kaelen Rivers were wed in Riverbend, with Kaelen Rivers relocating to Riverbend (Year 21, #130)]
+  * Arthur Ironwood converted from rel_1 to rel_sect_5 in Ironpeak (Missionary).
+  * Faith A and Faith B coalesced through cultural syncretism into Eternal Way of Peak and Peak in Oakhaven.
+
+--- YEAR 30 ---
+  * Bram Blackwood converted from rel_1 to rel_syncretic_8 in Riverbend (TradeRoute).
+  * Gareth Ashford was born to Silas Ashford and Briony Blackwood in Ironpeak.
+      [because: Silas Ashford and Briony Blackwood were wed in Ironpeak, with Briony Blackwood relocating to Ironpeak (Year 25, #162)]
+  * Corin Rivers was born to Caleb Rivers and Briony Crowley in Oakhaven.
+      [because: Caleb Rivers and Briony Crowley were wed in Oakhaven (Year 26, #169)]
+  * Briony Blackwood converted from rel_sect_7 to rel_sect_5 in Ironpeak (SaintCultVeneration).
+
+--- YEAR 31 ---
+  * Briony Blackwood penned 'The Great Chronicle of Ironpeak', a HistoricalChronicle preserved in the archives of Ironpeak.
+  * Cedric Crowley penned 'The Great Chronicle of Oakhaven', a HistoricalChronicle preserved in the archives of Oakhaven.
+      [because: Brenna Blackwood passed away peacefully of old age in Oakhaven (Year 21, #135); and Caleb Rivers and Sylvia Crowley were wed in Oakhaven (Year 21, #136)]
+  * Cedric Crowley penned 'Folklore and Traditions of Oakhaven', a LocalFolklore preserved in the archives of Oakhaven.
+  * Cedric Crowley penned 'The Mythic Lore of Eternal Way of Peak and Peak', a MythCollection preserved in the archives of Oakhaven.
+  * Eldrin Stone penned 'The Great Chronicle of Riverbend', a HistoricalChronicle preserved in the archives of Riverbend.
+      [because: Corin Blackwood died in a forestry accident with Kaelen Rivers at Riverbend (Year 21, #129)]
+  * Eldrin Stone penned 'The Mythic Lore of Ascendant Ascendant Way of the Sovereign Peak', a MythCollection preserved in the archives of Riverbend.
+  * Cedric Crowley penned 'Chronicle of House Crowley', a FamilyHistory preserved in the archives of Oakhaven.
+      [because: Gareth Rivers and Sylvia Crowley were wed in Oakhaven (Year 1, #0); and Aldous Rivers was born to Gareth Rivers and Sylvia Crowley in Oakhaven (Year 3, #30); and Briony Crowley was born to Cedric Crowley and Isolde Crowley in Oakhaven (Year 6, #50)]
+  * Arthur Ironwood penned 'Chronicle of House Ironwood', a FamilyHistory preserved in the archives of Ironpeak.
+      [because: Arthur Ironwood was born to Rowan Ironwood and Morwen Ashford in Ironpeak (Year 4, #39); and Caleb Ironwood was born to Rowan Ironwood and Morwen Ashford in Ironpeak (Year 12, #83)]
+  * Eldrin Stone penned 'Chronicle of House Stone', a FamilyHistory preserved in the archives of Riverbend.
+      [because: Eldrin Stone and Thalia Blackwood were wed in Riverbend (Year 1, #11); and Aldous Stone was born to Eldrin Stone and Thalia Blackwood in Riverbend (Year 1, #19); and A bitter blood feud was declared by Eldrin Stone against Rowan Ironwood in Riverbend (Year 3, #34)]
+  * Theron Blackwood and Sari Stone were wed in Riverbend.
+  * Caleb Crowley was born to Rowan Crowley and Lyra Rivers in Oakhaven.
+      [because: Rowan Crowley and Lyra Rivers were wed in Oakhaven (Year 27, #183)]
+  * Kaelen Crowley was born to Rowan Crowley and Lyra Rivers in Oakhaven.
+      [because: Rowan Crowley and Lyra Rivers were wed in Oakhaven (Year 27, #183)]
+  * Aldous Rivers converted from rel_2 to rel_syncretic_8 in Oakhaven (Missionary).
+  * Bram Blackwood and Thalia Ashford were wed in Riverbend, with Thalia Ashford relocating to Riverbend.
+  * Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties.
+      [because: A bitter blood feud was declared by Morwen Stone against Eldrin Stone in Ironpeak (Year 14, #97)]
+  * The municipal archive in Riverbend was desecrated during a raid, destroying or damaging 4 manuscripts.
+      [because: Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties (Year 31, #227)]
+
+--- YEAR 32 ---
+  * Unknown Person emerged as a venerated Mystic of the faith in Oakhaven.
+  * The holy sanctuary of 'Crest of Ancestors' was founded and consecrated to Way of the Undying Peak in Riverbend.
+  * Astrid Crowley completed a holy pilgrimage across the land to worship at 'The Grand Temple of Pure Spirit'.
+
+--- YEAR 34 ---
+  * Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties.
+      [because: A bitter blood feud was declared by Morwen Stone against Eldrin Stone in Ironpeak (Year 14, #97)]
+  * The municipal archive in Riverbend was desecrated during a raid, destroying or damaging 1 manuscripts.
+      [because: Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties (Year 34, #232)]
+
+--- YEAR 35 ---
+  * Cedric Crowley passed away peacefully of old age in Oakhaven.
+  * Cedric Crowley emerged as a venerated Martyr of the faith in Oakhaven.
+      [because: Cedric Crowley passed away peacefully of old age in Oakhaven (Year 35, #234)]
+  * The heroic legend of Cedric Crowley was recorded into the living mythology of Eternal Way of Peak and Peak.
+      [because: Cedric Crowley passed away peacefully of old age in Oakhaven (Year 35, #234)]
+  * Eleni Rivers was born to Caleb Rivers and Briony Crowley in Oakhaven.
+      [because: Caleb Rivers and Briony Crowley were wed in Oakhaven (Year 26, #169)]
+  * Caleb Ironwood converted from rel_1 to rel_syncretic_8 in Ironpeak (SaintCultVeneration).
+
+--- YEAR 36 ---
+  * Faith A and Faith B coalesced through cultural syncretism into United Peak and Peak in Riverbend.
+  * Faith A and Faith B coalesced through cultural syncretism into Eternal Way of Peak and Peak in Oakhaven.
+  * Tobias Blackwood converted from rel_1 to rel_syncretic_10 in Riverbend (TradeRoute).
+  * Gareth Ashford converted from rel_sect_7 to rel_syncretic_10 in Ironpeak (SaintCultVeneration).
+
+--- YEAR 37 ---
+  * Aldous Crowley completed a holy pilgrimage across the land to worship at 'Sovereign Peak Sanctuary'.
+  * 'The Grand Temple of Pure Spirit' in Oakhaven was elevated to the rank of LocalShrine due to influx of devout pilgrims.
+  * Astrid Crowley completed a holy pilgrimage across the land to worship at 'The Grand Temple of Pure Spirit'.
+  * Briony Blackwood converted from rel_sect_5 to rel_syncretic_9 in Ironpeak (SaintCultVeneration).
+
+--- YEAR 38 ---
+  * The heroic legend of Astrid Rivers was recorded into the living mythology of Ascendant Ascendant Way of the Sovereign Peak.
+      [because: Astrid Rivers passed away peacefully of old age in Oakhaven (Year 27, #179)]
+  * Thalia Ashford converted from rel_2 to rel_syncretic_9 in Ironpeak (Missionary).
+
+--- YEAR 39 ---
+  * Sylvia Crowley converted from rel_syncretic_10 to rel_syncretic_9 in Oakhaven (SaintCultVeneration).
+  * Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties.
+      [because: A bitter blood feud was declared by Morwen Stone against Eldrin Stone in Ironpeak (Year 14, #97)]
+  * Eldrin Stone converted from rel_syncretic_10 to rel_syncretic_9 in Riverbend (SaintCultVeneration).
+  * The municipal archive in Riverbend was desecrated during a raid, destroying or damaging 2 manuscripts.
+      [because: Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties (Year 39, #250)]
+  * Corin Blackwood was born to Theron Blackwood and Sari Stone in Riverbend.
+      [because: Theron Blackwood and Sari Stone were wed in Riverbend (Year 31, #222)]
+
+--- YEAR 40 ---
+  * Silas Ashford and Maeve Ironwood were wed in Ironpeak.
+  * Caleb Rivers was born to Caleb Rivers and Briony Crowley in Oakhaven.
+      [because: Caleb Rivers and Briony Crowley were wed in Oakhaven (Year 26, #169)]
+  * Gideon Ashford converted from rel_sect_5 to rel_syncretic_9 in Ironpeak (SaintCultVeneration).
+
+--- YEAR 41 ---
+  * Briony Blackwood penned 'The Great Chronicle of Ironpeak', a HistoricalChronicle preserved in the archives of Ironpeak.
+  * Briony Blackwood penned 'The Mythic Lore of United Peak and Peak', a MythCollection preserved in the archives of Ironpeak.
+  * Eldrin Stone penned 'The Great Chronicle of Riverbend', a HistoricalChronicle preserved in the archives of Riverbend.
+  * Eldrin Stone penned 'The Mythic Lore of Eternal Way of Peak and Peak', a MythCollection preserved in the archives of Riverbend.
+  * Arthur Ironwood penned 'Chronicle of House Ironwood', a FamilyHistory preserved in the archives of Ironpeak.
+      [because: Arthur Ironwood was born to Rowan Ironwood and Morwen Ashford in Ironpeak (Year 4, #39); and Caleb Ironwood was born to Rowan Ironwood and Morwen Ashford in Ironpeak (Year 12, #83)]
+  * Eldrin Stone penned 'Chronicle of House Stone', a FamilyHistory preserved in the archives of Riverbend.
+      [because: Eldrin Stone and Thalia Blackwood were wed in Riverbend (Year 1, #11); and Aldous Stone was born to Eldrin Stone and Thalia Blackwood in Riverbend (Year 1, #19); and A bitter blood feud was declared by Eldrin Stone against Rowan Ironwood in Riverbend (Year 3, #34)]
+  * The holy sanctuary of 'High Sanctum of Dawn' was founded and consecrated to Ascendant Ascendant Way of the Sovereign Peak in Ironpeak.
+
+--- YEAR 42 ---
+  * Briony Rivers converted from rel_syncretic_10 to rel_syncretic_9 in Oakhaven (SaintCultVeneration).
+  * Briony Blackwood converted from rel_syncretic_9 to rel_syncretic_10 in Ironpeak (SaintCultVeneration).
+  * Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties.
+      [because: A bitter blood feud was declared by Morwen Stone against Eldrin Stone in Ironpeak (Year 14, #97)]
+  * Sylvia Crowley converted from rel_syncretic_9 to rel_syncretic_10 in Oakhaven (Missionary).
+  * The municipal archive in Riverbend was desecrated during a raid, destroying or damaging 1 manuscripts.
+      [because: Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties (Year 42, #266)]
+  * Sylvia Crowley passed away peacefully of old age in Ironpeak.
+  * Morwen Stone assumed leadership as Chief of Ironpeak.
+      [because: Sylvia Crowley passed away peacefully of old age in Ironpeak (Year 42, #269)]
+  * Briony Blackwood penned 'The Life and Deeds of Sylvia Crowley', a Biography preserved in the archives of Ironpeak.
+      [because: Sylvia Crowley passed away peacefully of old age in Ironpeak (Year 42, #269)]
+  * Aldous Crowley penned 'The Personal Journal of Aldous Crowley', a PersonalJournal preserved in the archives of Oakhaven.
+      [because: Sylvia Crowley passed away peacefully of old age in Ironpeak (Year 42, #269)]
+  * Aldous Rivers died in a forestry accident with Silas Ashford at Oakhaven.
+  * Elora Ashford was born to Silas Ashford and Maeve Ironwood in Ironpeak.
+      [because: Silas Ashford and Maeve Ironwood were wed in Ironpeak (Year 40, #254)]
+  * A bitter blood feud was declared by Bram Rivers against Silas Ashford in Oakhaven.
+      [because: Aldous Rivers died in a forestry accident with Silas Ashford at Oakhaven (Year 42, #273)]
+  * The trade corridor between Unknown Settlement and Unknown Settlement was severed due to conflict.
+      [because: A bitter blood feud was declared by Bram Rivers against Silas Ashford in Oakhaven (Year 42, #275)]
+
+--- YEAR 43 ---
+  * Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties.
+      [because: A bitter blood feud was declared by Bram Rivers against Silas Ashford in Oakhaven (Year 42, #275)]
+  * The municipal archive in Ironpeak was desecrated during a raid, destroying or damaging 8 manuscripts.
+      [because: Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties (Year 43, #277)]
+  * Aldous Crowley and Morwen Ashford were wed in Oakhaven.
+  * Bram Blackwood died in a forestry accident with Caleb Ironwood at Riverbend.
+  * Theron Blackwood and Thalia Ashford were wed in Riverbend.
+  * Caleb Ironwood and Astrid Ashford were wed in Ironpeak.
+  * Eldrin Stone died in a forestry accident with Gideon Stone at Riverbend.
+  * A contested succession crisis erupted in Riverbend between Gideon Stone and Freya Ashford.
+      [because: Eldrin Stone died in a forestry accident with Gideon Stone at Riverbend (Year 43, #283)]
+  * Gideon Stone assumed leadership as Chief of Riverbend.
+      [because: A contested succession crisis erupted in Riverbend between Gideon Stone and Freya Ashford (Year 43, #284)]
+  * Corin Blackwood was born to Theron Blackwood and Thalia Ashford in Riverbend.
+      [because: Theron Blackwood and Thalia Ashford were wed in Riverbend (Year 43, #281)]
+  * Eldrin Rivers and Thalia Blackwood were wed in Oakhaven, with Thalia Blackwood relocating to Oakhaven.
+
+--- YEAR 44 ---
+  * Arthur Ironwood and Thalia Ashford were wed in Ironpeak.
+  * Aldous Blackwood and Lyra Ironwood were wed in Riverbend, with Lyra Ironwood relocating to Riverbend.
+  * Arthur Ironwood penned 'The Personal Journal of Arthur Ironwood', a PersonalJournal preserved in the archives of Ironpeak.
+      [because: Arthur Ironwood and Thalia Ashford were wed in Ironpeak (Year 44, #288)]
+  * Lyra Ironwood penned 'The Personal Journal of Lyra Ironwood', a PersonalJournal preserved in the archives of Riverbend.
+      [because: Aldous Blackwood and Lyra Ironwood were wed in Riverbend, with Lyra Ironwood relocating to Riverbend (Year 44, #289)]
+  * Lucan Ironwood was born to Arthur Ironwood and Thalia Ashford in Ironpeak.
+      [because: Arthur Ironwood and Thalia Ashford were wed in Ironpeak (Year 44, #288)]
+  * Morwen Blackwood was born to Theron Blackwood and Thalia Ashford in Riverbend.
+      [because: Theron Blackwood and Thalia Ashford were wed in Riverbend (Year 43, #281)]
+  * Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties.
+      [because: A bitter blood feud was declared by Morwen Stone against Eldrin Stone in Ironpeak (Year 14, #97)]
+  * The municipal archive in Riverbend was desecrated during a raid, destroying or damaging 2 manuscripts.
+      [because: Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties (Year 44, #294)]
+  * The holy sanctuary of 'The Grand Temple of Silence' was founded and consecrated to Ascendant Way of the Sovereign Peak in Riverbend.
+  * Theron Blackwood converted from rel_syncretic_10 to rel_sect_5 in Riverbend (Marriage).
+
+--- YEAR 45 ---
+  * Lyra Ashford was born to Silas Ashford and Maeve Ironwood in Ironpeak.
+      [because: Silas Ashford and Maeve Ironwood were wed in Ironpeak (Year 40, #254)]
+  * Isolde Ironwood was born to Arthur Ironwood and Thalia Ashford in Ironpeak.
+      [because: Arthur Ironwood and Thalia Ashford were wed in Ironpeak (Year 44, #288)]
+  * The heroic legend of Cedric Crowley was recorded into the living mythology of Eternal Way of Peak and Peak.
+      [because: Cedric Crowley passed away peacefully of old age in Oakhaven (Year 35, #234)]
+  * Thalia Ironwood was born to Arthur Ironwood and Thalia Ashford in Ironpeak.
+      [because: Arthur Ironwood and Thalia Ashford were wed in Ironpeak (Year 44, #288)]
+  * Caleb Blackwood was born to Theron Blackwood and Sari Stone in Riverbend.
+      [because: Theron Blackwood and Sari Stone were wed in Riverbend (Year 31, #222)]
+  * Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties.
+      [because: A bitter blood feud was declared by Morwen Stone against Eldrin Stone in Ironpeak (Year 14, #97)]
+  * The municipal archive in Riverbend was desecrated during a raid, destroying or damaging 2 manuscripts.
+      [because: Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties (Year 45, #303)]
+  * Silas Ashford was slain in revenge by Bram Rivers in Ironpeak.
+      [because: Aldous Rivers died in a forestry accident with Silas Ashford at Oakhaven (Year 42, #273); and A bitter blood feud was declared by Bram Rivers against Silas Ashford in Oakhaven (Year 42, #275)]
+  * Gareth Blackwood was born to Aldous Blackwood and Lyra Ironwood in Riverbend.
+      [because: Aldous Blackwood and Lyra Ironwood were wed in Riverbend, with Lyra Ironwood relocating to Riverbend (Year 44, #289)]
+  * Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties.
+      [because: A bitter blood feud was declared by Bram Rivers against Silas Ashford in Oakhaven (Year 42, #275)]
+  * The municipal archive in Ironpeak was desecrated during a raid, destroying or damaging 6 manuscripts.
+      [because: Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties (Year 45, #307)]
+  * Caleb Ironwood and Briony Blackwood were wed in Ironpeak.
+  * The holy sanctuary of 'World-Root of Serpent' was founded and consecrated to Eternal Way of Peak and Peak in Oakhaven.
+  * Lyra Blackwood was born to Theron Blackwood and Sari Stone in Riverbend.
+      [because: Theron Blackwood and Sari Stone were wed in Riverbend (Year 31, #222)]
+  * Briony Blackwood converted from rel_syncretic_10 to rel_syncretic_9 in Ironpeak (Marriage).
+
+--- YEAR 46 ---
+  * Lyra Blackwood emerged as a venerated Prophet of the faith in Riverbend.
+  * The heroic legend of Cedric Crowley was recorded into the living mythology of Eternal Way of Peak and Peak.
+      [because: Cedric Crowley passed away peacefully of old age in Oakhaven (Year 35, #234)]
+  * Bram Rivers passed away peacefully of old age in Oakhaven.
+  * Kaelen Blackwood passed away peacefully of old age in Oakhaven.
+  * Eldrin Rivers assumed leadership as Chief of Oakhaven.
+      [because: Bram Rivers passed away peacefully of old age in Oakhaven (Year 46, #315)]
+  * Cedric Blackwood penned 'The Personal Journal of Cedric Blackwood', a PersonalJournal preserved in the archives of Riverbend.
+      [because: Kaelen Blackwood passed away peacefully of old age in Oakhaven (Year 46, #316)]
+  * Sylvia Crowley passed away peacefully of old age in Oakhaven.
+  * Aldous Crowley penned 'The Personal Journal of Aldous Crowley', a PersonalJournal preserved in the archives of Oakhaven.
+      [because: Sylvia Crowley passed away peacefully of old age in Oakhaven (Year 46, #319)]
+  * Astrid Blackwood was born to Theron Blackwood and Sari Stone in Riverbend.
+      [because: Theron Blackwood and Sari Stone were wed in Riverbend (Year 31, #222)]
+  * Orson Blackwood was born to Aldous Blackwood and Lyra Ironwood in Riverbend.
+      [because: Aldous Blackwood and Lyra Ironwood were wed in Riverbend, with Lyra Ironwood relocating to Riverbend (Year 44, #289)]
+  * Caleb Rivers and Astrid Crowley were wed in Oakhaven.
+  * Astrid Crowley penned 'The Personal Journal of Astrid Crowley', a PersonalJournal preserved in the archives of Oakhaven.
+      [because: Caleb Rivers and Astrid Crowley were wed in Oakhaven (Year 46, #323)]
+
+--- YEAR 47 ---
+  * Arthur Ironwood was born to Arthur Ironwood and Thalia Ashford in Ironpeak.
+      [because: Arthur Ironwood and Thalia Ashford were wed in Ironpeak (Year 44, #288)]
+  * Corin Rivers died in a forestry accident with Aldous Blackwood at Oakhaven.
+  * Theron Blackwood died in a forestry accident with Sari Stone at Riverbend.
+  * Lyra Blackwood died in a forestry accident with Theron Blackwood at Riverbend.
+  * Cedric Blackwood penned 'The Personal Journal of Cedric Blackwood', a PersonalJournal preserved in the archives of Riverbend.
+      [because: Lyra Blackwood died in a forestry accident with Theron Blackwood at Riverbend (Year 47, #328)]
+  * Lyra Rivers converted from rel_syncretic_10 to rel_sect_5 in Oakhaven (Marriage).
+  * Astrid Blackwood completed a holy pilgrimage across the land to worship at 'Sovereign Peak Sanctuary'.
+  * Unknown Person emerged as a venerated Mystic of the faith in Riverbend.
+
+--- YEAR 48 ---
+  * The heroic legend of Astrid Rivers was recorded into the living mythology of Eternal Way of Peak and Peak.
+      [because: Astrid Rivers passed away peacefully of old age in Oakhaven (Year 27, #179)]
+  * Gareth Blackwood completed a holy pilgrimage across the land to worship at 'World-Root of Serpent'.
+  * Orson Blackwood completed a holy pilgrimage across the land to worship at 'World-Root of Serpent'.
+  * Bram Crowley and Brenna Rivers were wed in Oakhaven.
+  * Gareth Blackwood completed a holy pilgrimage across the land to worship at 'Sovereign Peak Sanctuary'.
+  * Faith A and Faith B coalesced through cultural syncretism into Sacred Union of Peak and Peak in Riverbend.
+  * Tobias Blackwood and Sari Stone were wed in Riverbend.
+  * Eldrin Blackwood and Kaelen Ashford were wed in Riverbend, with Kaelen Ashford relocating to Riverbend.
+  * A peace treaty was ratified between Morwen Stone and Gideon Stone in Ironpeak, bringing an end to hostilities.
+      [because: A bitter blood feud was declared by Morwen Stone against Eldrin Stone in Ironpeak (Year 14, #97); and Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties (Year 3, #35)]
+  * Briony Blackwood penned 'The Treaty and Concord of set_ironpeak', a LegalRecord preserved in the archives of Ironpeak.
+      [because: A peace treaty was ratified between Morwen Stone and Gideon Stone in Ironpeak, bringing an end to hostilities (Year 48, #341)]
+  * A bitter blood feud was declared by Kaelen Rivers against Morwen Stone in Riverbend.
+      [because: Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties (Year 19, #114)]
+  * Astrid Blackwood completed a holy pilgrimage across the land to worship at 'The Grand Temple of Pure Spirit'.
+  * Caleb Blackwood penned 'Council Record of Feud at set_riverbend', a LegalRecord preserved in the archives of Riverbend.
+      [because: A bitter blood feud was declared by Kaelen Rivers against Morwen Stone in Riverbend (Year 48, #343)]
+  * Kaelen Ashford converted from rel_syncretic_10 to rel_syncretic_11 in Riverbend (Missionary).
+
+--- YEAR 49 ---
+  * Caleb Crowley was born to Bram Crowley and Brenna Rivers in Oakhaven.
+      [because: Bram Crowley and Brenna Rivers were wed in Oakhaven (Year 48, #336)]
+  * Briony Blackwood died in a forestry accident with Arthur Ironwood at Ironpeak.
+  * Briony Blackwood emerged as a venerated Martyr of the faith in Ironpeak.
+      [because: Briony Blackwood died in a forestry accident with Arthur Ironwood at Ironpeak (Year 49, #348)]
+  * The heroic legend of Briony Blackwood was recorded into the living mythology of United Peak and Peak.
+      [because: Briony Blackwood died in a forestry accident with Arthur Ironwood at Ironpeak (Year 49, #348)]
+  * Caleb Crowley emerged as a venerated Prophet of the faith in Oakhaven.
+  * Arthur Ironwood completed a holy pilgrimage across the land to worship at 'World-Root of Serpent'.
+  * Bram Crowley converted from rel_syncretic_10 to rel_syncretic_11 in Oakhaven (SaintCultVeneration).
+  * Thalia Blackwood passed away peacefully of old age in Oakhaven.
+  * Cedric Blackwood penned 'The Personal Journal of Cedric Blackwood', a PersonalJournal preserved in the archives of Riverbend.
+      [because: Thalia Blackwood passed away peacefully of old age in Oakhaven (Year 49, #354)]
+  * Caleb Ironwood converted from rel_syncretic_9 to rel_syncretic_11 in Ironpeak (SaintCultVeneration).
+  * Unknown Person emerged as a venerated Mystic of the faith in Oakhaven.
+  * Eldrin Rivers and Kaelen Crowley were wed in Oakhaven.
+  * Sylvia Crowley was born to Bram Crowley and Brenna Rivers in Oakhaven.
+      [because: Bram Crowley and Brenna Rivers were wed in Oakhaven (Year 48, #336)]
+  * A peace treaty was ratified between Eldrin Rivers and Morwen Stone in Oakhaven, bringing an end to hostilities.
+      [because: A bitter blood feud was declared by Bram Rivers against Silas Ashford in Oakhaven (Year 42, #275); and Aldous Rivers died in a forestry accident with Silas Ashford at Oakhaven (Year 42, #273)]
+  * Lyra Blackwood completed a holy pilgrimage across the land to worship at 'World-Root of Serpent'.
+  * Orson Blackwood was born to Aldous Blackwood and Lyra Ironwood in Riverbend.
+      [because: Aldous Blackwood and Lyra Ironwood were wed in Riverbend, with Lyra Ironwood relocating to Riverbend (Year 44, #289)]
+  * Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties.
+      [because: A bitter blood feud was declared by Kaelen Rivers against Morwen Stone in Riverbend (Year 48, #343)]
+  * The municipal archive in Ironpeak was desecrated during a raid, destroying or damaging 4 manuscripts.
+      [because: Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties (Year 49, #363)]
+
+--- YEAR 50 ---
+  * Morwen Ashford passed away peacefully of old age in Oakhaven.
+  * Caleb Crowley completed a holy pilgrimage across the land to worship at 'Sovereign Peak Sanctuary'.
+  * Daphne Rivers was born to Eldrin Rivers and Kaelen Crowley in Oakhaven.
+      [because: Eldrin Rivers and Kaelen Crowley were wed in Oakhaven (Year 49, #358)]
+  * Daphne Ironwood was born to Caleb Ironwood and Astrid Ashford in Ironpeak.
+      [because: Caleb Ironwood and Astrid Ashford were wed in Ironpeak (Year 43, #282)]
+  * A bilateral commercial and diplomatic trade route was opened between Unknown Settlement and Unknown Settlement.
+      [because: A peace treaty was ratified between Eldrin Rivers and Morwen Stone in Oakhaven, bringing an end to hostilities (Year 49, #360)]
+  * Isolde Crowley was born to Bram Crowley and Brenna Rivers in Oakhaven.
+      [because: Bram Crowley and Brenna Rivers were wed in Oakhaven (Year 48, #336)]
+
+--- YEAR 51 ---
+  * Arthur Ironwood penned 'The Great Chronicle of Ironpeak', a HistoricalChronicle preserved in the archives of Ironpeak.
+  * Arthur Ironwood penned 'The Mythic Lore of Eternal Way of Peak and Peak', a MythCollection preserved in the archives of Ironpeak.
+  * Caleb Blackwood penned 'The Great Chronicle of Riverbend', a HistoricalChronicle preserved in the archives of Riverbend.
+  * Caleb Blackwood penned 'The Mythic Lore of Sacred Union of Peak and Peak', a MythCollection preserved in the archives of Riverbend.
+  * Cedric Blackwood penned 'Chronicle of House Blackwood', a FamilyHistory preserved in the archives of Riverbend.
+      [because: Cedric Blackwood was born to Silas Blackwood and Brenna Blackwood in Riverbend (Year 1, #2); and Theron Blackwood was born to Corin Blackwood and Sylvia Crowley in Riverbend (Year 18, #113); and Cedric Blackwood and Kaelen Rivers were wed in Riverbend, with Kaelen Rivers relocating to Riverbend (Year 21, #130)]
+  * Aldous Crowley penned 'Chronicle of House Crowley', a FamilyHistory preserved in the archives of Oakhaven.
+      [because: Briony Crowley was born to Cedric Crowley and Isolde Crowley in Oakhaven (Year 6, #50); and Aldous Crowley and Briony Rivers were wed in Oakhaven (Year 8, #64); and Rowan Crowley was born to Aldous Crowley and Briony Rivers in Oakhaven (Year 9, #65)]
+  * Arthur Ironwood penned 'Chronicle of House Ironwood', a FamilyHistory preserved in the archives of Ironpeak.
+      [because: Arthur Ironwood was born to Rowan Ironwood and Morwen Ashford in Ironpeak (Year 4, #39); and Caleb Ironwood was born to Rowan Ironwood and Morwen Ashford in Ironpeak (Year 12, #83)]
+  * Corin Blackwood was born to Aldous Blackwood and Lyra Ironwood in Riverbend.
+      [because: Aldous Blackwood and Lyra Ironwood were wed in Riverbend, with Lyra Ironwood relocating to Riverbend (Year 44, #289)]
+  * Morwen Stone passed away peacefully of old age in Ironpeak.
+  * Silas Ashford assumed leadership as Chief of Ironpeak.
+      [because: Morwen Stone passed away peacefully of old age in Ironpeak (Year 51, #379)]
+  * Arthur Ironwood penned 'The Life and Deeds of Morwen Stone', a Biography preserved in the archives of Ironpeak.
+      [because: Morwen Stone passed away peacefully of old age in Ironpeak (Year 51, #379)]
+  * Lyra Rivers converted from rel_sect_5 to rel_syncretic_10 in Oakhaven (Marriage).
+  * Gideon Ashford passed away peacefully of old age in Ironpeak.
+  * Gideon Ashford emerged as a venerated Martyr of the faith in Ironpeak.
+      [because: Gideon Ashford passed away peacefully of old age in Ironpeak (Year 51, #383)]
+  * The heroic legend of Gideon Ashford was recorded into the living mythology of United Peak and Peak.
+      [because: Gideon Ashford passed away peacefully of old age in Ironpeak (Year 51, #383)]
+  * The holy sanctuary of 'Sacred Stream of Celestial' was founded and consecrated to Eternal Way of Peak and Peak in Oakhaven.
+  * 'World-Root of Serpent' in Oakhaven was elevated to the rank of LocalShrine due to influx of devout pilgrims.
+  * Corin Blackwood completed a holy pilgrimage across the land to worship at 'World-Root of Serpent'.
+  * Arthur Ironwood penned 'The Life and Deeds of Gideon Ashford', a Biography preserved in the archives of Ironpeak.
+      [because: Gideon Ashford passed away peacefully of old age in Ironpeak (Year 51, #383)]
+  * Thalia Ashford penned 'The Personal Journal of Thalia Ashford', a PersonalJournal preserved in the archives of Riverbend.
+      [because: Gideon Ashford passed away peacefully of old age in Ironpeak (Year 51, #383)]
+  * The holy sanctuary of 'The Heaven Waters' was founded and consecrated to Covenant Revival Way of the Undying Peak in Ironpeak.
+
+--- YEAR 52 ---
+  * Briony Crowley died in a forestry accident with Gareth Ashford at Oakhaven.
+  * Caleb Crowley emerged as a venerated Prophet of the faith in Oakhaven.
+  * A bitter blood feud was declared by Aldous Crowley against Gareth Ashford in Oakhaven.
+      [because: Briony Crowley died in a forestry accident with Gareth Ashford at Oakhaven (Year 52, #392)]
+  * The trade corridor between Unknown Settlement and Unknown Settlement was severed due to conflict.
+      [because: A bitter blood feud was declared by Aldous Crowley against Gareth Ashford in Oakhaven (Year 52, #394)]
+  * Caleb Crowley completed a holy pilgrimage across the land to worship at 'The Grand Temple of Pure Spirit'.
+  * Briony Rivers converted from rel_syncretic_9 to rel_syncretic_10 in Oakhaven (Missionary).
+  * Caleb Crowley emerged as a venerated Prophet of the faith in Oakhaven.
+  * Sari Blackwood was born to Eldrin Blackwood and Kaelen Ashford in Riverbend.
+      [because: Eldrin Blackwood and Kaelen Ashford were wed in Riverbend, with Kaelen Ashford relocating to Riverbend (Year 48, #340)]
+  * Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties.
+      [because: A bitter blood feud was declared by Kaelen Rivers against Morwen Stone in Riverbend (Year 48, #343)]
+  * Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties.
+      [because: A bitter blood feud was declared by Aldous Crowley against Gareth Ashford in Oakhaven (Year 52, #394)]
+  * Unknown Person emerged as a venerated Mystic of the faith in Oakhaven.
+  * The municipal archive in Ironpeak was desecrated during a raid, destroying or damaging 8 manuscripts.
+      [because: Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties (Year 52, #400)]
+  * The municipal archive in Ironpeak was desecrated during a raid, destroying or damaging 3 manuscripts.
+      [because: Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties (Year 52, #401)]
+
+--- YEAR 53 ---
+  * Aldous Crowley and Eleni Rivers were wed in Oakhaven.
+  * Briony Rivers passed away peacefully of old age in Oakhaven.
+  * Briony Rivers emerged as a venerated Martyr of the faith in Oakhaven.
+      [because: Briony Rivers passed away peacefully of old age in Oakhaven (Year 53, #406)]
+  * The heroic legend of Briony Rivers was recorded into the living mythology of Sacred Union of Peak and Peak.
+      [because: Briony Rivers passed away peacefully of old age in Oakhaven (Year 53, #406)]
+  * Isolde Crowley penned 'The Life and Deeds of Briony Rivers', a Biography preserved in the archives of Oakhaven.
+      [because: Briony Rivers passed away peacefully of old age in Oakhaven (Year 53, #406)]
+
+--- YEAR 54 ---
+  * Caleb Crowley completed a holy pilgrimage across the land to worship at 'Sovereign Peak Sanctuary'.
+  * Kaelen Rivers died in a forestry accident with Lyra Rivers at Riverbend.
+  * Isolde Crowley penned 'The Life and Deeds of Lyra Rivers', a Biography preserved in the archives of Oakhaven.
+      [because: Kaelen Rivers died in a forestry accident with Lyra Rivers at Riverbend (Year 54, #411)]
+  * Freya Ashford passed away peacefully of old age in Riverbend.
+  * Caleb Blackwood penned 'The Life and Deeds of Freya Ashford', a Biography preserved in the archives of Riverbend.
+      [because: Freya Ashford passed away peacefully of old age in Riverbend (Year 54, #413)]
+  * Thalia Ashford penned 'The Personal Journal of Thalia Ashford', a PersonalJournal preserved in the archives of Riverbend.
+      [because: Freya Ashford passed away peacefully of old age in Riverbend (Year 54, #413)]
+  * Daphne Ironwood was born to Caleb Ironwood and Astrid Ashford in Ironpeak.
+      [because: Caleb Ironwood and Astrid Ashford were wed in Ironpeak (Year 43, #282)]
+  * Aldous Crowley passed away peacefully of old age in Oakhaven.
+  * Lyra Blackwood completed a holy pilgrimage across the land to worship at 'The Grand Temple of Pure Spirit'.
+  * Isolde Crowley penned 'The Life and Deeds of Aldous Crowley', a Biography preserved in the archives of Oakhaven.
+      [because: Aldous Crowley passed away peacefully of old age in Oakhaven (Year 54, #417)]
+  * Caleb Crowley completed a holy pilgrimage across the land to worship at 'Sovereign Peak Sanctuary'.
+
+--- YEAR 55 ---
+  * Caleb Crowley emerged as a venerated Prophet of the faith in Oakhaven.
+  * Caleb Ironwood died in a forestry accident with Rowan Crowley at Ironpeak.
+  * Isolde Crowley penned 'The Life and Deeds of Rowan Crowley', a Biography preserved in the archives of Oakhaven.
+      [because: Caleb Ironwood died in a forestry accident with Rowan Crowley at Ironpeak (Year 55, #422)]
+
+--- YEAR 56 ---
+  * Caleb Rivers and Astrid Ashford were wed in Oakhaven, with Astrid Ashford relocating to Oakhaven.
+  * Caleb Crowley completed a holy pilgrimage across the land to worship at 'High Sanctum of Dawn'.
+  * Kaelen Crowley was born to Bram Crowley and Brenna Rivers in Oakhaven.
+      [because: Bram Crowley and Brenna Rivers were wed in Oakhaven (Year 48, #336)]
+  * Eldrin Rivers was born to Eldrin Rivers and Kaelen Crowley in Oakhaven.
+      [because: Eldrin Rivers and Kaelen Crowley were wed in Oakhaven (Year 49, #358)]
+  * Caleb Crowley emerged as a venerated Prophet of the faith in Oakhaven.
+  * Caleb Crowley emerged as a venerated Prophet of the faith in Oakhaven.
+
+--- YEAR 57 ---
+  * Lucan Rivers was born to Caleb Rivers and Astrid Crowley in Oakhaven.
+      [because: Caleb Rivers and Astrid Crowley were wed in Oakhaven (Year 46, #323)]
+  * Morwen Blackwood was born to Theron Blackwood and Thalia Ashford in Riverbend.
+      [because: Theron Blackwood and Thalia Ashford were wed in Riverbend (Year 43, #281)]
+
+--- YEAR 58 ---
+  * Eldrin Rivers completed a holy pilgrimage across the land to worship at 'World-Root of Serpent'.
+  * Vance Rivers was born to Caleb Rivers and Astrid Ashford in Oakhaven.
+      [because: Caleb Rivers and Astrid Ashford were wed in Oakhaven, with Astrid Ashford relocating to Oakhaven (Year 56, #424)]
+
+--- YEAR 59 ---
+  * Morwen Blackwood completed a holy pilgrimage across the land to worship at 'High Sanctum of Dawn'.
+  * Astrid Crowley converted from rel_syncretic_11 to rel_syncretic_9 in Oakhaven (SaintCultVeneration).
+  * Caleb Crowley emerged as a venerated Prophet of the faith in Oakhaven.
+  * Isolde Ashford was born to Silas Ashford and Maeve Ironwood in Ironpeak.
+      [because: Silas Ashford and Maeve Ironwood were wed in Ironpeak (Year 40, #254)]
+
+--- YEAR 60 ---
+  * The heroic legend of Briony Blackwood was recorded into the living mythology of United Peak and Peak.
+      [because: Briony Blackwood died in a forestry accident with Arthur Ironwood at Ironpeak (Year 49, #348)]
+  * Caleb Ironwood and Elora Ashford were wed in Ironpeak.
+  * Orson Rivers was born to Caleb Rivers and Astrid Ashford in Oakhaven.
+      [because: Caleb Rivers and Astrid Ashford were wed in Oakhaven, with Astrid Ashford relocating to Oakhaven (Year 56, #424)]
+
+--- YEAR 61 ---
+  * Arthur Ironwood penned 'The Great Chronicle of Ironpeak', a HistoricalChronicle preserved in the archives of Ironpeak.
+  * Arthur Ironwood penned 'Folklore and Traditions of Ironpeak', a LocalFolklore preserved in the archives of Ironpeak.
+  * Arthur Ironwood penned 'The Mythic Lore of Sacred Union of Peak and Peak', a MythCollection preserved in the archives of Ironpeak.
+  * Orson Rivers penned 'The Great Chronicle of Oakhaven', a HistoricalChronicle preserved in the archives of Oakhaven.
+      [because: The holy sanctuary of 'Sacred Stream of Celestial' was founded and consecrated to Eternal Way of Peak and Peak in Oakhaven (Year 51, #386)]
+  * Caleb Blackwood penned 'The Great Chronicle of Riverbend', a HistoricalChronicle preserved in the archives of Riverbend.
+  * Cedric Blackwood penned 'Folklore and Traditions of Riverbend', a LocalFolklore preserved in the archives of Riverbend.
+  * Caleb Blackwood penned 'The Mythic Lore of Sacred Union of Peak and Peak', a MythCollection preserved in the archives of Riverbend.
+  * Thalia Ashford penned 'Chronicle of House Ashford', a FamilyHistory preserved in the archives of Riverbend.
+      [because: Thalia Ashford was born to Gideon Ashford and Morwen Stone in Ironpeak (Year 13, #87); and Silas Ashford was born to Gideon Ashford and Morwen Stone in Ironpeak (Year 15, #100); and Astrid Ashford was born to Silas Ashford and Briony Blackwood in Ironpeak (Year 25, #163)]
+  * Cedric Blackwood penned 'Chronicle of House Blackwood', a FamilyHistory preserved in the archives of Riverbend.
+      [because: Cedric Blackwood was born to Silas Blackwood and Brenna Blackwood in Riverbend (Year 1, #2); and Theron Blackwood was born to Corin Blackwood and Sylvia Crowley in Riverbend (Year 18, #113); and Cedric Blackwood and Kaelen Rivers were wed in Riverbend, with Kaelen Rivers relocating to Riverbend (Year 21, #130)]
+  * Rowan Crowley penned 'Chronicle of House Crowley', a FamilyHistory preserved in the archives of Oakhaven.
+      [because: Rowan Crowley was born to Aldous Crowley and Briony Rivers in Oakhaven (Year 9, #65); and Aldous Crowley was born to Aldous Crowley and Briony Rivers in Oakhaven (Year 11, #77); and Rowan Crowley and Lyra Rivers were wed in Oakhaven (Year 27, #183)]
+  * Arthur Ironwood penned 'Chronicle of House Ironwood', a FamilyHistory preserved in the archives of Ironpeak.
+      [because: Arthur Ironwood was born to Rowan Ironwood and Morwen Ashford in Ironpeak (Year 4, #39); and Caleb Ironwood was born to Rowan Ironwood and Morwen Ashford in Ironpeak (Year 12, #83)]
+  * Orson Ironwood was born to Caleb Ironwood and Elora Ashford in Ironpeak.
+      [because: Caleb Ironwood and Elora Ashford were wed in Ironpeak (Year 60, #439)]
+  * A peace treaty was ratified between Gideon Stone and Silas Ashford in Riverbend, bringing an end to hostilities.
+      [because: A bitter blood feud was declared by Kaelen Rivers against Morwen Stone in Riverbend (Year 48, #343); and Warriors from Unknown Settlement raided Unknown Settlement, seizing 0 food and causing 0 casualties (Year 19, #114)]
+  * Caleb Blackwood penned 'The Treaty and Concord of set_riverbend', a LegalRecord preserved in the archives of Riverbend.
+      [because: A peace treaty was ratified between Gideon Stone and Silas Ashford in Riverbend, bringing an end to hostilities (Year 61, #453)]
+  * A bilateral commercial and diplomatic trade route was opened between Unknown Settlement and Unknown Settlement.
+      [because: A peace treaty was ratified between Gideon Stone and Silas Ashford in Riverbend, bringing an end to hostilities (Year 61, #453)]
+  * Orson Rivers completed a holy pilgrimage across the land to worship at 'Sovereign Peak Sanctuary'.
+  * Vance Rivers was born to Caleb Rivers and Astrid Crowley in Oakhaven.
+      [because: Caleb Rivers and Astrid Crowley were wed in Oakhaven (Year 46, #323)]
+  * Kaelen Ashford died in a forestry accident with Corin Blackwood at Riverbend.
+  * Cedric Blackwood penned 'The Personal Journal of Cedric Blackwood', a PersonalJournal preserved in the archives of Riverbend.
+      [because: Kaelen Ashford died in a forestry accident with Corin Blackwood at Riverbend (Year 61, #458)]
+  * Caleb Crowley completed a holy pilgrimage across the land to worship at 'The Grand Temple of Pure Spirit'.
+  * Cedric Blackwood passed away peacefully of old age in Riverbend.
+  * Caleb Blackwood penned 'The Life and Deeds of Cedric Blackwood', a Biography preserved in the archives of Riverbend.
+      [because: Cedric Blackwood passed away peacefully of old age in Riverbend (Year 61, #461)]
+
+--- YEAR 62 ---
+  * The heroic legend of Gideon Ashford was recorded into the living mythology of United Peak and Peak.
+      [because: Gideon Ashford passed away peacefully of old age in Ironpeak (Year 51, #383)]
+  * Arthur Rivers was born to Caleb Rivers and Astrid Crowley in Oakhaven.
+      [because: Caleb Rivers and Astrid Crowley were wed in Oakhaven (Year 46, #323)]
+  * Orson Rivers completed a holy pilgrimage across the land to worship at 'Sovereign Peak Sanctuary'.
+
+--- YEAR 63 ---
+  * Caleb Rivers and Isolde Ironwood were wed in Oakhaven, with Isolde Ironwood relocating to Oakhaven.
+  * Thalia Ironwood died in a forestry accident with Caleb Blackwood at Ironpeak.
+  * Rowan Ironwood was born to Caleb Ironwood and Elora Ashford in Ironpeak.
+      [because: Caleb Ironwood and Elora Ashford were wed in Ironpeak (Year 60, #439)]
+  * A severe famine struck Ironpeak, exhausting granaries and threatening the harvest.
+  * Corin Blackwood and Lyra Ashford were wed in Riverbend, with Lyra Ashford relocating to Riverbend.
+  * Gideon Stone and Morwen Blackwood were wed in Riverbend.
+  * Tobias Rivers was born to Caleb Rivers and Astrid Crowley in Oakhaven.
+      [because: Caleb Rivers and Astrid Crowley were wed in Oakhaven (Year 46, #323)]
+
+--- YEAR 64 ---
+  * Arthur Ironwood died in a forestry accident with Aldous Blackwood at Ironpeak.
+  * The heroic legend of Briony Rivers was recorded into the living mythology of Sacred Union of Peak and Peak.
+      [because: Briony Rivers passed away peacefully of old age in Oakhaven (Year 53, #406)]
+  * Caleb Crowley and Lyra Blackwood were wed in Oakhaven, with Lyra Blackwood relocating to Oakhaven.
+  * Astrid Rivers was born to Eldrin Rivers and Kaelen Crowley in Oakhaven.
+      [because: Eldrin Rivers and Kaelen Crowley were wed in Oakhaven (Year 49, #358)]
+  * Lyra Blackwood penned 'The Personal Journal of Lyra Blackwood', a PersonalJournal preserved in the archives of Oakhaven.
+      [because: Caleb Crowley and Lyra Blackwood were wed in Oakhaven, with Lyra Blackwood relocating to Oakhaven (Year 64, #475)]
+  * Astrid Crowley converted from rel_syncretic_8 to rel_syncretic_10 in Oakhaven (SaintCultVeneration).
+  * Rowan Ironwood completed a holy pilgrimage across the land to worship at 'High Sanctum of Dawn'.
+  * Lucan Ironwood and Astrid Blackwood were wed in Ironpeak, with Astrid Blackwood relocating to Ironpeak.
+  * Daphne Ashford was born to Silas Ashford and Maeve Ironwood in Ironpeak.
+      [because: Silas Ashford and Maeve Ironwood were wed in Ironpeak (Year 40, #254)]
+
+--- YEAR 65 ---
+  * Rowan Ironwood emerged as a venerated Prophet of the faith in Ironpeak.
+  * Morwen Crowley was born to Caleb Crowley and Lyra Blackwood in Oakhaven.
+      [because: Caleb Crowley and Lyra Blackwood were wed in Oakhaven, with Lyra Blackwood relocating to Oakhaven (Year 64, #475)]
+  * Corin Blackwood and Thalia Ashford were wed in Riverbend, with Thalia Ashford relocating to Riverbend.
+  * Unknown Person emerged as a venerated Mystic of the faith in Ironpeak.
+  * Lyra Crowley was born to Caleb Crowley and Lyra Blackwood in Oakhaven.
+      [because: Caleb Crowley and Lyra Blackwood were wed in Oakhaven, with Lyra Blackwood relocating to Oakhaven (Year 64, #475)]
+  * Bram Stone was born to Gideon Stone and Morwen Blackwood in Riverbend.
+      [because: Gideon Stone and Morwen Blackwood were wed in Riverbend (Year 63, #471)]
+
+--- YEAR 66 ---
+  * Caleb Crowley died in a forestry accident with Theron Blackwood at Oakhaven.
+  * Morwen Crowley completed a holy pilgrimage across the land to worship at 'High Sanctum of Dawn'.
+  * Caleb Blackwood penned 'The Life and Deeds of Theron Blackwood', a Biography preserved in the archives of Riverbend.
+      [because: Caleb Crowley died in a forestry accident with Theron Blackwood at Oakhaven (Year 66, #488)]
+  * Thalia Ashford penned 'The Personal Journal of Thalia Ashford', a PersonalJournal preserved in the archives of Riverbend.
+      [because: Caleb Crowley died in a forestry accident with Theron Blackwood at Oakhaven (Year 66, #488)]
+  * Theron Blackwood died in a forestry accident with Astrid Crowley at Riverbend.
+  * Rowan Crowley penned 'The Personal Journal of Rowan Crowley', a PersonalJournal preserved in the archives of Oakhaven.
+      [because: Theron Blackwood died in a forestry accident with Astrid Crowley at Riverbend (Year 66, #492)]
+  * Aldous Blackwood died in a forestry accident with Astrid Crowley at Riverbend.
+  * A bitter blood feud was declared by Morwen Blackwood against Astrid Crowley in Riverbend.
+      [because: Aldous Blackwood died in a forestry accident with Astrid Crowley at Riverbend (Year 66, #494)]
+  * Rowan Crowley penned 'The Personal Journal of Rowan Crowley', a PersonalJournal preserved in the archives of Oakhaven.
+      [because: Aldous Blackwood died in a forestry accident with Astrid Crowley at Riverbend (Year 66, #494)]
+  * Caleb Blackwood penned 'Council Record of Feud at set_riverbend', a LegalRecord preserved in the archives of Riverbend.
+      [because: A bitter blood feud was declared by Morwen Blackwood against Astrid Crowley in Riverbend (Year 66, #495)]
+  * The trade corridor between Unknown Settlement and Unknown Settlement was severed due to conflict.
+      [because: A bitter blood feud was declared by Morwen Blackwood against Astrid Crowley in Riverbend (Year 66, #495)]
+  * Eldrin Blackwood and Lyra Ironwood were wed in Riverbend.
+
+--- YEAR 67 ---
+  * Caleb Blackwood and Thalia Ashford were wed in Riverbend.
+  * Caleb Crowley and Lyra Blackwood were wed in Oakhaven.
+  * Rowan Ironwood emerged as a venerated Prophet of the faith in Ironpeak.
+  * Caleb Rivers died in a forestry accident with Eleni Rivers at Oakhaven.
+  * Rowan Ironwood completed a holy pilgrimage across the land to worship at 'The Grand Temple of Pure Spirit'.
+  * Gideon Stone passed away peacefully of old age in Riverbend.
+  * Sari Stone assumed leadership as Chief of Riverbend.
+      [because: Gideon Stone passed away peacefully of old age in Riverbend (Year 67, #505)]
+  * Caleb Blackwood penned 'The Life and Deeds of Gideon Stone', a Biography preserved in the archives of Riverbend.
+      [because: Gideon Stone passed away peacefully of old age in Riverbend (Year 67, #505)]
+  * Sari Stone penned 'The Personal Journal of Sari Stone', a PersonalJournal preserved in the archives of Riverbend.
+      [because: Gideon Stone passed away peacefully of old age in Riverbend (Year 67, #505)]
+  * Gareth Blackwood and Astrid Ashford were wed in Riverbend, with Astrid Ashford relocating to Riverbend.
+  * Arthur Ironwood and Morwen Blackwood were wed in Ironpeak, with Morwen Blackwood relocating to Ironpeak.
+  * Astrid Crowley converted from rel_syncretic_10 to rel_syncretic_11 in Oakhaven (Missionary).
+  * 'High Sanctum of Dawn' in Ironpeak was elevated to the rank of LocalShrine due to influx of devout pilgrims.
+  * Rowan Ironwood completed a holy pilgrimage across the land to worship at 'High Sanctum of Dawn'.
+  * Gareth Blackwood penned 'The Personal Journal of Gareth Blackwood', a PersonalJournal preserved in the archives of Riverbend.
+      [because: Gareth Blackwood and Astrid Ashford were wed in Riverbend, with Astrid Ashford relocating to Riverbend (Year 67, #509)]
+
+--- YEAR 68 ---
+  * Rowan Ironwood completed a holy pilgrimage across the land to worship at 'The Grand Temple of Pure Spirit'.
+  * The heroic legend of Astrid Rivers was recorded into the living mythology of Ascendant Ascendant Way of the Sovereign Peak.
+      [because: Astrid Rivers passed away peacefully of old age in Oakhaven (Year 27, #179)]
+  * Rowan Ironwood completed a holy pilgrimage across the land to worship at 'High Sanctum of Dawn'.
+  * Gareth Ashford and Daphne Rivers were wed in Ironpeak, with Daphne Rivers relocating to Ironpeak.
+  * Corin Blackwood died in a forestry accident with Kaelen Crowley at Riverbend.
+  * Tobias Blackwood died in a forestry accident with Aldous Crowley at Riverbend.
+  * Isolde Crowley penned 'The Life and Deeds of Aldous Crowley', a Biography preserved in the archives of Oakhaven.
+      [because: Tobias Blackwood died in a forestry accident with Aldous Crowley at Riverbend (Year 68, #520)]
+  * Rowan Crowley penned 'The Personal Journal of Rowan Crowley', a PersonalJournal preserved in the archives of Oakhaven.
+      [because: Tobias Blackwood died in a forestry accident with Aldous Crowley at Riverbend (Year 68, #520)]
+  * Orson Blackwood and Isolde Crowley were wed in Riverbend, with Isolde Crowley relocating to Riverbend.
+
+--- YEAR 69 ---
+  * Vesper Blackwood was born to Orson Blackwood and Isolde Crowley in Riverbend.
+      [because: Orson Blackwood and Isolde Crowley were wed in Riverbend, with Isolde Crowley relocating to Riverbend (Year 68, #523)]
+  * Orson Blackwood and Lyra Ashford were wed in Riverbend.
+  * Lyra Rivers died in a forestry accident with Isolde Ironwood at Oakhaven.
+  * Corin Blackwood and Daphne Ironwood were wed in Riverbend, with Daphne Ironwood relocating to Riverbend.
+  * Thalia Ironwood was born to Caleb Ironwood and Elora Ashford in Ironpeak.
+      [because: Caleb Ironwood and Elora Ashford were wed in Ironpeak (Year 60, #439)]
+  * Rowan Ironwood completed a holy pilgrimage across the land to worship at 'High Sanctum of Dawn'.
+
+--- YEAR 70 ---
+  * Caleb Rivers passed away peacefully of old age in Oakhaven.
+  * Orson Rivers penned 'The Life and Deeds of Caleb Rivers', a Biography preserved in the archives of Oakhaven.
+      [because: Caleb Rivers passed away peacefully of old age in Oakhaven (Year 70, #530)]
+  * Eldrin Rivers penned 'The Personal Journal of Eldrin Rivers', a PersonalJournal preserved in the archives of Oakhaven.
+      [because: Caleb Rivers passed away peacefully of old age in Oakhaven (Year 70, #530)]
+  * Astrid Crowley penned 'The Personal Journal of Astrid Crowley', a PersonalJournal preserved in the archives of Oakhaven.
+      [because: Caleb Rivers passed away peacefully of old age in Oakhaven (Year 70, #530)]
+  * Rowan Crowley passed away peacefully of old age in Oakhaven.
+
+--- YEAR 71 ---
+  * Daphne Crowley was born to Aldous Crowley and Eleni Rivers in Oakhaven.
+      [because: Aldous Crowley and Eleni Rivers were wed in Oakhaven (Year 53, #405)]
+  * The heroic legend of Briony Rivers was recorded into the living mythology of Sacred Union of Peak and Peak.
+      [because: Briony Rivers passed away peacefully of old age in Oakhaven (Year 53, #406)]
+  * Orson Rivers penned 'The Great Chronicle of Oakhaven', a HistoricalChronicle preserved in the archives of Oakhaven.
+      [because: Orson Rivers completed a holy pilgrimage across the land to worship at 'Sovereign Peak Sanctuary' (Year 61, #456)]
+  * Daphne Crowley penned 'The Mythic Lore of Sacred Union of Peak and Peak', a MythCollection preserved in the archives of Oakhaven.
+  * Caleb Blackwood penned 'The Great Chronicle of Riverbend', a HistoricalChronicle preserved in the archives of Riverbend.
+  * Sari Stone penned 'Folklore and Traditions of Riverbend', a LocalFolklore preserved in the archives of Riverbend.
+  * Caleb Blackwood penned 'The Mythic Lore of Sacred Union of Peak and Peak', a MythCollection preserved in the archives of Riverbend.
+  * Thalia Ashford penned 'Chronicle of House Ashford', a FamilyHistory preserved in the archives of Riverbend.
+      [because: Thalia Ashford was born to Gideon Ashford and Morwen Stone in Ironpeak (Year 13, #87); and Silas Ashford was born to Gideon Ashford and Morwen Stone in Ironpeak (Year 15, #100); and Astrid Ashford was born to Silas Ashford and Briony Blackwood in Ironpeak (Year 25, #163)]
+  * Eldrin Blackwood penned 'Chronicle of House Blackwood', a FamilyHistory preserved in the archives of Riverbend.
+      [because: Eldrin Blackwood was born to Cedric Blackwood and Kaelen Rivers in Riverbend (Year 29, #206); and Corin Blackwood was born to Theron Blackwood and Thalia Ashford in Riverbend (Year 43, #286); and Morwen Blackwood was born to Theron Blackwood and Thalia Ashford in Riverbend (Year 44, #293)]
+  * Eldrin Rivers penned 'Chronicle of House Rivers', a FamilyHistory preserved in the archives of Oakhaven.
+      [because: Eldrin Rivers was born to Bram Rivers and Kaelen Blackwood in Oakhaven (Year 16, #103); and Brenna Rivers was born to Caleb Rivers and Briony Crowley in Oakhaven (Year 29, #205); and Eleni Rivers was born to Caleb Rivers and Briony Crowley in Oakhaven (Year 35, #237)]
+  * Sari Stone penned 'Chronicle of House Stone', a FamilyHistory preserved in the archives of Riverbend.
+      [because: Sari Stone was born to Eldrin Stone and Thalia Blackwood in Riverbend (Year 11, #79); and Theron Blackwood and Sari Stone were wed in Riverbend (Year 31, #222); and Corin Blackwood was born to Theron Blackwood and Sari Stone in Riverbend (Year 39, #253)]
+  * Lucan Ashford was born to Gareth Ashford and Daphne Rivers in Ironpeak.
+      [because: Gareth Ashford and Daphne Rivers were wed in Ironpeak, with Daphne Rivers relocating to Ironpeak (Year 68, #518)]
+  * Eldrin Blackwood was born to Orson Blackwood and Isolde Crowley in Riverbend.
+      [because: Orson Blackwood and Isolde Crowley were wed in Riverbend, with Isolde Crowley relocating to Riverbend (Year 68, #523)]
+  * Sylvia Rivers was born to Caleb Rivers and Isolde Ironwood in Oakhaven.
+      [because: Caleb Rivers and Isolde Ironwood were wed in Oakhaven, with Isolde Ironwood relocating to Oakhaven (Year 63, #466)]
+  * A peace treaty was ratified between Eldrin Rivers and Gareth Ashford in Oakhaven, bringing an end to hostilities.
+      [because: A bitter blood feud was declared by Aldous Crowley against Gareth Ashford in Oakhaven (Year 52, #394); and Briony Crowley died in a forestry accident with Gareth Ashford at Oakhaven (Year 52, #392)]
+  * Orson Rivers penned 'The Treaty and Concord of set_oakhaven', a LegalRecord preserved in the archives of Oakhaven.
+      [because: A peace treaty was ratified between Eldrin Rivers and Gareth Ashford in Oakhaven, bringing an end to hostilities (Year 71, #549)]
+
+--- YEAR 72 ---
+  * Astrid Crowley converted from rel_syncretic_11 to rel_syncretic_9 in Oakhaven (SaintCultVeneration).
+  * Isolde Ironwood was born to Caleb Ironwood and Elora Ashford in Ironpeak.
+      [because: Caleb Ironwood and Elora Ashford were wed in Ironpeak (Year 60, #439)]
+  * Rowan Ironwood emerged as a venerated Prophet of the faith in Ironpeak.
+  * Faith A and Faith B coalesced through cultural syncretism into Harmonious Peak and Peak in Riverbend.
+  * Caleb Blackwood was born to Orson Blackwood and Lyra Ashford in Riverbend.
+      [because: Orson Blackwood and Lyra Ashford were wed in Riverbend (Year 69, #525)]
+  * Arthur Ironwood died in a forestry accident with Bram Crowley at Ironpeak.
+  * Sylvia Ironwood was born to Lucan Ironwood and Astrid Blackwood in Ironpeak.
+      [because: Lucan Ironwood and Astrid Blackwood were wed in Ironpeak, with Astrid Blackwood relocating to Ironpeak (Year 64, #480)]
+  * Daphne Ironwood was born to Lucan Ironwood and Astrid Blackwood in Ironpeak.
+      [because: Lucan Ironwood and Astrid Blackwood were wed in Ironpeak, with Astrid Blackwood relocating to Ironpeak (Year 64, #480)]
+
+--- YEAR 73 ---
+  * Caleb Ironwood converted from rel_syncretic_11 to rel_syncretic_12 in Ironpeak (SaintCultVeneration).
+  * Lyra Blackwood was born to Corin Blackwood and Daphne Ironwood in Riverbend.
+      [because: Corin Blackwood and Daphne Ironwood were wed in Riverbend, with Daphne Ironwood relocating to Riverbend (Year 69, #527)]
+  * Lucan Blackwood was born to Orson Blackwood and Lyra Ashford in Riverbend.
+      [because: Orson Blackwood and Lyra Ashford were wed in Riverbend (Year 69, #525)]
+
+--- YEAR 74 ---
+  * Aldous Crowley passed away peacefully of old age in Oakhaven.
+  * Astrid Crowley penned 'The Personal Journal of Astrid Crowley', a PersonalJournal preserved in the archives of Oakhaven.
+      [because: Aldous Crowley passed away peacefully of old age in Oakhaven (Year 74, #562)]
+  * Astrid Crowley died in a forestry accident with Thalia Ashford at Oakhaven.
+  * Lyra Blackwood completed a holy pilgrimage across the land to worship at 'The Grand Temple of Pure Spirit'.
+  * Caleb Blackwood penned 'The Life and Deeds of Thalia Ashford', a Biography preserved in the archives of Riverbend.
+      [because: Astrid Crowley died in a forestry accident with Thalia Ashford at Oakhaven (Year 74, #564)]
+  * Thalia Ashford penned 'The Personal Journal of Thalia Ashford', a PersonalJournal preserved in the archives of Riverbend.
+      [because: Astrid Crowley died in a forestry accident with Thalia Ashford at Oakhaven (Year 74, #564)]
+  * Eldrin Rivers and Daphne Ironwood were wed in Oakhaven, with Daphne Ironwood relocating to Oakhaven.
+  * Daphne Ironwood penned 'The Personal Journal of Daphne Ironwood', a PersonalJournal preserved in the archives of Oakhaven.
+      [because: Eldrin Rivers and Daphne Ironwood were wed in Oakhaven, with Daphne Ironwood relocating to Oakhaven (Year 74, #568)]
+  * Lucan Blackwood completed a holy pilgrimage across the land to worship at 'World-Root of Serpent'.
+
+--- YEAR 75 ---
+  * Rowan Ironwood completed a holy pilgrimage across the land to worship at 'The Grand Temple of Pure Spirit'.
+  * The heroic legend of Cedric Crowley was recorded into the living mythology of Eternal Way of Peak and Peak.
+      [because: Cedric Crowley passed away peacefully of old age in Oakhaven (Year 35, #234)]
+  * Caleb Blackwood was born to Orson Blackwood and Isolde Crowley in Riverbend.
+      [because: Orson Blackwood and Isolde Crowley were wed in Riverbend, with Isolde Crowley relocating to Riverbend (Year 68, #523)]
+  * Brenna Rivers died in a forestry accident with Corin Blackwood at Oakhaven.
+  * Lucan Rivers and Sari Stone were wed in Oakhaven, with Sari Stone relocating to Oakhaven.
+  * Rowan Ironwood completed a holy pilgrimage across the land to worship at 'The Grand Temple of Pure Spirit'.
+  * Faith A and Faith B coalesced through cultural syncretism into Harmonious Peak and Peak in Riverbend.
+  * Sari Stone penned 'The Personal Journal of Sari Stone', a PersonalJournal preserved in the archives of Oakhaven.
+      [because: Lucan Rivers and Sari Stone were wed in Oakhaven, with Sari Stone relocating to Oakhaven (Year 75, #575)]
+  * Gareth Rivers was born to Eldrin Rivers and Kaelen Crowley in Oakhaven.
+      [because: Eldrin Rivers and Kaelen Crowley were wed in Oakhaven (Year 49, #358)]
+  * Lyra Blackwood was born to Orson Blackwood and Lyra Ashford in Riverbend.
+      [because: Orson Blackwood and Lyra Ashford were wed in Riverbend (Year 69, #525)]
+  * 'The Grand Temple of Pure Spirit' in Oakhaven was elevated to the rank of Temple due to influx of devout pilgrims.
+  * Lyra Blackwood completed a holy pilgrimage across the land to worship at 'The Grand Temple of Pure Spirit'.
+
+--- YEAR 76 ---
+  * The heroic legend of Cedric Crowley was recorded into the living mythology of Eternal Way of Peak and Peak.
+      [because: Cedric Crowley passed away peacefully of old age in Oakhaven (Year 35, #234)]
+  * Bram Crowley and Morwen Blackwood were wed in Oakhaven, with Morwen Blackwood relocating to Oakhaven.
+  * Lucan Blackwood completed a holy pilgrimage across the land to worship at 'Sovereign Peak Sanctuary'.
+  * Unknown Person emerged as a venerated Mystic of the faith in Ironpeak.
+  * Gareth Ashford died in a forestry accident with Gareth Blackwood at Ironpeak.
+  * Caleb Crowley converted from rel_syncretic_11 to rel_syncretic_10 in Oakhaven (SaintCultVeneration).
+  * Sylvia Rivers was born to Caleb Rivers and Isolde Ironwood in Oakhaven.
+      [because: Caleb Rivers and Isolde Ironwood were wed in Oakhaven, with Isolde Ironwood relocating to Oakhaven (Year 63, #466)]
+
+--- YEAR 77 ---
+  * The objective truth was formally revealed to Unknown Person through the testimony of Thalia Ashford in Ironpeak.
+      [because: Aldous Blackwood died in a forestry accident with Astrid Crowley at Riverbend (Year 66, #494); and A bitter blood feud was declared by Morwen Blackwood against Astrid Crowley in Riverbend (Year 66, #495)]
+  * A peace treaty was ratified between Morwen Blackwood and Eldrin Rivers in Riverbend, bringing an end to hostilities.
+      [because: A bitter blood feud was declared by Morwen Blackwood against Astrid Crowley in Riverbend (Year 66, #495); and The objective truth was formally revealed to Unknown Person through the testimony of Thalia Ashford in Ironpeak (Year 77, #590)]
+  * Caleb Blackwood penned 'The Treaty and Concord of set_riverbend', a LegalRecord preserved in the archives of Riverbend.
+      [because: A peace treaty was ratified between Morwen Blackwood and Eldrin Rivers in Riverbend, bringing an end to hostilities (Year 77, #591)]
+  * A bilateral commercial and diplomatic trade route was opened between Unknown Settlement and Unknown Settlement.
+      [because: A peace treaty was ratified between Morwen Blackwood and Eldrin Rivers in Riverbend, bringing an end to hostilities (Year 77, #591)]
+  * Vance Rivers converted from rel_syncretic_11 to rel_syncretic_12 in Oakhaven (SaintCultVeneration).
+  * Lyra Blackwood converted from rel_syncretic_11 to rel_syncretic_10 in Oakhaven (SaintCultVeneration).
+  * Lucan Blackwood was born to Corin Blackwood and Daphne Ironwood in Riverbend.
+      [because: Corin Blackwood and Daphne Ironwood were wed in Riverbend, with Daphne Ironwood relocating to Riverbend (Year 69, #527)]
+  * Rowan Ironwood emerged as a venerated Prophet of the faith in Ironpeak.
+  * Eldrin Rivers converted from rel_syncretic_11 to rel_syncretic_13 in Oakhaven (SaintCultVeneration).
+  * Eldrin Blackwood was born to Orson Blackwood and Lyra Ashford in Riverbend.
+      [because: Orson Blackwood and Lyra Ashford were wed in Riverbend (Year 69, #525)]
+  * Vance Rivers and Sylvia Crowley were wed in Oakhaven.
+  * Silas Ashford passed away peacefully of old age in Ironpeak.
+  * Elora Ashford assumed leadership as Chief of Ironpeak.
+      [because: Silas Ashford passed away peacefully of old age in Ironpeak (Year 77, #601)]
+  * A bilateral commercial and diplomatic trade route was opened between Unknown Settlement and Unknown Settlement.
+  * Sari Stone passed away peacefully of old age in Oakhaven.
+  * Lyra Blackwood died in a forestry accident with Caleb Crowley at Oakhaven.
+  * Caleb Blackwood assumed leadership as Chief of Riverbend.
+      [because: Sari Stone passed away peacefully of old age in Oakhaven (Year 77, #604)]
+  * Orson Rivers penned 'The Life and Deeds of Sari Stone', a Biography preserved in the archives of Oakhaven.
+      [because: Sari Stone passed away peacefully of old age in Oakhaven (Year 77, #604)]
+
+--- YEAR 78 ---
+  * Caleb Crowley and Eleni Rivers were wed in Oakhaven.
+  * Lucan Rivers and Sari Blackwood were joined in an alliance marriage in Oakhaven, with Sari Blackwood relocating to Oakhaven.
+      [because: A peace treaty was ratified between Morwen Blackwood and Eldrin Rivers in Riverbend, bringing an end to hostilities (Year 77, #591)]
+  * Astrid Ironwood was born to Lucan Ironwood and Astrid Blackwood in Ironpeak.
+      [because: Lucan Ironwood and Astrid Blackwood were wed in Ironpeak, with Astrid Blackwood relocating to Ironpeak (Year 64, #480)]
+  * Brenna Rivers was born to Eldrin Rivers and Daphne Ironwood in Oakhaven.
+      [because: Eldrin Rivers and Daphne Ironwood were wed in Oakhaven, with Daphne Ironwood relocating to Oakhaven (Year 74, #568)]
+  * The heroic legend of Astrid Rivers was recorded into the living mythology of Eternal Way of Peak and Peak.
+      [because: Astrid Rivers passed away peacefully of old age in Oakhaven (Year 27, #179)]
+  * Lyra Rivers was born to Lucan Rivers and Sari Blackwood in Oakhaven.
+      [because: Lucan Rivers and Sari Blackwood were joined in an alliance marriage in Oakhaven, with Sari Blackwood relocating to Oakhaven (Year 78, #609)]
+  * Lucan Blackwood completed a holy pilgrimage across the land to worship at 'The Grand Temple of Pure Spirit'.
+  * Rowan Ironwood emerged as a venerated Prophet of the faith in Ironpeak.
+  * Thalia Ironwood converted from rel_syncretic_11 to rel_syncretic_13 in Ironpeak (SaintCultVeneration).
+  * Lucan Blackwood completed a holy pilgrimage across the land to worship at 'Sacred Stream of Celestial'.
+
+--- YEAR 79 ---
+  * Orson Ironwood and Morwen Blackwood were wed in Ironpeak.
+  * Bram Rivers was born to Vance Rivers and Sylvia Crowley in Oakhaven.
+      [because: Vance Rivers and Sylvia Crowley were wed in Oakhaven (Year 77, #600)]
+  * 'Sovereign Peak Sanctuary' in Oakhaven was elevated to the rank of Temple due to influx of devout pilgrims.
+  * Rowan Ironwood completed a holy pilgrimage across the land to worship at 'Sovereign Peak Sanctuary'.
+  * Orson Rivers and Isolde Ashford were wed in Oakhaven, with Isolde Ashford relocating to Oakhaven.
+      [because: A bilateral commercial and diplomatic trade route was opened between Unknown Settlement and Unknown Settlement (Year 77, #603)]
+  * Tobias Rivers was born to Orson Rivers and Isolde Ashford in Oakhaven.
+      [because: Orson Rivers and Isolde Ashford were wed in Oakhaven, with Isolde Ashford relocating to Oakhaven (Year 79, #622)]
+  * Thalia Ashford converted from rel_syncretic_11 to rel_syncretic_13 in Riverbend (SaintCultVeneration).
+  * Lucan Blackwood completed a holy pilgrimage across the land to worship at 'World-Root of Serpent'.
+  * Eldrin Rivers was born to Vance Rivers and Sylvia Crowley in Oakhaven.
+      [because: Vance Rivers and Sylvia Crowley were wed in Oakhaven (Year 77, #600)]
+
+--- YEAR 80 ---
+  * Faith A and Faith B coalesced through cultural syncretism into Harmonious Peak and Peak in Riverbend.
+  * Sylvia Rivers converted from rel_syncretic_11 to rel_syncretic_14 in Oakhaven (SaintCultVeneration).
+  * Thalia Ashford completed a holy pilgrimage across the land to worship at 'World-Root of Serpent'.
+  * Vance Rivers and Maeve Ironwood were wed in Oakhaven, with Maeve Ironwood relocating to Oakhaven.
+  * Sari Rivers was born to Orson Rivers and Isolde Ashford in Oakhaven.
+      [because: Orson Rivers and Isolde Ashford were wed in Oakhaven, with Isolde Ashford relocating to Oakhaven (Year 79, #622)]
+  * Bram Ironwood was born to Orson Ironwood and Morwen Blackwood in Ironpeak.
+      [because: Orson Ironwood and Morwen Blackwood were wed in Ironpeak (Year 79, #618)]
+  * Thalia Ashford completed a holy pilgrimage across the land to worship at 'High Sanctum of Dawn'.
+  * Thalia Ashford passed away peacefully of old age in Riverbend.
+  * Caleb Blackwood penned 'The Life and Deeds of Thalia Ashford', a Biography preserved in the archives of Riverbend.
+      [because: Thalia Ashford passed away peacefully of old age in Riverbend (Year 80, #634)]
+  * Astrid Blackwood died in a forestry accident with Eldrin Blackwood at Ironpeak.
+  * Lucan Blackwood completed a holy pilgrimage across the land to worship at 'High Sanctum of Dawn'.
+  * Caleb Blackwood penned 'The Life and Deeds of Eldrin Blackwood', a Biography preserved in the archives of Riverbend.
+      [because: Astrid Blackwood died in a forestry accident with Eldrin Blackwood at Ironpeak (Year 80, #636)]
+
+--- YEAR 81 ---
+  * Caleb Crowley converted from rel_syncretic_11 to rel_syncretic_10 in Oakhaven (SaintCultVeneration).
+  * Orson Rivers penned 'The Great Chronicle of Oakhaven', a HistoricalChronicle preserved in the archives of Oakhaven.
+      [because: Daphne Crowley was born to Aldous Crowley and Eleni Rivers in Oakhaven (Year 71, #535); and The heroic legend of Briony Rivers was recorded into the living mythology of Sacred Union of Peak and Peak (Year 71, #536)]
+  * Eldrin Rivers penned 'Folklore and Traditions of Oakhaven', a LocalFolklore preserved in the archives of Oakhaven.
+  * Daphne Crowley penned 'The Mythic Lore of Sacred Union of Peak and Peak', a MythCollection preserved in the archives of Oakhaven.
+  * Caleb Blackwood penned 'The Great Chronicle of Riverbend', a HistoricalChronicle preserved in the archives of Riverbend.
+  * Lyra Ironwood penned 'Folklore and Traditions of Riverbend', a LocalFolklore preserved in the archives of Riverbend.
+  * Caleb Blackwood penned 'The Mythic Lore of Harmonious Peak and Peak', a MythCollection preserved in the archives of Riverbend.
+  * Eldrin Blackwood penned 'Chronicle of House Blackwood', a FamilyHistory preserved in the archives of Riverbend.
+      [because: Eldrin Blackwood was born to Cedric Blackwood and Kaelen Rivers in Riverbend (Year 29, #206); and Corin Blackwood was born to Theron Blackwood and Thalia Ashford in Riverbend (Year 43, #286); and Morwen Blackwood was born to Theron Blackwood and Thalia Ashford in Riverbend (Year 44, #293)]
+  * Eldrin Rivers penned 'Chronicle of House Rivers', a FamilyHistory preserved in the archives of Oakhaven.
+      [because: Eldrin Rivers was born to Bram Rivers and Kaelen Blackwood in Oakhaven (Year 16, #103); and Eleni Rivers was born to Caleb Rivers and Briony Crowley in Oakhaven (Year 35, #237); and Caleb Rivers was born to Caleb Rivers and Briony Crowley in Oakhaven (Year 40, #255)]
+  * Thalia Blackwood was born to Corin Blackwood and Daphne Ironwood in Riverbend.
+      [because: Corin Blackwood and Daphne Ironwood were wed in Riverbend, with Daphne Ironwood relocating to Riverbend (Year 69, #527)]
+  * Isolde Crowley died in a forestry accident with Lucan Ironwood at Riverbend.
+  * Caleb Blackwood and Daphne Rivers were wed in Riverbend, with Daphne Rivers relocating to Riverbend.
+  * Lucan Ironwood converted from rel_sect_5 to rel_syncretic_14 in Ironpeak (SaintCultVeneration).
+  * Lucan Blackwood completed a holy pilgrimage across the land to worship at 'High Sanctum of Dawn'.
+
+--- YEAR 82 ---
+  * Corin Blackwood converted from rel_syncretic_14 to rel_syncretic_12 in Riverbend (SaintCultVeneration).
+  * Rowan Ironwood emerged as a venerated Prophet of the faith in Ironpeak.
+  * Daphne Rivers was born to Vance Rivers and Sylvia Crowley in Oakhaven.
+      [because: Vance Rivers and Sylvia Crowley were wed in Oakhaven (Year 77, #600)]
+  * Arthur Rivers and Kaelen Crowley were wed in Oakhaven.
+  * Tobias Rivers completed a holy pilgrimage across the land to worship at 'The Grand Temple of Pure Spirit'.
+
+--- YEAR 83 ---
+  * Faith A and Faith B coalesced through cultural syncretism into Harmonious Peak and Peak in Riverbend.
+  * Lucan Ironwood and Daphne Ashford were wed in Ironpeak.
+  * Corin Blackwood died in a forestry accident with Morwen Blackwood at Riverbend.
+  * Caleb Crowley converted from rel_syncretic_10 to rel_syncretic_14 in Oakhaven (Marriage).
+  * Unknown Person emerged as a venerated Mystic of the faith in Ironpeak.
+  * Lucan Ironwood penned 'The Personal Journal of Lucan Ironwood', a PersonalJournal preserved in the archives of Ironpeak.
+      [because: Lucan Ironwood and Daphne Ashford were wed in Ironpeak (Year 83, #659)]
+  * Orson Blackwood and Daphne Ironwood were wed in Riverbend.
+  * Orson Blackwood penned 'The Personal Journal of Orson Blackwood', a PersonalJournal preserved in the archives of Riverbend.
+      [because: Orson Blackwood and Daphne Ironwood were wed in Riverbend (Year 83, #664)]
+  * Lucan Blackwood completed a holy pilgrimage across the land to worship at 'The Grand Temple of Pure Spirit'.
+  * Brenna Rivers converted from rel_sect_5 to rel_syncretic_15 in Oakhaven (SaintCultVeneration).
+  * Freya Rivers was born to Lucan Rivers and Sari Blackwood in Oakhaven.
+      [because: Lucan Rivers and Sari Blackwood were joined in an alliance marriage in Oakhaven, with Sari Blackwood relocating to Oakhaven (Year 78, #609)]
+  * Corin Blackwood was born to Caleb Blackwood and Daphne Rivers in Riverbend.
+      [because: Caleb Blackwood and Daphne Rivers were wed in Riverbend, with Daphne Rivers relocating to Riverbend (Year 81, #650)]
+  * Elora Ironwood was born to Orson Ironwood and Morwen Blackwood in Ironpeak.
+      [because: Orson Ironwood and Morwen Blackwood were wed in Ironpeak (Year 79, #618)]
+  * Vance Rivers was born to Caleb Rivers and Isolde Ironwood in Oakhaven.
+      [because: Caleb Rivers and Isolde Ironwood were wed in Oakhaven, with Isolde Ironwood relocating to Oakhaven (Year 63, #466)]
+  * Thalia Ashford completed a holy pilgrimage across the land to worship at 'The Grand Temple of Pure Spirit'.
+  * Unknown Person emerged as a venerated Mystic of the faith in Ironpeak.
+  * Bram Stone and Morwen Crowley were wed in Riverbend, with Morwen Crowley relocating to Riverbend.
+  * Bram Stone penned 'The Personal Journal of Bram Stone', a PersonalJournal preserved in the archives of Riverbend.
+      [because: Bram Stone and Morwen Crowley were wed in Riverbend, with Morwen Crowley relocating to Riverbend (Year 83, #674)]
+
+--- YEAR 84 ---
+  * Rowan Ironwood and Astrid Rivers were wed in Ironpeak, with Astrid Rivers relocating to Ironpeak.
+  * Orson Rivers was born to Caleb Rivers and Isolde Ironwood in Oakhaven.
+      [because: Caleb Rivers and Isolde Ironwood were wed in Oakhaven, with Isolde Ironwood relocating to Oakhaven (Year 63, #466)]
+  * Unknown Person emerged as a venerated Mystic of the faith in Ironpeak.
+  * Unknown Person emerged as a venerated Mystic of the faith in Ironpeak.
+  * Lucan Rivers was born to Arthur Rivers and Kaelen Crowley in Oakhaven.
+      [because: Arthur Rivers and Kaelen Crowley were wed in Oakhaven (Year 82, #656)]
+  * Eldrin Rivers passed away peacefully of old age in Oakhaven.
+  * Eldrin Rivers assumed leadership as Chief of Oakhaven.
+      [because: Eldrin Rivers passed away peacefully of old age in Oakhaven (Year 84, #681)]
+  * Morwen Crowley converted from rel_syncretic_10 to rel_syncretic_15 in Riverbend (SaintCultVeneration).
+  * Orson Rivers penned 'The Life and Deeds of Eldrin Rivers', a Biography preserved in the archives of Oakhaven.
+      [because: Eldrin Rivers passed away peacefully of old age in Oakhaven (Year 84, #681)]
+  * Lyra Blackwood was born to Caleb Blackwood and Daphne Rivers in Riverbend.
+      [because: Caleb Blackwood and Daphne Rivers were wed in Riverbend, with Daphne Rivers relocating to Riverbend (Year 81, #650)]
+  * Brenna Rivers was born to Orson Rivers and Isolde Ashford in Oakhaven.
+      [because: Orson Rivers and Isolde Ashford were wed in Oakhaven, with Isolde Ashford relocating to Oakhaven (Year 79, #622)]
+  * Faith A and Faith B coalesced through cultural syncretism into Eternal Way of Peak and Peak in Riverbend.
+  * Maeve Ironwood passed away peacefully of old age in Oakhaven.
+  * Orson Rivers penned 'The Life and Deeds of Maeve Ironwood', a Biography preserved in the archives of Oakhaven.
+      [because: Maeve Ironwood passed away peacefully of old age in Oakhaven (Year 84, #688)]
+  * Tobias Rivers and Lyra Crowley were wed in Oakhaven.
+  * Kaelen Stone was born to Bram Stone and Morwen Crowley in Riverbend.
+      [because: Bram Stone and Morwen Crowley were wed in Riverbend, with Morwen Crowley relocating to Riverbend (Year 83, #674)]
+
+--- YEAR 85 ---
+  * Thalia Rivers was born to Tobias Rivers and Lyra Crowley in Oakhaven.
+      [because: Tobias Rivers and Lyra Crowley were wed in Oakhaven (Year 84, #690)]
+  * Cedric Crowley was born to Bram Crowley and Morwen Blackwood in Oakhaven.
+      [because: Bram Crowley and Morwen Blackwood were wed in Oakhaven, with Morwen Blackwood relocating to Oakhaven (Year 76, #584)]
+  * Lucan Ironwood converted from rel_syncretic_14 to rel_syncretic_15 in Ironpeak (SaintCultVeneration).
+  * Brenna Rivers completed a holy pilgrimage across the land to worship at 'High Sanctum of Dawn'.
+  * Sylvia Stone was born to Bram Stone and Morwen Crowley in Riverbend.
+      [because: Bram Stone and Morwen Crowley were wed in Riverbend, with Morwen Crowley relocating to Riverbend (Year 83, #674)]
+  * Aldous Rivers was born to Vance Rivers and Sylvia Crowley in Oakhaven.
+      [because: Vance Rivers and Sylvia Crowley were wed in Oakhaven (Year 77, #600)]
+  * Astrid Ashford passed away peacefully of old age in Riverbend.
+  * Caleb Blackwood penned 'The Life and Deeds of Astrid Ashford', a Biography preserved in the archives of Riverbend.
+      [because: Astrid Ashford passed away peacefully of old age in Riverbend (Year 85, #698)]
+
+--- YEAR 86 ---
+  * Caleb Rivers was born to Orson Rivers and Isolde Ashford in Oakhaven.
+      [because: Orson Rivers and Isolde Ashford were wed in Oakhaven, with Isolde Ashford relocating to Oakhaven (Year 79, #622)]
+  * Gareth Blackwood and Kaelen Crowley were wed in Riverbend, with Kaelen Crowley relocating to Riverbend.
+  * Thalia Ashford passed away peacefully of old age in Riverbend.
+  * Lucan Blackwood completed a holy pilgrimage across the land to worship at 'High Sanctum of Dawn'.
+  * Daphne Ironwood converted from rel_syncretic_12 to rel_syncretic_16 in Riverbend (SaintCultVeneration).
+  * Lucan Blackwood completed a holy pilgrimage across the land to worship at 'The Grand Temple of Pure Spirit'.
+  * Thalia Rivers completed a holy pilgrimage across the land to worship at 'World-Root of Serpent'.
+
+--- YEAR 87 ---
+  * Caleb Ironwood passed away peacefully of old age in Ironpeak.
+  * Lyra Ironwood passed away peacefully of old age in Riverbend.
+  * Lucan Ironwood penned 'The Personal Journal of Lucan Ironwood', a PersonalJournal preserved in the archives of Ironpeak.
+      [because: Caleb Ironwood passed away peacefully of old age in Ironpeak (Year 87, #707)]
+  * Caleb Blackwood penned 'The Life and Deeds of Lyra Ironwood', a Biography preserved in the archives of Riverbend.
+      [because: Lyra Ironwood passed away peacefully of old age in Riverbend (Year 87, #708)]
+  * Bram Stone was born to Bram Stone and Morwen Crowley in Riverbend.
+      [because: Bram Stone and Morwen Crowley were wed in Riverbend, with Morwen Crowley relocating to Riverbend (Year 83, #674)]
+  * Sari Rivers converted from rel_syncretic_11 to rel_syncretic_16 in Oakhaven (SaintCultVeneration).
+  * Corin Ironwood was born to Orson Ironwood and Morwen Blackwood in Ironpeak.
+      [because: Orson Ironwood and Morwen Blackwood were wed in Ironpeak (Year 79, #618)]
+  * Lyra Blackwood was born to Caleb Blackwood and Daphne Rivers in Riverbend.
+      [because: Caleb Blackwood and Daphne Rivers were wed in Riverbend, with Daphne Rivers relocating to Riverbend (Year 81, #650)]
+  * Brenna Rivers completed a holy pilgrimage across the land to worship at 'Sovereign Peak Sanctuary'.
+  * Caleb Crowley converted from rel_syncretic_14 to rel_syncretic_9 in Oakhaven (SaintCultVeneration).
+  * Corin Blackwood converted from rel_syncretic_16 to rel_syncretic_14 in Riverbend (TradeRoute).
+  * Elora Rivers was born to Tobias Rivers and Lyra Crowley in Oakhaven.
+      [because: Tobias Rivers and Lyra Crowley were wed in Oakhaven (Year 84, #690)]
+  * Freya Rivers was born to Eldrin Rivers and Daphne Ironwood in Oakhaven.
+      [because: Eldrin Rivers and Daphne Ironwood were wed in Oakhaven, with Daphne Ironwood relocating to Oakhaven (Year 74, #568)]
+  * Faith A and Faith B coalesced through cultural syncretism into Harmonious Peak and Peak in Riverbend.
+  * Corin Blackwood and Thalia Ironwood were wed in Riverbend, with Thalia Ironwood relocating to Riverbend.
+
+--- YEAR 88 ---
+  * The heroic legend of Astrid Rivers was recorded into the living mythology of Ascendant Ascendant Way of the Sovereign Peak.
+      [because: Astrid Rivers passed away peacefully of old age in Oakhaven (Year 27, #179)]
+  * Cedric Rivers was born to Tobias Rivers and Lyra Crowley in Oakhaven.
+      [because: Tobias Rivers and Lyra Crowley were wed in Oakhaven (Year 84, #690)]
+  * Eldrin Rivers converted from rel_sect_5 to rel_syncretic_17 in Oakhaven (SaintCultVeneration).
+  * Orson Rivers died in a forestry accident with Corin Blackwood at Oakhaven.
+  * Corin Rivers was born to Tobias Rivers and Lyra Crowley in Oakhaven.
+      [because: Tobias Rivers and Lyra Crowley were wed in Oakhaven (Year 84, #690)]
+  * Bram Stone completed a holy pilgrimage across the land to worship at 'Sovereign Peak Sanctuary'.
+  * Elora Rivers was born to Arthur Rivers and Kaelen Crowley in Oakhaven.
+      [because: Arthur Rivers and Kaelen Crowley were wed in Oakhaven (Year 82, #656)]
+
+--- YEAR 89 ---
+  * Sylvia Blackwood was born to Orson Blackwood and Daphne Ironwood in Riverbend.
+      [because: Orson Blackwood and Daphne Ironwood were wed in Riverbend (Year 83, #664)]
+  * Vance Rivers and Isolde Ashford were wed in Oakhaven.
+
+--- YEAR 90 ---
+  * The heroic legend of Briony Blackwood was recorded into the living mythology of United Peak and Peak.
+      [because: Briony Blackwood died in a forestry accident with Arthur Ironwood at Ironpeak (Year 49, #348)]
+  * Theron Ironwood was born to Rowan Ironwood and Astrid Rivers in Ironpeak.
+      [because: Rowan Ironwood and Astrid Rivers were wed in Ironpeak, with Astrid Rivers relocating to Ironpeak (Year 84, #676)]
+  * Lucan Ashford and Daphne Crowley were wed in Ironpeak, with Daphne Crowley relocating to Ironpeak.
+  * Vesper Blackwood died in a forestry accident with Lucan Rivers at Riverbend.
+  * Daphne Crowley penned 'The Personal Journal of Daphne Crowley', a PersonalJournal preserved in the archives of Ironpeak.
+      [because: Lucan Ashford and Daphne Crowley were wed in Ironpeak, with Daphne Crowley relocating to Ironpeak (Year 90, #733)]
+  * Eldrin Blackwood and Isolde Ironwood were wed in Riverbend, with Isolde Ironwood relocating to Riverbend.
+  * Bram Crowley passed away peacefully of old age in Oakhaven.
+  * Bram Stone converted from rel_syncretic_14 to rel_syncretic_17 in Riverbend (Marriage).
+  * Eldrin Blackwood penned 'The Personal Journal of Eldrin Blackwood', a PersonalJournal preserved in the archives of Riverbend.
+      [because: Eldrin Blackwood and Isolde Ironwood were wed in Riverbend, with Isolde Ironwood relocating to Riverbend (Year 90, #736)]
+  * Tobias Rivers penned 'The Life and Deeds of Bram Crowley', a Biography preserved in the archives of Oakhaven.
+      [because: Bram Crowley passed away peacefully of old age in Oakhaven (Year 90, #737)]
+  * Thalia Ironwood died in a forestry accident with Vance Rivers at Riverbend.
+  * Caleb Blackwood and Sylvia Rivers were wed in Riverbend, with Sylvia Rivers relocating to Riverbend.
+  * Caleb Blackwood penned 'The Personal Journal of Caleb Blackwood', a PersonalJournal preserved in the archives of Riverbend.
+      [because: Caleb Blackwood and Sylvia Rivers were wed in Riverbend, with Sylvia Rivers relocating to Riverbend (Year 90, #742)]
+  * Eldrin Blackwood and Sylvia Ironwood were wed in Riverbend, with Sylvia Ironwood relocating to Riverbend.
+  * Elora Rivers was born to Arthur Rivers and Kaelen Crowley in Oakhaven.
+      [because: Arthur Rivers and Kaelen Crowley were wed in Oakhaven (Year 82, #656)]
+
+--- YEAR 91 ---
+  * Daphne Crowley penned 'The Great Chronicle of Ironpeak', a HistoricalChronicle preserved in the archives of Ironpeak.
+      [because: Lucan Blackwood completed a holy pilgrimage across the land to worship at 'High Sanctum of Dawn' (Year 81, #652); and Rowan Ironwood emerged as a venerated Prophet of the faith in Ironpeak (Year 82, #654)]
+  * Daphne Crowley penned 'The Mythic Lore of Sacred Union of Peak and Peak', a MythCollection preserved in the archives of Ironpeak.
+  * Eleni Rivers penned 'The Great Chronicle of Oakhaven', a HistoricalChronicle preserved in the archives of Oakhaven.
+  * Eleni Rivers penned 'Folklore and Traditions of Oakhaven', a LocalFolklore preserved in the archives of Oakhaven.
+  * Eleni Rivers penned 'The Mythic Lore of Sacred Union of Peak and Peak', a MythCollection preserved in the archives of Oakhaven.
+  * Caleb Blackwood penned 'The Great Chronicle of Riverbend', a HistoricalChronicle preserved in the archives of Riverbend.
+  * Eldrin Blackwood penned 'Folklore and Traditions of Riverbend', a LocalFolklore preserved in the archives of Riverbend.
+  * Caleb Blackwood penned 'The Mythic Lore of Harmonious Peak and Peak', a MythCollection preserved in the archives of Riverbend.
+  * Eldrin Blackwood penned 'Chronicle of House Blackwood', a FamilyHistory preserved in the archives of Riverbend.
+      [because: Eldrin Blackwood was born to Cedric Blackwood and Kaelen Rivers in Riverbend (Year 29, #206); and Corin Blackwood was born to Theron Blackwood and Thalia Ashford in Riverbend (Year 43, #286); and Morwen Blackwood was born to Theron Blackwood and Thalia Ashford in Riverbend (Year 44, #293)]
+  * Lucan Ironwood penned 'Chronicle of House Ironwood', a FamilyHistory preserved in the archives of Ironpeak.
+      [because: Lucan Ironwood was born to Arthur Ironwood and Thalia Ashford in Ironpeak (Year 44, #292); and Isolde Ironwood was born to Arthur Ironwood and Thalia Ashford in Ironpeak (Year 45, #299); and Daphne Ironwood was born to Caleb Ironwood and Astrid Ashford in Ironpeak (Year 50, #368)]
+  * Eleni Rivers penned 'Chronicle of House Rivers', a FamilyHistory preserved in the archives of Oakhaven.
+      [because: Eleni Rivers was born to Caleb Rivers and Briony Crowley in Oakhaven (Year 35, #237); and Caleb Rivers was born to Caleb Rivers and Briony Crowley in Oakhaven (Year 40, #255); and Daphne Rivers was born to Eldrin Rivers and Kaelen Crowley in Oakhaven (Year 50, #367)]
+  * Bram Stone penned 'Chronicle of House Stone', a FamilyHistory preserved in the archives of Riverbend.
+      [because: Bram Stone was born to Gideon Stone and Morwen Blackwood in Riverbend (Year 65, #487); and Bram Stone and Morwen Crowley were wed in Riverbend, with Morwen Crowley relocating to Riverbend (Year 83, #674)]
+  * Corin Blackwood and Elora Ashford were wed in Riverbend, with Elora Ashford relocating to Riverbend.
+  * Brenna Rivers was born to Eldrin Rivers and Daphne Ironwood in Oakhaven.
+      [because: Eldrin Rivers and Daphne Ironwood were wed in Oakhaven, with Daphne Ironwood relocating to Oakhaven (Year 74, #568)]
+  * Brenna Rivers was born to Lucan Rivers and Sari Blackwood in Oakhaven.
+      [because: Lucan Rivers and Sari Blackwood were joined in an alliance marriage in Oakhaven, with Sari Blackwood relocating to Oakhaven (Year 78, #609)]
+  * Orson Ironwood converted from rel_syncretic_11 to rel_syncretic_16 in Ironpeak (SaintCultVeneration).
+  * Unknown Person emerged as a venerated Mystic of the faith in Oakhaven.
+
+--- YEAR 92 ---
+  * Unknown Person emerged as a venerated Mystic of the faith in Oakhaven.
+  * The heroic legend of Gideon Ashford was recorded into the living mythology of United Peak and Peak.
+      [because: Gideon Ashford passed away peacefully of old age in Ironpeak (Year 51, #383)]
+  * Vance Blackwood was born to Eldrin Blackwood and Isolde Ironwood in Riverbend.
+      [because: Eldrin Blackwood and Isolde Ironwood were wed in Riverbend, with Isolde Ironwood relocating to Riverbend (Year 90, #736)]
+  * Bram Stone died in a forestry accident with Caleb Rivers at Riverbend.
+  * Tobias Rivers penned 'The Life and Deeds of Caleb Rivers', a Biography preserved in the archives of Oakhaven.
+      [because: Bram Stone died in a forestry accident with Caleb Rivers at Riverbend (Year 92, #766)]
+  * Eleni Rivers penned 'The Personal Journal of Eleni Rivers', a PersonalJournal preserved in the archives of Oakhaven.
+      [because: Bram Stone died in a forestry accident with Caleb Rivers at Riverbend (Year 92, #766)]
+  * Elora Rivers emerged as a venerated Prophet of the faith in Oakhaven.
+  * Vance Blackwood completed a holy pilgrimage across the land to worship at 'The Grand Temple of Pure Spirit'.
+  * Bram Blackwood was born to Eldrin Blackwood and Sylvia Ironwood in Riverbend.
+      [because: Eldrin Blackwood and Sylvia Ironwood were wed in Riverbend, with Sylvia Ironwood relocating to Riverbend (Year 90, #744)]
+
+--- YEAR 93 ---
+  * Kaelen Ironwood was born to Lucan Ironwood and Daphne Ashford in Ironpeak.
+      [because: Lucan Ironwood and Daphne Ashford were wed in Ironpeak (Year 83, #659)]
+  * Tobias Rivers was born to Eldrin Rivers and Daphne Ironwood in Oakhaven.
+      [because: Eldrin Rivers and Daphne Ironwood were wed in Oakhaven, with Daphne Ironwood relocating to Oakhaven (Year 74, #568)]
+  * Vesper Ashford was born to Lucan Ashford and Daphne Crowley in Ironpeak.
+      [because: Lucan Ashford and Daphne Crowley were wed in Ironpeak, with Daphne Crowley relocating to Ironpeak (Year 90, #733)]
+
+--- YEAR 94 ---
+  * The heroic legend of Briony Rivers was recorded into the living mythology of Sacred Union of Peak and Peak.
+      [because: Briony Rivers passed away peacefully of old age in Oakhaven (Year 53, #406)]
+  * Morwen Blackwood converted from rel_syncretic_11 to rel_syncretic_17 in Ironpeak (Marriage).
+  * Gareth Rivers and Lyra Blackwood were wed in Oakhaven, with Lyra Blackwood relocating to Oakhaven.
+  * Lucan Blackwood and Daphne Ironwood were wed in Riverbend, with Daphne Ironwood relocating to Riverbend.
+  * Eldrin Blackwood passed away peacefully of old age in Riverbend.
+  * Gideon Ironwood was born to Lucan Ironwood and Daphne Ashford in Ironpeak.
+      [because: Lucan Ironwood and Daphne Ashford were wed in Ironpeak (Year 83, #659)]
+  * Lucan Blackwood died in a forestry accident with Daphne Rivers at Riverbend.
+  * Eleni Rivers penned 'The Personal Journal of Eleni Rivers', a PersonalJournal preserved in the archives of Oakhaven.
+      [because: Lucan Blackwood died in a forestry accident with Daphne Rivers at Riverbend (Year 94, #781)]
+  * Elora Rivers emerged as a venerated Prophet of the faith in Oakhaven.
+  * Morwen Blackwood was born to Caleb Blackwood and Sylvia Rivers in Riverbend.
+      [because: Caleb Blackwood and Sylvia Rivers were wed in Riverbend, with Sylvia Rivers relocating to Riverbend (Year 90, #742)]
+
+--- YEAR 95 ---
+  * The heroic legend of Cedric Crowley was recorded into the living mythology of Eternal Way of Peak and Peak.
+      [because: Cedric Crowley passed away peacefully of old age in Oakhaven (Year 35, #234)]
+  * Eleni Rivers passed away peacefully of old age in Oakhaven.
+  * Tobias Rivers penned 'The Life and Deeds of Eleni Rivers', a Biography preserved in the archives of Oakhaven.
+      [because: Eleni Rivers passed away peacefully of old age in Oakhaven (Year 95, #786)]
+  * Caleb Crowley and Sylvia Rivers were wed in Oakhaven.
+  * Sylvia Rivers penned 'The Personal Journal of Sylvia Rivers', a PersonalJournal preserved in the archives of Oakhaven.
+      [because: Caleb Crowley and Sylvia Rivers were wed in Oakhaven (Year 95, #788)]
+  * Lucan Blackwood and Daphne Ironwood were wed in Riverbend.
+  * Caleb Crowley converted from rel_syncretic_8 to rel_syncretic_11 in Oakhaven (Marriage).
+  * Bram Rivers died in a forestry accident with Kaelen Crowley at Oakhaven.
+  * Lyra Crowley died in a forestry accident with Corin Blackwood at Oakhaven.
+  * Kaelen Crowley passed away peacefully of old age in Riverbend.
+  * Caleb Blackwood penned 'The Life and Deeds of Corin Blackwood', a Biography preserved in the archives of Riverbend.
+      [because: Lyra Crowley died in a forestry accident with Corin Blackwood at Oakhaven (Year 95, #793)]
+  * Caleb Blackwood penned 'The Life and Deeds of Kaelen Crowley', a Biography preserved in the archives of Riverbend.
+      [because: Kaelen Crowley passed away peacefully of old age in Riverbend (Year 95, #794)]
+  * Gareth Blackwood penned 'The Personal Journal of Gareth Blackwood', a PersonalJournal preserved in the archives of Riverbend.
+      [because: Kaelen Crowley passed away peacefully of old age in Riverbend (Year 95, #794)]
+  * Faith A and Faith B coalesced through cultural syncretism into Eternal Way of Peak and Peak in Riverbend.
+
+--- YEAR 96 ---
+  * Eldrin Blackwood and Isolde Ironwood were wed in Riverbend.
+  * The heroic legend of Cedric Crowley was recorded into the living mythology of Eternal Way of Peak and Peak.
+      [because: Cedric Crowley passed away peacefully of old age in Oakhaven (Year 35, #234)]
+  * Rowan Ironwood converted from rel_syncretic_11 to rel_syncretic_12 in Ironpeak (Marriage).
+  * Tobias Rivers and Lyra Blackwood were wed in Oakhaven, with Lyra Blackwood relocating to Oakhaven.
+  * Lyra Crowley was born to Caleb Crowley and Sylvia Rivers in Oakhaven.
+      [because: Caleb Crowley and Sylvia Rivers were wed in Oakhaven (Year 95, #788)]
+  * Tobias Rivers penned 'The Personal Journal of Tobias Rivers', a PersonalJournal preserved in the archives of Oakhaven.
+      [because: Tobias Rivers and Lyra Blackwood were wed in Oakhaven, with Lyra Blackwood relocating to Oakhaven (Year 96, #802)]
+  * Caleb Blackwood and Astrid Ironwood were wed in Riverbend, with Astrid Ironwood relocating to Riverbend.
+  * Gareth Blackwood and Brenna Rivers were wed in Riverbend, with Brenna Rivers relocating to Riverbend.
+  * Gareth Blackwood penned 'The Personal Journal of Gareth Blackwood', a PersonalJournal preserved in the archives of Riverbend.
+      [because: Gareth Blackwood and Brenna Rivers were wed in Riverbend, with Brenna Rivers relocating to Riverbend (Year 96, #806)]
+  * Lyra Blackwood was born to Lucan Blackwood and Daphne Ironwood in Riverbend.
+      [because: Lucan Blackwood and Daphne Ironwood were wed in Riverbend (Year 95, #790)]
+  * Kaelen Rivers was born to Lucan Rivers and Sari Blackwood in Oakhaven.
+      [because: Lucan Rivers and Sari Blackwood were joined in an alliance marriage in Oakhaven, with Sari Blackwood relocating to Oakhaven (Year 78, #609)]
+  * Lyra Crowley completed a holy pilgrimage across the land to worship at 'The Grand Temple of Pure Spirit'.
+  * Caleb Blackwood died in a forestry accident with Caleb Blackwood at Riverbend.
+  * Elora Ashford assumed leadership as Chief of Riverbend.
+      [because: Caleb Blackwood died in a forestry accident with Caleb Blackwood at Riverbend (Year 96, #811)]
+
+--- YEAR 97 ---
+  * Orson Ironwood converted from rel_syncretic_17 to rel_syncretic_18 in Ironpeak (SaintCultVeneration).
+  * Silas Blackwood was born to Gareth Blackwood and Brenna Rivers in Riverbend.
+      [because: Gareth Blackwood and Brenna Rivers were wed in Riverbend, with Brenna Rivers relocating to Riverbend (Year 96, #806)]
+  * Tobias Rivers and Morwen Blackwood were wed in Oakhaven.
+  * Morwen Blackwood penned 'The Personal Journal of Morwen Blackwood', a PersonalJournal preserved in the archives of Oakhaven.
+      [because: Tobias Rivers and Morwen Blackwood were wed in Oakhaven (Year 97, #815)]
+  * Lyra Crowley completed a holy pilgrimage across the land to worship at 'World-Root of Serpent'.
+
+--- YEAR 98 ---
+  * The heroic legend of Astrid Rivers was recorded into the living mythology of Eternal Way of Peak and Peak.
+      [because: Astrid Rivers passed away peacefully of old age in Oakhaven (Year 27, #179)]
+  * Kaelen Rivers completed a holy pilgrimage across the land to worship at 'High Sanctum of Dawn'.
+  * Bram Ashford was born to Lucan Ashford and Daphne Crowley in Ironpeak.
+      [because: Lucan Ashford and Daphne Crowley were wed in Ironpeak, with Daphne Crowley relocating to Ironpeak (Year 90, #733)]
+  * Lucan Rivers converted from rel_syncretic_11 to rel_syncretic_18 in Oakhaven (SaintCultVeneration).
+  * Kaelen Rivers completed a holy pilgrimage across the land to worship at 'The Grand Temple of Pure Spirit'.
+
+--- YEAR 99 ---
+  * Sylvia Ironwood converted from rel_syncretic_8 to rel_syncretic_18 in Riverbend (Marriage).
+  * Lyra Ashford died in a forestry accident with Lyra Blackwood at Riverbend.
+  * Eldrin Rivers and Morwen Crowley were wed in Oakhaven, with Morwen Crowley relocating to Oakhaven.
+  * Elora Rivers completed a holy pilgrimage across the land to worship at 'World-Root of Serpent'.
+  * Faith A and Faith B coalesced through cultural syncretism into Sacred Union of Peak and Peak in Riverbend.
+
+--- YEAR 100 ---
+  * Silas Rivers was born to Arthur Rivers and Kaelen Crowley in Oakhaven.
+      [because: Arthur Rivers and Kaelen Crowley were wed in Oakhaven (Year 82, #656)]
+  * Aldous Blackwood was born to Lucan Blackwood and Daphne Ironwood in Riverbend.
+      [because: Lucan Blackwood and Daphne Ironwood were wed in Riverbend (Year 95, #790)]
+  * Orson Blackwood and Daphne Rivers were wed in Riverbend.
+  * Freya Blackwood was born to Eldrin Blackwood and Sylvia Ironwood in Riverbend.
+      [because: Eldrin Blackwood and Sylvia Ironwood were wed in Riverbend, with Sylvia Ironwood relocating to Riverbend (Year 90, #744)]
+  * Cedric Rivers converted from rel_syncretic_14 to rel_syncretic_19 in Oakhaven (SaintCultVeneration).
+  * Bram Ironwood and Thalia Blackwood were wed in Ironpeak, with Thalia Blackwood relocating to Ironpeak.
+  * Rowan Ironwood converted from rel_syncretic_12 to rel_syncretic_11 in Ironpeak (SaintCultVeneration).

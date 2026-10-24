@@ -1,0 +1,70 @@
+{
+  "aggregate": {
+    "total_seeds": 100,
+    "reconciliation_rate": 100.0,
+    "survival_rate": 100.0,
+    "stall_rate": 0.0,
+    "min_conflict_depth": 1,
+    "median_conflict_depth": 6,
+    "max_conflict_depth": 14
+  },
+  "training": {
+    "total_seeds": 50,
+    "reconciliation_rate": 100.0,
+    "survival_rate": 100.0,
+    "stall_rate": 0.0,
+    "event_shares": {
+      "Birth": 22.97,
+      "BookWritten": 17.4,
+      "Marriage": 11.92,
+      "Death": 10.82,
+      "Pilgrimage": 10.67,
+      "Conversion": 6.74,
+      "MythRecorded": 3.37,
+      "GreatFigureEmergence": 3.22,
+      "LocalCustomCelebrated": 1.24,
+      "Feud": 1.95,
+      "Raid": 1.82,
+      "Peace": 1.15
+    }
+  },
+  "holdout_c": {
+    "total_seeds": 50,
+    "reconciliation_rate": 100.0,
+    "survival_rate": 100.0,
+    "stall_rate": 0.0,
+    "event_shares": {
+      "Birth": 22.03,
+      "BookWritten": 17.65,
+      "Marriage": 11.72,
+      "Death": 10.72,
+      "Pilgrimage": 10.37,
+      "Conversion": 7.0,
+      "MythRecorded": 3.59,
+      "GreatFigureEmergence": 3.04,
+      "LocalCustomCelebrated": 1.21,
+      "Feud": 1.98,
+      "Raid": 1.85,
+      "Peace": 1.18
+    }
+  },
+  "selected_runs": {
+    "highest": {
+      "seed": 3036,
+      "depth": 12,
+      "path": [226, 230, 236, 278, 280, 425, 429, 643, 693, 829, 938, 939, 1060],
+      "history_file": "reports/m052_history_highest.txt",
+      "mermaid_file": "reports/m052_causal_dag_highest.mmd"
+    },
+    "median": {
+      "seed": 3026,
+      "depth": 6,
+      "history_file": "reports/m052_history_median.txt"
+    },
+    "lowest": {
+      "seed": 3013,
+      "depth": 1,
+      "history_file": "reports/m052_history_lowest.txt"
+    }
+  }
+}
