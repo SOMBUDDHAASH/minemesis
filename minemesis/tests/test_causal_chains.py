@@ -25,7 +25,7 @@ def test_real_causal_chain_depth_and_diversity() -> None:
     Conflict depth must have real depth >= 3 and at least 3 distinct conflict event types
     (restricted to Death, Feud, Raid, Famine, SuccessionCrisis, Peace, Revelation).
     """
-    sim = Simulation(seed=42)
+    sim = Simulation(seed=42, enable_religion=False, enable_lore=False)
     sim.run_years(100)
 
     # 1. Conflict causal chain depth

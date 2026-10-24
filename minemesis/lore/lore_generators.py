@@ -19,7 +19,13 @@ from typing import Any, Mapping, Optional, Sequence
 from minemesis.core.rng import KeyedRNG
 from minemesis.core.types import EventType, Intent
 from minemesis.lore.lore_models import Book, BookGenre, LiteracyLevel
-from minemesis.lore.lore_templates import get_term, paginate_text, render_event_sentence
+from minemesis.lore.lore_templates import (
+    clean_duplicate_words,
+    format_settlement_name,
+    get_term,
+    paginate_text,
+    render_event_sentence,
+)
 from minemesis.core.event_log import Event
 from minemesis.models.character import Character
 
@@ -36,20 +42,23 @@ def generate_family_history(
     tick: int,
     rng: KeyedRNG,
     literacy: LiteracyLevel = LiteracyLevel.EDUCATED,
+    author_beliefs: Optional[Mapping[int, Any]] = None,
 ) -> Book:
     """
     Compiles an authoritative family chronicle documenting lineage,
     hearth founding, births, marriages, departed forebears, and feuds.
+    Synthesizes historical milestones from author beliefs when available.
     """
     author = patriarch_or_author
     year = (tick // 12) + 1
     title = f"Chronicle of House {family_name}"
     paras: list[str] = []
+    auth_set = format_settlement_name(author.settlement_id)
 
     # Title & Prologue
     paras.append(
         f"# {title}\n"
-        f"Penned by {author.full_name} in Year {year} at {author.settlement_id}.\n\n"
+        f"Penned by {author.full_name} in Year {year} at {auth_set}.\n\n"
         f"Let it be known to all descendants who read these lines: this book sets forth "
         f"the true record of our blood and hearth, that our lineage may endure unforgotten."
     )
@@ -57,7 +66,7 @@ def generate_family_history(
     # Section 1: The Founders and Hearth
     paras.append(
         f"## The Roots of House {family_name}\n"
-        f"Our blood was established in the settlement of {author.settlement_id}. "
+        f"Our blood was established in the settlement of {auth_set}. "
         f"Through toil in the soil, the forest, and the stone, our forebears carved "
         f"a homestead of honor. {len(kin_characters)} kin have shared our hearth in these annals."
     )
@@ -74,13 +83,29 @@ def generate_family_history(
     sorted_events = sorted(family_events, key=lambda e: e.tick)
     if sorted_events:
         for evt in sorted_events:
+            b = author_beliefs.get(evt.id) if author_beliefs else None
+            b_intent = getattr(b, "believed_intent", None)
+            b_actor = getattr(b, "believed_actor", None)
+            b_target = getattr(b, "believed_target", None)
+            b_loc = getattr(b, "believed_location", None)
+
+            actor_name = b_actor if (b and b_actor) else (evt.participants[0][1] if evt.participants else family_name)
+            target_name = b_target if (b and b_target) else (evt.participants[1][1] if len(evt.participants) > 1 else "the house")
+            loc_name = format_settlement_name(b_loc) if (b and b_loc) else format_settlement_name(evt.location)
+
+            cause_desc = evt.payload.get("cause_of_death") or evt.payload.get("reason", "unforeseen fate")
+            if b_intent == Intent.INTENTIONAL:
+                cause_desc = f"murder attributed to {b_actor or 'an enemy'}"
+
             ctx = {
                 "year": (evt.tick // 12) + 1,
                 "tick": evt.tick,
-                "actor_name": evt.participants[0][1] if evt.participants else family_name,
-                "target_name": evt.participants[1][1] if len(evt.participants) > 1 else "the house",
-                "location": evt.location,
-                "cause_desc": evt.payload.get("cause_of_death") or evt.payload.get("reason", "unforeseen fate"),
+                "actor_name": actor_name,
+                "target_name": target_name,
+                "location": loc_name,
+                "cause_desc": cause_desc,
+                "believed_intent": b_intent,
+                "believed_actor": b_actor,
             }
             sentence = render_event_sentence(
                 event_type_val=evt.type.value,
@@ -138,23 +163,27 @@ def generate_personal_journal(
     title = f"The Personal Journal of {character.full_name}"
     paras: list[str] = []
 
+    loc_clean = format_settlement_name(character.settlement_id)
     paras.append(
         f"# {title}\n"
-        f"Private diary kept by {character.full_name} at {character.settlement_id}, Year {year}.\n\n"
+        f"Private diary kept by {character.full_name} at {loc_clean}, Year {year}.\n\n"
         f"I set down these private reflections so my heart may find peace."
     )
 
-    # Grudges and Suspicions
+    # Grudges and Suspicions (Directive 3: at least 4 varied templates)
     suspicious_beliefs = [b for b in beliefs if getattr(b, "believed_intent", None) == Intent.INTENTIONAL]
     if suspicious_beliefs:
         paras.append("## Reflections of Sorrow & Suspicion")
+        journal_suspicion_variants = [
+            "I cannot shake the conviction that {actor} acted with malice. The folk call it chance, but in my soul, I know what occurred.",
+            "They tell me {actor} had no ill intent, yet every rumor and glance tells a different story. I will not be blinded by pleasant lies.",
+            "Dark whispers surround the deeds of {actor}. Though no magistrate lays charges, our blood demands vigilance and memory.",
+            "My heart remains hardened against {actor}. The wound is too deep to call it mere misfortune; too many coincidences favor their gain.",
+        ]
         for b in suspicious_beliefs[:5]:
             actor = getattr(b, "believed_actor", "A hidden enemy")
-            paras.append(
-                f"I cannot shake the conviction that {actor} acted with malice. "
-                f"The folk call it chance, but in my soul, I know what occurred. "
-                f"I hold this truth close, though I must bide my time."
-            )
+            template = rng.choice(journal_suspicion_variants)
+            paras.append(template.format(actor=actor) + " I hold this truth close, though I must bide my time.")
 
     # Sentiments toward other characters
     if relationships:
@@ -176,7 +205,7 @@ def generate_personal_journal(
             paras.append(f"The feeling of {emo_val} still lingers within me when I think upon past days.")
 
     # Closing
-    paras.append(f"Recorded by my own hand at {character.settlement_id}, Year {year}.")
+    paras.append(f"Recorded by my own hand at {loc_clean}, Year {year}.")
 
     pages, word_count = paginate_text(paras, words_per_page=90)
     bias = "Subjective Personal Bias"
@@ -350,10 +379,12 @@ def generate_historical_chronicle(
     tick: int,
     rng: KeyedRNG,
     literacy: LiteracyLevel = LiteracyLevel.HISTORIAN,
+    author_beliefs: Optional[Mapping[int, Any]] = None,
 ) -> Book:
     """
-    Compiles an objective, multi-decade settlement chronicle from the Event Log,
+    Compiles a settlement chronicle from the Event Log,
     recording foundational events, chiefs, trade, raids, and peace treaties.
+    Synthesizes entries from author beliefs when available.
     """
     year = (tick // 12) + 1
     clean_set = settlement_id.replace("set_", "").capitalize()
@@ -365,7 +396,7 @@ def generate_historical_chronicle(
         f"Official annals recorded by {author_name}, Chief Scribe of {clean_set}.\n"
         f"Completed in Year {year} of the settlement era.\n\n"
         f"This official chronicle compiles the historical annals of {clean_set}, "
-        f"preserving objective reality for future generations."
+        f"preserving recorded events for future generations."
     )
 
     events_by_year: dict[int, list[Event]] = {}
@@ -377,13 +408,29 @@ def generate_historical_chronicle(
         paras.append(f"## Annals of Year {y:02d}")
         year_events = events_by_year[y]
         for evt in year_events:
+            b = author_beliefs.get(evt.id) if author_beliefs else None
+            b_intent = getattr(b, "believed_intent", None)
+            b_actor = getattr(b, "believed_actor", None)
+            b_target = getattr(b, "believed_target", None)
+            b_loc = getattr(b, "believed_location", None)
+
+            actor_name = b_actor if (b and b_actor) else (evt.participants[0][1] if evt.participants else clean_set)
+            target_name = b_target if (b and b_target) else (evt.participants[1][1] if len(evt.participants) > 1 else "the realm")
+            loc_name = format_settlement_name(b_loc) if (b and b_loc) else format_settlement_name(evt.location)
+
+            cause_desc = evt.payload.get("cause_of_death") or evt.payload.get("reason", "unforeseen cause")
+            if b_intent == Intent.INTENTIONAL:
+                cause_desc = f"murder attributed to {b_actor or 'an enemy'}"
+
             ctx = {
                 "year": y,
                 "tick": evt.tick,
-                "actor_name": evt.participants[0][1] if evt.participants else clean_set,
-                "target_name": evt.participants[1][1] if len(evt.participants) > 1 else "the realm",
-                "location": evt.location,
-                "cause_desc": evt.payload.get("cause_of_death") or evt.payload.get("reason", "unforeseen cause"),
+                "actor_name": actor_name,
+                "target_name": target_name,
+                "location": loc_name,
+                "cause_desc": cause_desc,
+                "believed_intent": b_intent,
+                "believed_actor": b_actor,
             }
             sentence = render_event_sentence(
                 event_type_val=evt.type.value,
@@ -559,32 +606,34 @@ def generate_travel_account(
     year = (tick // 12) + 1
     title = f"Pilgrim's Journey to {holy_site_name}"
     paras: list[str] = []
+    p_set = format_settlement_name(pilgrim.settlement_id)
+    h_set = format_settlement_name(holy_site_settlement)
 
     paras.append(
         f"# {title}\n"
-        f"A personal travelogue written by {pilgrim.full_name} of {pilgrim.settlement_id}.\n"
+        f"A personal travelogue written by {pilgrim.full_name} of {p_set}.\n"
         f"Completed upon return in Year {year}.\n\n"
         f"I set down the perils and spiritual blessings of my holy expedition "
-        f"from {pilgrim.settlement_id} across the wilderness to {holy_site_settlement}."
+        f"from {p_set} across the wilderness to {h_set}."
     )
 
     paras.append(
         f"## The Departure and the Road\n"
-        f"Leaving the familiar hearth of {pilgrim.settlement_id}, I joined a merchant caravan. "
+        f"Leaving the familiar hearth of {p_set}, I joined a merchant caravan. "
         f"We crossed winding mountain paths and swift river fords. "
         f"Though fatigue weighed upon my limbs, the holy call of {holy_site_name} guided my steps."
     )
 
     paras.append(
         f"## Arrival at the Sanctuary\n"
-        f"Upon reaching {holy_site_settlement}, the sight of {holy_site_name} filled my soul "
+        f"Upon reaching {h_set}, the sight of {holy_site_name} filled my soul "
         f"with awe. I performed the sacred ablutions, offered prayers for my kin, "
         f"and felt the heavy burdens of sorrow lift from my heart."
     )
 
     paras.append(
         f"## The Return Home\n"
-        f"I return to {pilgrim.settlement_id} renewed in faith and spirit. "
+        f"I return to {p_set} renewed in faith and spirit. "
         f"May every devout soul undertake this sacred journey before their days are done."
     )
 
@@ -617,38 +666,58 @@ def generate_biography(
     tick: int,
     rng: KeyedRNG,
     literacy: LiteracyLevel = LiteracyLevel.HISTORIAN,
+    author_beliefs: Optional[Mapping[int, Any]] = None,
 ) -> Book:
     """
     Compiles a comprehensive biographical account of a notable leader, saint,
-    martyr, or founder.
+    martyr, or founder. Synthesizes milestones through the author's subjective beliefs.
     """
     year = (tick // 12) + 1
     title = f"The Life and Deeds of {subject.full_name}"
     paras: list[str] = []
 
+    auth_set = format_settlement_name(author.settlement_id)
+    subj_set = format_settlement_name(subject.settlement_id)
+
     paras.append(
         f"# {title}\n"
-        f"Authored by {author.full_name} at {author.settlement_id}, Year {year}.\n\n"
+        f"Authored by {author.full_name} at {auth_set}, Year {year}.\n\n"
         f"This biography records the life, virtues, trials, and enduring legacy "
-        f"of {subject.full_name}, whose actions shaped the history of {subject.settlement_id}."
+        f"of {subject.full_name}, whose actions shaped the history of {subj_set}."
     )
 
     paras.append(
         f"## Early Years and Origins\n"
-        f"{subject.full_name} was born into House {subject.last_name} in {subject.settlement_id}. "
+        f"{subject.full_name} was born into House {subject.last_name} in {subj_set}. "
         f"From youth, they displayed notable character and earned the deep respect of their peers."
     )
 
     if subject_events:
         paras.append("## Major Life Milestones")
         for evt in subject_events[:8]:
+            b = author_beliefs.get(evt.id) if author_beliefs else None
+            b_intent = getattr(b, "believed_intent", None)
+            b_actor = getattr(b, "believed_actor", None)
+            b_target = getattr(b, "believed_target", None)
+            b_loc = getattr(b, "believed_location", None)
+
+            actor_name = subject.full_name
+            target_name = b_target if (b and b_target) else (evt.participants[1][1] if len(evt.participants) > 1 else "the community")
+            loc_name = format_settlement_name(b_loc) if (b and b_loc) else format_settlement_name(evt.location)
+
+            cause_desc = evt.payload.get("cause_of_death", "fate")
+            if b_intent == Intent.INTENTIONAL:
+                cause_desc = f"murder attributed to {b_actor or 'an enemy'}"
+
             ctx = {
                 "year": (evt.tick // 12) + 1,
                 "tick": evt.tick,
-                "actor_name": subject.full_name,
-                "target_name": evt.participants[1][1] if len(evt.participants) > 1 else "the community",
-                "location": evt.location,
-                "cause_desc": evt.payload.get("cause_of_death", "fate"),
+                "actor_name": actor_name,
+                "target_name": target_name,
+                "location": loc_name,
+                "cause_desc": cause_desc,
+                "believed_intent": b_intent,
+                "believed_actor": b_actor,
             }
             sentence = render_event_sentence(
                 event_type_val=evt.type.value,
@@ -662,7 +731,7 @@ def generate_biography(
     status_str = f"Living at age {subject.age_years}" if subject.alive else "Having completed their mortal tenure"
     paras.append(
         f"## Historical Legacy\n"
-        f"{status_str}, {subject.full_name} stands as an enduring pillar of {subject.settlement_id}. "
+        f"{status_str}, {subject.full_name} stands as an enduring pillar of {subj_set}. "
         f"Their memory shall remain preserved in these archives across generations."
     )
 

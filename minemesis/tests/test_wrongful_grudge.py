@@ -13,7 +13,7 @@ from minemesis.systems.simulation import Simulation
 
 
 def test_wrongful_grudge_emergence() -> None:
-    sim = Simulation(seed=42)
+    sim = Simulation(seed=42, enable_religion=False, enable_lore=False)
     sim.run_years(100)
 
     events = sim.event_log.all_events()

@@ -28,7 +28,12 @@ from minemesis.systems.world_gen import generate_world
 
 
 class Simulation:
-    def __init__(self, seed: int) -> None:
+    def __init__(
+        self,
+        seed: int = 42,
+        enable_religion: Optional[bool] = None,
+        enable_lore: Optional[bool] = None,
+    ) -> None:
         self.seed = seed
         self.tick = 0
         self.event_log = EventLog()
@@ -60,8 +65,9 @@ class Simulation:
         try:
             from minemesis.religion.religion_config import ENABLE_RELIGION_ENGINE
             from minemesis.religion.religion_engine import ReligionEngine
+            r_enabled = ENABLE_RELIGION_ENGINE if enable_religion is None else enable_religion
             self.religion_engine: Optional[ReligionEngine] = (
-                ReligionEngine(seed=self.seed, enabled=ENABLE_RELIGION_ENGINE)
+                ReligionEngine(seed=self.seed, enabled=r_enabled)
             )
             if self.religion_engine and self.religion_engine.enabled:
                 self.religion_engine.initialize(
@@ -75,8 +81,9 @@ class Simulation:
         # Procedural Literature Engine (Milestone L0)
         try:
             from minemesis.lore.lore_engine import LoreEngine, ENABLE_LORE_ENGINE
+            l_enabled = ENABLE_LORE_ENGINE if enable_lore is None else enable_lore
             self.lore_engine: Optional[LoreEngine] = (
-                LoreEngine(seed=self.seed, enabled=ENABLE_LORE_ENGINE)
+                LoreEngine(seed=self.seed, enabled=l_enabled)
             )
         except ImportError:
             self.lore_engine = None
@@ -121,6 +128,16 @@ class Simulation:
         if self.lore_engine and self.lore_engine.enabled:
             return self.lore_engine.get_book(book_id)
         return None
+
+    def get_character_beliefs(self, character_id: str) -> dict[int, Belief]:
+        """Read-only query helper: returns a copy of character beliefs."""
+        return dict(self.beliefs_by_character.get(character_id, {}))
+
+    def get_all_books(self):
+        """Read-only query helper: returns all books penned in simulation."""
+        if self.lore_engine and self.lore_engine.enabled:
+            return self.lore_engine.library_manager.get_all_books()
+        return []
 
     def export_minecraft_book(self, book_id: str):
         """Exports a book to Minecraft Written Book JSON structure."""

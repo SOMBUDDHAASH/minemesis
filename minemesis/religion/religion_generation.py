@@ -58,7 +58,7 @@ _GEOGRAPHY = [
 ]
 
 _CONCEPTS = [
-    "Path", "Truth", "Breath", "Dreaming", "Covenant", "Void", "Presence",
+    "Path", "Truth", "Breath", "Dreaming", "Harmony", "Void", "Presence",
 ]
 
 _AUTHORITIES = [

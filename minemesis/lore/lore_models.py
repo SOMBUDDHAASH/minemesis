@@ -86,8 +86,16 @@ class Book:
         Exports the book to a standard Minecraft written book JSON structure.
         Compatible with NBT book data tags.
         """
+        raw_title = self.title
+        if len(raw_title) > 32:
+            trunc = raw_title[:32]
+            last_space = trunc.rfind(" ")
+            short_title = trunc[:last_space] if last_space > 0 else trunc
+        else:
+            short_title = raw_title
+
         return {
-            "title": self.title[:32],  # Minecraft title limit
+            "title": short_title,  # Minecraft title limit (word-boundary truncated)
             "author": self.author_name[:16],
             "generation": 0 if self.original_book_id is None else 1,
             "pages": list(self.pages),

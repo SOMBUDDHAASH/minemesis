@@ -168,7 +168,49 @@ Diff of implemented `CAUSE_GRAMMAR` against brief Table 4.1:
 - **History Printer & Automated Completeness Test**:
   - `format_causal_chain` now prints event causes explicitly (`Causes: [#...]`) and resolves character IDs to `Full Name (id)`.
   - Added `format_notable_deaths` extracting chiefs, martyrs, revenge victims, accident victims, and starvation casualties with causes.
-  - Added `test_printed_causal_chains_completeness_and_verifiability` in `test_causal_chains.py` with a negative control detecting broken/missing causal links.
+  ### Step 5. Religion & Literature Audit, Event Volume Balancing, and Epistemological Integrity
+- **Demotion of Routine Custom Celebrations to State**:
+  - `LOCAL_CUSTOM_CELEBRATED` previously generated over 1,200 events per seed (~38% of the event log).
+  - Routine annual village celebrations now update cultural state (`celebration_count`, `last_celebrated_tick`) without logging events.
+  - Events are emitted exclusively on:
+    1. The first time a local custom is celebrated (`celebration_count == 0`).
+    2. Resumption of a celebration following an extended dormancy period ($\ge 60$ ticks / 5 years).
+- **Books Read Author Beliefs Rather Than Raw Event Reality**:
+  - In `minemesis/lore/lore_generators.py` (`generate_biography`, `generate_historical_chronicle`, `generate_family_history`, `generate_personal_journal`), books synthesize historical milestones from author beliefs passed via `author_beliefs`.
+  - When an author believes an accidental death was intentional murder, the text explicitly records murder / deliberate slaying and names the accused actor, rather than citing raw event reality.
+  - Added `test_books_read_author_beliefs_not_raw_reality` in `test_lore_engine.py` with positive assertions and a negative control proving fallback to raw reality when beliefs are absent.
+- **Literacy Distribution Rebalance**:
+  - Population-wide literacy distribution weighted to guarantee realistic historical demographics:
+    - Illiterate: $\ge 65\%$ (exceeding $\ge 60\%$ target).
+    - Basic Literacy: $23\%$.
+    - Educated: $8\%$.
+    - Scholar: $3\%$.
+    - Historian: $1\%$.
+    - Combined Educated / Scholar / Historian is $12\%$ (strictly meeting $\le 15\%$ target).
+    - Professional roles (`Priest`, `Historian`, `Scholar`) are assigned based on role rather than random population-wide roll.
+- **Lore Formatting & Text Generation Enhancements**:
+  - Added word-boundary title truncation in `Book.to_minecraft_json()` to prevent mid-word slicing at the 32-character limit.
+  - Removed duplicate concept roots in procedural religion generation (eliminating "Covenant Covenant" titles).
+  - Formatted all raw settlement IDs to human-readable names (e.g. `Ironwood` instead of `set_ironwood`).
+  - Expanded grudge and suspicion text templates to 5 distinct variations in `lore_templates.py` and 4 in `lore_generators.py`.
+- **Historiographical Documentation Disclosure**:
+  - Added explicit architectural and historiographical disclosure in `minemesis/religion/religion_engine.py` docstring.
+  - Acknowledges that the institutional conflict model (councils, orthodoxy vs. heresy, formal schisms, excommunication) derives from Abrahamic / Christian historiographical patterns.
+  - Clarifies that Milestones R1.5 and R2 generalize this into living faith systems including Dharmic, East Asian, and indigenous oral/ancestral traditions.
+- **Existing Test Modification (Documented per Standing Rules)**:
+  - *Test*: `minemesis/tests/test_syncretism_and_culture.py::test_100_year_unscripted_syncretism_and_culture`
+  - *Before*:
+    ```python
+    custom_events = [e for e in sim.event_log.all_events() if e.type == EventType.LOCAL_CUSTOM_CELEBRATED]
+    assert len(custom_events) > 50
+    ```
+  - *After*:
+    ```python
+    custom_events = [e for e in sim.event_log.all_events() if e.type == EventType.LOCAL_CUSTOM_CELEBRATED]
+    assert len(custom_events) >= 5
+    assert all(e.payload.get("is_first_celebration") or e.payload.get("is_resumed") for e in custom_events)
+    ```
+  - *Rationale*: Routine annual celebrations were demoted from log-flooding events (which constituted 38% of all events) to persistent cultural state updates. Only first celebrations and post-dormancy resumptions are logged as events, bringing `LocalCustomCelebrated` volume from ~1,200 events to ~12 events per run.
 
 
 

@@ -44,24 +44,32 @@ ACTIVE_PARTICIPANT_ROLES = {
 def validate_event_actors_alive(event: Event, characters: Mapping[str, Character]) -> None:
     """
     Validates at runtime (during simulation step) that every active participant
-    is currently alive.
+    is alive at the moment the event occurred.
+    A character cannot act if they died prior to this event (event.tick > death_tick
+    or event.tick == death_tick and event.id > death_event_id).
     """
     for role, participant_id in event.participants:
         # Check if participant refers to a tracked character
         if participant_id in characters:
             char = characters[participant_id]
-            if role in ACTIVE_PARTICIPANT_ROLES:
+            is_active = (role in ACTIVE_PARTICIPANT_ROLES) or (
+                event.type == EventType.DEATH and role in ("actor", "instigator")
+            )
+            if is_active:
                 if not char.alive:
-                    raise InvariantViolationError(
-                        f"Invariant Violation: Dead character '{char.id}' ({char.full_name}) "
-                        f"acted as '{role}' in event #{event.id} ({event.type.value}) at tick {event.tick}"
-                    )
-            elif event.type == EventType.DEATH and role in ("actor", "instigator"):
-                if not char.alive:
-                    raise InvariantViolationError(
-                        f"Invariant Violation: Dead character '{char.id}' ({char.full_name}) "
-                        f"acted as killer/actor in Death event #{event.id} at tick {event.tick}"
-                    )
+                    d_tick = char.death_tick
+                    d_evt = char.death_event_id
+                    if d_tick is not None:
+                        if event.tick > d_tick or (d_evt is not None and event.id > d_evt):
+                            raise InvariantViolationError(
+                                f"Invariant Violation: Dead character '{char.id}' ({char.full_name}) "
+                                f"died at tick {d_tick} (event #{d_evt}) but acted as '{role}' in event #{event.id} ({event.type.value}) at tick {event.tick}"
+                            )
+                    else:
+                        raise InvariantViolationError(
+                            f"Invariant Violation: Dead character '{char.id}' ({char.full_name}) "
+                            f"acted as '{role}' in event #{event.id} ({event.type.value}) at tick {event.tick}"
+                        )
 
 
 def validate_entire_history_no_dead_actors(event_log: EventLog) -> None:

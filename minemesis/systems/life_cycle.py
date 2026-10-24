@@ -207,7 +207,8 @@ def process_life_cycle(
             roll = keyed_float(seed, "natural_death", char.id, tick)
             if roll < death_prob:
                 char.alive = False
-                event_log.append(
+                char.death_tick = tick
+                evt = event_log.append(
                     tick=tick,
                     location=char.settlement_id,
                     event_type=EventType.DEATH,
@@ -221,6 +222,7 @@ def process_life_cycle(
                         "natural": True,
                     },
                 )
+                char.death_event_id = evt.id
                 continue
 
         # B. Accidental Death during labor/forestry
@@ -231,8 +233,8 @@ def process_life_cycle(
                 if peers:
                     partner = keyed_choice(seed, "acc_partner", char.id, tick, peers)
                     char.alive = False
-
-                    event_log.append(
+                    char.death_tick = tick
+                    evt = event_log.append(
                         tick=tick,
                         location=char.settlement_id,
                         event_type=EventType.DEATH,
@@ -247,3 +249,4 @@ def process_life_cycle(
                             "accidental": True,
                         },
                     )
+                    char.death_event_id = evt.id

@@ -21,6 +21,8 @@ class Character:
     age_ticks: int
     sex: str  # "M" or "F"
     alive: bool = True
+    death_tick: Optional[int] = None
+    death_event_id: Optional[int] = None
     spouse_id: Optional[str] = None
     father_id: Optional[str] = None
     mother_id: Optional[str] = None
@@ -51,6 +53,7 @@ class Character:
             "age_years": self.age_years,
             "sex": self.sex,
             "alive": self.alive,
+            "death_tick": self.death_tick,
             "spouse_id": self.spouse_id,
             "father_id": self.father_id,
             "mother_id": self.mother_id,

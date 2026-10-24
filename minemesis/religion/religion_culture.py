@@ -156,22 +156,39 @@ def celebrate_local_customs(
     current_tick: int,
 ) -> list[dict[str, Any]]:
     """
-    R2.4: Triggers annual celebrations when current tick month matches local custom.
+    R2.4: Celebrates annual village customs.
+    Directive 1: Routine annual celebrations update cultural state without logging events.
+    Events are emitted ONLY on:
+    1. First celebration of a custom (celebration_count == 0)
+    2. Celebrations after an extended period of dormancy (>= 60 ticks / 5 years)
     """
     current_month = (current_tick % 12) + 1
     events: list[dict[str, Any]] = []
 
     for custom in culture.local_customs:
         if custom.season_month == current_month:
-            events.append({
-                "settlement_id": settlement_id,
-                "custom_id": custom.id,
-                "custom_name": custom.name,
-                "custom_type": custom.custom_type.value,
-                "description": custom.description,
-                "month": current_month,
-                "tick": current_tick,
-            })
+            is_first = (custom.celebration_count == 0)
+            is_resumed = (
+                custom.last_celebrated_tick is not None
+                and (current_tick - custom.last_celebrated_tick) >= 60
+            )
+
+            custom.celebration_count += 1
+            custom.last_celebrated_tick = current_tick
+
+            # Only log event if first celebration or resumed after long dormancy
+            if is_first or is_resumed:
+                events.append({
+                    "settlement_id": settlement_id,
+                    "custom_id": custom.id,
+                    "custom_name": custom.name,
+                    "custom_type": custom.custom_type.value,
+                    "description": custom.description,
+                    "month": current_month,
+                    "tick": current_tick,
+                    "is_first_celebration": is_first,
+                    "is_resumed": is_resumed,
+                })
 
     return events
 

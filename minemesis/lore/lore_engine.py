@@ -64,35 +64,36 @@ class LoreEngine:
         if character.id in self.character_literacy:
             return self.character_literacy[character.id]
 
-        # Priestly or scholarly roles
-        if role and "priest" in role.lower():
-            level = LiteracyLevel.PRIEST
-        elif character.age_years >= 55:
-            # Deterministic keyed roll for elders
-            r = keyed_float(self.seed, "character_literacy", character.id, 0, salt=0x7391)
-            if r < 0.25:
+        # Priestly or scholarly roles held by role, not population-wide roll (Directive 4)
+        if role:
+            r_lower = role.lower()
+            if "priest" in r_lower or "shaman" in r_lower or "monk" in r_lower:
+                level = LiteracyLevel.PRIEST
+                self.character_literacy[character.id] = level
+                return level
+            elif "historian" in r_lower or "scribe" in r_lower or "chronicler" in r_lower:
                 level = LiteracyLevel.HISTORIAN
-            elif r < 0.50:
+                self.character_literacy[character.id] = level
+                return level
+            elif "scholar" in r_lower:
                 level = LiteracyLevel.SCHOLAR
-            elif r < 0.80:
-                level = LiteracyLevel.EDUCATED
-            elif r < 0.95:
-                level = LiteracyLevel.BASIC_LITERACY
-            else:
-                level = LiteracyLevel.ILLITERATE
+                self.character_literacy[character.id] = level
+                return level
+
+        # Population-wide roll (Directive 4):
+        # Adult literacy heavily weighted toward Illiterate (>= 60%),
+        # with Educated/Scholar/Historian rare (<= 15% combined).
+        r = keyed_float(self.seed, "character_literacy", character.id, 0, salt=0x51A7)
+        if r < 0.65:
+            level = LiteracyLevel.ILLITERATE
+        elif r < 0.88:
+            level = LiteracyLevel.BASIC_LITERACY
+        elif r < 0.96:
+            level = LiteracyLevel.EDUCATED
+        elif r < 0.99:
+            level = LiteracyLevel.SCHOLAR
         else:
-            # Deterministic roll for general adult population
-            r = keyed_float(self.seed, "character_literacy", character.id, 0, salt=0x51A7)
-            if r < 0.20:
-                level = LiteracyLevel.ILLITERATE
-            elif r < 0.65:
-                level = LiteracyLevel.BASIC_LITERACY
-            elif r < 0.88:
-                level = LiteracyLevel.EDUCATED
-            elif r < 0.96:
-                level = LiteracyLevel.SCHOLAR
-            else:
-                level = LiteracyLevel.HISTORIAN
+            level = LiteracyLevel.HISTORIAN
 
         self.character_literacy[character.id] = level
         return level
@@ -244,6 +245,9 @@ class LoreEngine:
                                     e for e in event_log.all_events()
                                     if any(p[1] == deceased.id for p in e.participants)
                                 ]
+                                author_beliefs = (
+                                    beliefs_by_character.get(author.id, {}) if beliefs_by_character else {}
+                                )
                                 book = generate_biography(
                                     book_id=self._next_book_id(),
                                     subject=deceased,
@@ -252,6 +256,7 @@ class LoreEngine:
                                     tick=tick,
                                     rng=self.rng,
                                     literacy=author_lit,
+                                    author_beliefs=author_beliefs,
                                 )
                                 self.library_manager.add_book(book, LibraryType.SCHOLARS_STUDY)
                                 self._emit_book_event(book, event_log, [evt.id], tick)
@@ -408,6 +413,9 @@ class LoreEngine:
                         e for e in event_log.all_events()
                         if e.location == s_id and e.tick >= tick - 120
                     ]
+                    historian_beliefs = (
+                        beliefs_by_character.get(historian.id, {}) if beliefs_by_character else {}
+                    )
                     book = generate_historical_chronicle(
                         book_id=self._next_book_id(),
                         settlement_id=s_id,
@@ -417,6 +425,7 @@ class LoreEngine:
                         tick=tick,
                         rng=self.rng,
                         literacy=h_lit,
+                        author_beliefs=historian_beliefs,
                     )
                     self.library_manager.add_book(book, LibraryType.TOWN_ARCHIVE)
                     causes = [e.id for e in recent_set_events[:3]]

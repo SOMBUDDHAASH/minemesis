@@ -15,8 +15,10 @@ import random
 import pytest
 
 from minemesis.core.causal_grammar import validate_causes
-from minemesis.core.event_log import EventLog
-from minemesis.core.types import EventType, Intent, Scale
+from minemesis.core.event_log import Event, EventLog
+from minemesis.core.rng import KeyedRNG
+from minemesis.core.types import BeliefSource, EventType, Intent, Scale
+from minemesis.models.belief import Belief
 from minemesis.lore.lore_engine import LoreEngine
 from minemesis.lore.lore_generators import (
     generate_biography,
@@ -473,3 +475,113 @@ def test_full_simulation_with_lore_engine_enabled():
     mc_book = sim.export_minecraft_book(first_book.id)
     assert mc_book is not None
     assert "pages" in mc_book
+
+
+# =============================================================================
+# 8. Books Read Author Beliefs Rather Than Raw Event Reality (Directive 5.2)
+# =============================================================================
+def test_books_read_author_beliefs_not_raw_reality():
+    """
+    Directive 5.2: Books cite and synthesize from author beliefs rather than raw event reality.
+    If the author believes an accidental death was intentional murder, the book text reflects murder.
+    Includes negative control.
+    """
+    rng = KeyedRNG(42, "test_author_beliefs")
+    deceased = _create_dummy_character("c_deceased", "Aethelgard", "Ironwood", age_years=60)
+    author_objective = _create_dummy_character("c_auth_obj", "Rowan", "Oak", age_years=40)
+    author_suspicious = _create_dummy_character("c_auth_susp", "Varek", "Crow", age_years=40)
+
+    # Raw event reality: Accidental death in a forestry accident
+    raw_death_event = Event(
+        id=101,
+        tick=24,
+        location="set_ironwood",
+        type=EventType.DEATH,
+        participants=[("deceased", "c_deceased")],
+        causes=[],
+        intent=Intent.ACCIDENTAL,
+        scale=Scale.INDIVIDUAL,
+        payload={"cause_of_death": "forestry mishap with falling timber"},
+    )
+
+    # Author Objective has belief reflecting reality (Accidental)
+    belief_accidental = Belief(
+        belief_id=1,
+        believer_id=author_objective.id,
+        event_ref=101,
+        source=BeliefSource.WITNESSED,
+        source_character_id=None,
+        confidence=0.9,
+        tick_acquired=24,
+        believed_type=EventType.DEATH,
+        believed_intent=Intent.ACCIDENTAL,
+        believed_actor=None,
+        believed_target="c_deceased",
+        believed_location="set_ironwood",
+        believed_payload={"cause_of_death": "forestry mishap with falling timber"},
+    )
+
+    # Author Suspicious believes it was intentional murder by Cormac
+    belief_murder = Belief(
+        belief_id=2,
+        believer_id=author_suspicious.id,
+        event_ref=101,
+        source=BeliefSource.INFERRED,
+        source_character_id=None,
+        confidence=0.95,
+        tick_acquired=25,
+        believed_type=EventType.DEATH,
+        believed_intent=Intent.INTENTIONAL,
+        believed_actor="Cormac Blackwood",
+        believed_target="c_deceased",
+        believed_location="set_ironwood",
+        believed_payload={"cause_of_death": "murder"},
+    )
+
+    # 1. Author with objective belief writes biography
+    book_objective = generate_biography(
+        book_id="b_obj",
+        subject=deceased,
+        author=author_objective,
+        subject_events=[raw_death_event],
+        tick=36,
+        rng=rng,
+        literacy=LiteracyLevel.HISTORIAN,
+        author_beliefs={101: belief_accidental},
+    )
+    obj_text = book_objective.full_text().lower()
+
+    # 2. Author with suspicious belief writes biography
+    book_suspicious = generate_biography(
+        book_id="b_susp",
+        subject=deceased,
+        author=author_suspicious,
+        subject_events=[raw_death_event],
+        tick=36,
+        rng=rng,
+        literacy=LiteracyLevel.HISTORIAN,
+        author_beliefs={101: belief_murder},
+    )
+    susp_text = book_suspicious.full_text().lower()
+
+    # Positive assertions:
+    assert ("murder" in susp_text or "slain" in susp_text)
+    assert "cormac blackwood" in susp_text
+    assert ("murder" not in obj_text and "slain" not in obj_text)
+
+    # Negative control:
+    # If the system ignored beliefs and read only raw event reality, both texts would be identical
+    # and neither would mention murder or Cormac Blackwood.
+    raw_book = generate_biography(
+        book_id="b_raw",
+        subject=deceased,
+        author=author_suspicious,
+        subject_events=[raw_death_event],
+        tick=36,
+        rng=rng,
+        literacy=LiteracyLevel.HISTORIAN,
+        author_beliefs=None,  # No beliefs provided -> falls back to raw reality
+    )
+    raw_text = raw_book.full_text().lower()
+    assert "cormac blackwood" not in raw_text
+    assert "murder" not in raw_text and "slain" not in raw_text

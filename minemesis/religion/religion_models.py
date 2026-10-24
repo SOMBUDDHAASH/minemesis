@@ -409,6 +409,8 @@ class LocalCustom:
     settlement_id: str
     season_month: int
     description: str
+    celebration_count: int = 0
+    last_celebrated_tick: Optional[int] = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -418,6 +420,8 @@ class LocalCustom:
             "settlement_id": self.settlement_id,
             "season_month": self.season_month,
             "description": self.description,
+            "celebration_count": self.celebration_count,
+            "last_celebrated_tick": self.last_celebrated_tick,
         }
 
     @classmethod
@@ -429,6 +433,8 @@ class LocalCustom:
             settlement_id=data["settlement_id"],
             season_month=int(data["season_month"]),
             description=data["description"],
+            celebration_count=data.get("celebration_count", 0),
+            last_celebrated_tick=data.get("last_celebrated_tick"),
         )
 
 

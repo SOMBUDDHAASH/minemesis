@@ -187,7 +187,8 @@ def process_conflicts_and_economy(
                     vulnerable = [c for c in local_living if c.age_years >= 60 or c.age_years <= 12]
                     starve_victim = keyed_choice(seed, "starve_victim", s_id, tick, vulnerable or local_living)
                     starve_victim.alive = False
-                    event_log.append(
+                    starve_victim.death_tick = tick
+                    evt = event_log.append(
                         tick=tick,
                         location=s.id,
                         event_type=EventType.DEATH,
@@ -202,6 +203,7 @@ def process_conflicts_and_economy(
                             "famine_id": s.active_famine_event_id,
                         },
                     )
+                    starve_victim.death_event_id = evt.id
 
             # Desperate food raid during active famine
             food_rich = [other_id for other_id in settlement_keys if settlements[other_id].food > 40 and other_id not in collapsed_settlements]
@@ -521,10 +523,11 @@ def process_conflicts_and_economy(
             roll = keyed_float(seed, "revenge_kill", str(feud.id), tick)
             if roll < revenge_chance:
                 target.alive = False
+                target.death_tick = tick
                 feud.last_revenge_tick = tick
                 feud.revenge_count += 1
 
-                event_log.append(
+                evt = event_log.append(
                     tick=tick,
                     location=target.settlement_id,
                     event_type=EventType.DEATH,
@@ -541,6 +544,7 @@ def process_conflicts_and_economy(
                         "feud_id": feud.id,
                     },
                 )
+                target.death_event_id = evt.id
 
     # =========================================================================
     # 6. RAIDS (Feud, Famine, or Succession Escalation)
@@ -634,7 +638,8 @@ def process_conflicts_and_economy(
 
                 if casualty is not None:
                     casualty.alive = False
-                    event_log.append(
+                    casualty.death_tick = tick
+                    evt = event_log.append(
                         tick=tick,
                         location=defender_set.id,
                         event_type=EventType.DEATH,
@@ -647,6 +652,7 @@ def process_conflicts_and_economy(
                             "victim_name": casualty.full_name,
                         },
                     )
+                    casualty.death_event_id = evt.id
 
     # =========================================================================
     # 7. TRUTH REVELATION & PEACE RECONCILIATION (Sections 4.3 & 4.4)

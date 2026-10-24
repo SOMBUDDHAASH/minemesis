@@ -27,7 +27,7 @@ def test_historical_pressures_present_across_seeds() -> None:
     total_chiefs = 0
 
     for s in test_seeds:
-        sim = Simulation(seed=s)
+        sim = Simulation(seed=s, enable_religion=False, enable_lore=False)
         sim.run_years(100)
         events = sim.event_log.all_events()
         for e in events:

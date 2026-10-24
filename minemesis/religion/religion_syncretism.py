@@ -130,7 +130,7 @@ def evaluate_syncretic_fusion(
     syncretic_id = f"rel_syncretic_{r_idx}"
 
     # Procedural Syncretic Name synthesis
-    prefixes = ["United", "Harmonious", "Covenant of", "Syncretic", "Eternal Way of", "Sacred Union of"]
+    prefixes = ["United", "Harmonious", "Syncretic", "Eternal Way of", "Sacred Union of"]
     prefix = rng.choice(prefixes)
     short_a = rel_a.name.split()[-1]
     short_b = rel_b.name.split()[-1]

@@ -537,9 +537,10 @@ def test_100_year_unscripted_syncretism_and_culture():
         assert len(culture.folk_traditions) >= 1
         assert len(culture.local_customs) >= 3
 
-    # Check event log recorded cultural customs
+    # Check event log recorded notable cultural customs (first celebrations or post-dormancy)
     custom_events = [e for e in sim.event_log.all_events() if e.type == EventType.LOCAL_CUSTOM_CELEBRATED]
-    assert len(custom_events) > 50
+    assert len(custom_events) >= 5
+    assert all(e.payload.get("is_first_celebration") or e.payload.get("is_resumed") for e in custom_events)
 
     # Analytics report verifies living faith dynamics
     report = sim.generate_religious_analytics()

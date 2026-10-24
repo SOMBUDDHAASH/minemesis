@@ -7,9 +7,25 @@ and dynamic page formatting.
 """
 
 from __future__ import annotations
+import re
 from typing import Any, Mapping, Optional, Sequence
 from minemesis.core.rng import KeyedRNG
+from minemesis.core.types import Intent
 from minemesis.lore.lore_models import LiteracyLevel
+
+
+def format_settlement_name(settlement_id: str) -> str:
+    """Formats a settlement ID into a clean display name (e.g. 'set_ironwood' -> 'Ironwood')."""
+    if not settlement_id:
+        return "the settlement"
+    if settlement_id.startswith("set_"):
+        return settlement_id[4:].replace("_", " ").title()
+    return settlement_id.replace("_", " ").title()
+
+
+def clean_duplicate_words(text: str) -> str:
+    """Removes accidental consecutive duplicate words (e.g. 'Covenant Covenant' -> 'Covenant')."""
+    return re.sub(r'\b([A-Za-z]+)(?:\s+\1\b)+', r'\1', text, flags=re.IGNORECASE)
 
 
 # =============================================================================
@@ -107,7 +123,7 @@ def render_event_sentence(
     tick = context.get("tick", 0)
     actor = context.get("actor_name", "Someone")
     target = context.get("target_name", "someone")
-    loc = context.get("location", "the settlement")
+    loc = format_settlement_name(str(context.get("location", "the settlement")))
     cause_desc = context.get("cause_desc", "unforeseen circumstances")
 
     # Perspective modifiers
@@ -117,11 +133,27 @@ def render_event_sentence(
 
     if event_type_val == "Death":
         die_term = get_term(literacy, "died", rng)
+        believed_intent = context.get("believed_intent")
+        believed_actor = context.get("believed_actor")
+
+        # Directive 5.2: Books read author beliefs rather than raw event reality
+        if believed_intent == Intent.INTENTIONAL or (believed_intent is not None and str(believed_intent).lower() == "intentional"):
+            killer = believed_actor or context.get("target_name") or "an unknown assailant"
+            murder_templates = [
+                f"In Year {year}, {actor} was murdered at {loc}. {killer} was believed responsible for the deliberate slaying.",
+                f"Year {year}: {actor} fell to murder at {loc}, slain by {killer} in cold blood.",
+                f"Tragedy struck in Year {year} when {actor} was murdered at {loc}; many held {killer} guilty of the crime.",
+                f"The annals record that in Year {year}, {actor} was murdered at {loc}, a victim of {killer}'s malice.",
+            ]
+            return rng.choice(murder_templates)
+
         if is_grudge:
             templates = [
                 f"In Year {year}, {actor} {die_term} at {loc}, though many whispered that dark hands and malice were responsible.",
-                f"Word came in Year {year} that {actor} {die_term}. Our house does not believe the tale that it was merely an accident.",
-                f"Year {year} saw {actor} {die_term} under mysterious circumstances at {loc}, deepening our bitter suspicions.",
+                f"Word came in Year {year} that {actor} {die_term}. Our house refuses the convenient tale that it was merely an accident.",
+                f"Year {year} saw {actor} {die_term} under contested circumstances at {loc}, deepening bitter suspicions and accusations of foul play.",
+                f"The sudden end of {actor} in Year {year} at {loc} left our kin convinced that dark hands and deliberate malice took their life.",
+                f"Though official voices called it an accident in Year {year}, we whispered that {actor} fell to covert enmity at {loc}.",
             ]
         elif is_pious:
             templates = [

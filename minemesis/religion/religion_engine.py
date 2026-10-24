@@ -13,6 +13,17 @@ Subsystem Architecture:
 9. Religious Virtue System (Moral codes & Character standing)
 10. Dynamic Spread (Marriage, Trade, Family, Pilgrimages, Refugees, Missionaries, Conquests, Saint Cults)
 11. Religious Analytics & Chronicle
+
+HISTORIOGRAPHICAL DISCLOSURE & FUTURE ROADMAP:
+The current structural model of institutional religious evolution (formal councils, canon,
+orthodoxy vs. heresy, schisms, counter-reformations, excommunication, and dogmatic declarations)
+draws heavily from Abrahamic and specifically Christian historiographical frameworks.
+While emergent trait generation and sacred geography reflect global traditions, the institutional
+conflict mechanisms in R1 reflect this specific structural heritage.
+Future milestones (Milestone R1.5 and R2) will generalize this evolution into living faith systems,
+incorporating Dharmic (darśana, cyclical renewal, philosophical lineages), East Asian (syncretic
+coexistence, state ritual vs. folk practice, ancestors), and Indigenous traditions (animism,
+land-centered ceremony, oral transmission without rigid dogmatic councils).
 """
 
 from __future__ import annotations
@@ -146,6 +157,7 @@ class ReligionEngine:
         self.custom_counter = [1]
         self.dominant_by_settlement: dict[str, str] = {}
         self.settlement_tensions: dict[str, float] = {}
+        self.settlement_faith_plantings: set[tuple[str, str]] = set()
 
     def initialize(
         self,
@@ -216,6 +228,8 @@ class ReligionEngine:
                     faiths=self.faiths,
                     religions=self.religions,
                 )
+                for s_id, dom_rel in self.dominant_by_settlement.items():
+                    self.settlement_faith_plantings.add((dom_rel, s_id))
 
     def generate_religions(self, settlement_ids: Sequence[str] = ()) -> dict[str, Religion]:
         """Procedurally generates emergent religions."""
@@ -256,6 +270,47 @@ class ReligionEngine:
         if child_faith:
             self.faiths[child_id] = child_faith
         return child_faith
+
+    def _is_notable_conversion(
+        self,
+        character_id: str,
+        new_religion_id: str,
+        settlement_id: str,
+        reason: str,
+        characters: Mapping[str, Any] | None,
+        settlements: Mapping[str, Any] | None,
+    ) -> bool:
+        """
+        Determines whether a faith conversion is historically notable to record in EventLog.
+        Routine private lay conversions update CharacterFaith state without flooding the EventLog.
+        Notable conversions:
+        1. Formal conquest, schism, or heresy conversions.
+        2. Settlement Chief / Leader.
+        3. Clergy / Priest / Prophet.
+        4. First time a religion is planted in a settlement.
+        """
+        if reason in ("Conquest", "Schism", "Heresy"):
+            return True
+
+        if characters and character_id in characters:
+            char = characters[character_id]
+            # Chief conversion
+            if settlements:
+                for s in settlements.values():
+                    if getattr(s, "chief_id", None) == character_id:
+                        return True
+            # Clergy conversion
+            c_faith = self.faiths.get(character_id)
+            if c_faith and c_faith.role != ReligiousRole.LAITY:
+                return True
+
+        # First time this faith has ever taken root in this settlement (faith planting)
+        planting_key = (new_religion_id, settlement_id)
+        if planting_key not in self.settlement_faith_plantings:
+            self.settlement_faith_plantings.add(planting_key)
+            return True
+
+        return False
 
     def update_tick(
         self,
@@ -380,8 +435,9 @@ class ReligionEngine:
                                     "reason": "Marriage",
                                 },
                             }
-                            emitted_events.append(event_data)
-                            self._emit_to_event_log(event_log, event_data)
+                            if self._is_notable_conversion(c_id, new_rel, c.settlement_id, "Marriage", characters, settlements):
+                                emitted_events.append(event_data)
+                                self._emit_to_event_log(event_log, event_data)
 
             # Trade Route Evangelism
             if active_trade_routes and settlements and characters:
@@ -408,8 +464,9 @@ class ReligionEngine:
                                         "reason": "TradeRoute",
                                     },
                                 }
-                                emitted_events.append(event_data)
-                                self._emit_to_event_log(event_log, event_data)
+                                if self._is_notable_conversion(c_id, new_rel, s_b, "TradeRoute", characters, settlements):
+                                    emitted_events.append(event_data)
+                                    self._emit_to_event_log(event_log, event_data)
 
             # Clergy Missionary Work
             clergy = [c for c in living if self.faiths.get(c.id) and self.faiths[c.id].role != ReligiousRole.LAITY]
@@ -431,18 +488,20 @@ class ReligionEngine:
                             "reason": "Missionary",
                         },
                     }
-                    emitted_events.append(event_data)
-                    self._emit_to_event_log(event_log, event_data)
+                    if self._is_notable_conversion(c_id, new_rel, cl.settlement_id, "Missionary", characters, settlements):
+                        emitted_events.append(event_data)
+                        self._emit_to_event_log(event_log, event_data)
 
             # Saint Cult Conversions (R1.9)
             for r in self.religions.values():
                 if r.saints:
                     cult_converts = process_saint_cult_conversions(r, living, self.faiths, self.rng, tick)
                     for c_id, o_rel, n_rel in cult_converts:
+                        set_loc = characters[c_id].settlement_id if (characters and c_id in characters) else "unknown"
                         event_data = {
                             "type": "Conversion",
                             "tick": tick,
-                            "location": characters[c_id].settlement_id if characters else "unknown",
+                            "location": set_loc,
                             "causes": [],
                             "participants": [("convert", characters[c_id].name if characters else c_id), ("religion", r.name)],
                             "payload": {
@@ -452,8 +511,9 @@ class ReligionEngine:
                                 "reason": "SaintCultVeneration",
                             },
                         }
-                        emitted_events.append(event_data)
-                        self._emit_to_event_log(event_log, event_data)
+                        if self._is_notable_conversion(c_id, n_rel, set_loc, "SaintCultVeneration", characters, settlements):
+                            emitted_events.append(event_data)
+                            self._emit_to_event_log(event_log, event_data)
 
         # -------------------------------------------------------------
         # 3. Sectarian Tension & Religious Refugees (R1.2 & R1.9)

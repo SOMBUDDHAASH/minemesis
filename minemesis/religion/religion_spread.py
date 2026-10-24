@@ -107,6 +107,11 @@ def process_marriage_conversion(
     if spouse1_faith.religion_id == spouse2_faith.religion_id:
         return None
 
+    # Conversion cooldown: minimum 24 ticks (2 years) between conversions for characters who already converted
+    if (spouse1_faith.conversion_tick > 0 and (tick - spouse1_faith.conversion_tick) < 24) or \
+       (spouse2_faith.conversion_tick > 0 and (tick - spouse2_faith.conversion_tick) < 24):
+        return None
+
     diff = abs(spouse1_faith.devotion - spouse2_faith.devotion)
     chance = MARRIAGE_CONVERSION_CHANCE + (diff * 0.1)
 
@@ -143,6 +148,7 @@ def process_trade_route_evangelism(
     candidates = [
         c for c in characters_in_town
         if c.alive and faiths.get(c.id) and faiths[c.id].religion_id != foreign_dominant_rel_id
+        and not (faiths[c.id].conversion_tick > 0 and (tick - faiths[c.id].conversion_tick) < 24)
     ]
     if not candidates:
         return None
@@ -177,6 +183,7 @@ def process_clergy_missionary_work(
     potential_converts = [
         c for c in settlement_characters
         if c.alive and c.id != clergy_char_id and faiths.get(c.id) and faiths[c.id].religion_id != clergy_faith.religion_id
+        and not (faiths[c.id].conversion_tick > 0 and (tick - faiths[c.id].conversion_tick) < 24)
     ]
 
     if potential_converts and rng.random() < MISSIONARY_PROSELYTIZE_CHANCE:
@@ -300,6 +307,7 @@ def process_saint_cult_conversions(
     candidates = [
         c for c in settlement_characters
         if c.alive and c.id in faiths and faiths[c.id].religion_id != religion.id and faiths[c.id].devotion < 0.5
+        and not (faiths[c.id].conversion_tick > 0 and (tick - faiths[c.id].conversion_tick) < 24)
     ]
 
     if candidates and rng.random() < SAINT_CULT_CONVERSION_CHANCE:
