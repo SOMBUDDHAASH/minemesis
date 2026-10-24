@@ -53,6 +53,40 @@ class Simulation:
         self.belief_counter = [0]
         self.memory_counter = [0]
 
+        # Optional Standalone Religion Engine (Milestone R0)
+        try:
+            from minemesis.religion.religion_config import ENABLE_RELIGION_ENGINE
+            from minemesis.religion.religion_engine import ReligionEngine
+            self.religion_engine: Optional[ReligionEngine] = (
+                ReligionEngine(seed=self.seed, enabled=ENABLE_RELIGION_ENGINE)
+            )
+            if self.religion_engine and self.religion_engine.enabled:
+                self.religion_engine.initialize(
+                    seed=self.seed,
+                    settlements=self.settlements,
+                    characters=self.characters,
+                )
+        except ImportError:
+            self.religion_engine = None
+
+    def get_character_religion(self, character_id: str):
+        """Returns the Religion object adhered to by a character, or None."""
+        if self.religion_engine:
+            return self.religion_engine.get_character_religion(character_id)
+        return None
+
+    def get_settlement_religion(self, settlement_id: str):
+        """Returns the dominant Religion of a settlement, or None."""
+        if self.religion_engine:
+            return self.religion_engine.get_settlement_religion(settlement_id)
+        return None
+
+    def get_religion_modifiers(self, target_id: str) -> dict[str, float]:
+        """Returns active religion modifiers for character, settlement, or religion ID."""
+        if self.religion_engine:
+            return self.religion_engine.get_religion_modifiers(target_id)
+        return {}
+
     def get_relationship(self, source_id: str, target_id: str) -> Relationship:
         """
         Dynamically computes the relationship view between two characters from active memories.
@@ -190,7 +224,31 @@ class Simulation:
         self._register_and_perceive_events(conflict_start)
 
         # -------------------------------------------------------------
-        # Step 4: Advance Simulation Tick
+        # Step 4: Standalone Religion Engine (Milestone R0)
+        # -------------------------------------------------------------
+        if self.religion_engine and self.religion_engine.enabled:
+            # Register newly born characters if any
+            for c_id, c in self.characters.items():
+                if c_id not in self.religion_engine.faiths:
+                    self.religion_engine.register_newborn(
+                        child_id=c_id,
+                        father_id=c.father_id,
+                        mother_id=c.mother_id,
+                        settlement_id=c.settlement_id,
+                        tick=self.tick,
+                    )
+            religion_start = len(self.event_log)
+            self.religion_engine.update_tick(
+                tick=self.tick,
+                event_log=self.event_log,
+                settlements=self.settlements,
+                characters=self.characters,
+                active_trade_routes=self.trade_routes,
+            )
+            self._register_and_perceive_events(religion_start)
+
+        # -------------------------------------------------------------
+        # Step 5: Advance Simulation Tick
         # -------------------------------------------------------------
         self.tick += 1
 

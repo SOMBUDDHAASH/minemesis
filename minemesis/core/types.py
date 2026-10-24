@@ -27,6 +27,14 @@ class EventType(str, Enum):
     SETTLEMENT_COLLAPSE = "SettlementCollapse"
     MIGRATION = "Migration"
 
+    # Milestone R0: Religion Engine event types
+    CONVERSION = "Conversion"
+    RELIGIOUS_REFORM = "ReligiousReform"
+    RELIGIOUS_SCHISM = "ReligiousSchism"
+    SAINT_CANONIZED = "SaintCanonized"
+    PILGRIMAGE = "Pilgrimage"
+    HOLY_SITE_DISCOVERED = "HolySiteDiscovered"
+
     # Alias for backwards compatibility
     FEUD_BEGINS = "Feud"
 

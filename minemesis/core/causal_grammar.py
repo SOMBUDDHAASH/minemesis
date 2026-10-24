@@ -181,6 +181,57 @@ CAUSE_GRAMMAR: Mapping[EventType, GrammarRule] = {
         }),
         validator=_validate_migration,
     ),
+    # Milestone R0: Religion Engine event grammar rules
+    EventType.CONVERSION: GrammarRule(
+        root_allowed=True,
+        allowed_cause_types=frozenset({
+            EventType.MARRIAGE,
+            EventType.MIGRATION,
+            EventType.RELIGIOUS_REFORM,
+            EventType.RELIGIOUS_SCHISM,
+            EventType.PILGRIMAGE,
+        }),
+    ),
+    EventType.RELIGIOUS_REFORM: GrammarRule(
+        root_allowed=True,
+        allowed_cause_types=frozenset({
+            EventType.DEATH,
+            EventType.FAMINE,
+            EventType.SUCCESSION_CRISIS,
+            EventType.RAID,
+            EventType.FEUD,
+        }),
+    ),
+    EventType.RELIGIOUS_SCHISM: GrammarRule(
+        root_allowed=True,
+        allowed_cause_types=frozenset({
+            EventType.RELIGIOUS_REFORM,
+            EventType.FEUD,
+            EventType.SUCCESSION_CRISIS,
+            EventType.DEATH,
+        }),
+    ),
+    EventType.SAINT_CANONIZED: GrammarRule(
+        root_allowed=False,
+        allowed_cause_types=frozenset({
+            EventType.DEATH,
+        }),
+    ),
+    EventType.PILGRIMAGE: GrammarRule(
+        root_allowed=True,
+        allowed_cause_types=frozenset({
+            EventType.HOLY_SITE_DISCOVERED,
+            EventType.RELIGIOUS_REFORM,
+        }),
+    ),
+    EventType.HOLY_SITE_DISCOVERED: GrammarRule(
+        root_allowed=True,
+        allowed_cause_types=frozenset({
+            EventType.FAMINE,
+            EventType.DEATH,
+            EventType.RELIGIOUS_REFORM,
+        }),
+    ),
 }
 
 

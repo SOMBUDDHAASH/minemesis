@@ -34,6 +34,10 @@ class Character:
         return f"{self.first_name} {self.last_name}"
 
     @property
+    def name(self) -> str:
+        return self.full_name
+
+    @property
     def age_years(self) -> int:
         return self.age_ticks // 12
 
