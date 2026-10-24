@@ -346,6 +346,36 @@ CAUSE_GRAMMAR: Mapping[EventType, GrammarRule] = {
             EventType.MIGRATION,
         }),
     ),
+    EventType.BOOK_WRITTEN: GrammarRule(
+        root_allowed=True,
+        allowed_cause_types=frozenset({
+            EventType.DEATH,
+            EventType.BIRTH,
+            EventType.MARRIAGE,
+            EventType.FEUD,
+            EventType.PEACE,
+            EventType.RAID,
+            EventType.REVELATION,
+            EventType.PILGRIMAGE,
+            EventType.SAINT_CANONIZED,
+            EventType.GREAT_FIGURE_EMERGENCE,
+            EventType.MYTH_RECORDED,
+            EventType.LOCAL_CUSTOM_CELEBRATED,
+            EventType.HOLY_SITE_DISCOVERED,
+            EventType.RELIGIOUS_SYNCRETISM,
+            EventType.RELIGIOUS_SCHISM,
+            EventType.TRADE_ROUTE_FOUNDED,
+        }),
+    ),
+    EventType.ARCHIVE_DAMAGED: GrammarRule(
+        root_allowed=True,
+        allowed_cause_types=frozenset({
+            EventType.RAID,
+            EventType.FAMINE,
+            EventType.SETTLEMENT_COLLAPSE,
+            EventType.FEUD,
+        }),
+    ),
 }
 
 

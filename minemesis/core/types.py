@@ -50,6 +50,10 @@ class EventType(str, Enum):
     HOLY_SITE_ELEVATED = "HolySiteElevated"
     MYTH_EXCHANGED = "MythExchanged"
 
+    # Milestone L0: Procedural Literature Engine
+    BOOK_WRITTEN = "BookWritten"
+    ARCHIVE_DAMAGED = "ArchiveDamaged"
+
     # Alias for backwards compatibility
     FEUD_BEGINS = "Feud"
 

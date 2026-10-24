@@ -70,6 +70,13 @@ class Simulation:
         except ImportError:
             self.religion_engine = None
 
+        # Procedural Literature Engine (Milestone L0)
+        try:
+            from minemesis.lore.lore_engine import LoreEngine
+            self.lore_engine: Optional[LoreEngine] = LoreEngine(seed=self.seed, enabled=True)
+        except ImportError:
+            self.lore_engine = None
+
     def get_character_religion(self, character_id: str):
         """Returns the Religion object adhered to by a character, or None."""
         if self.religion_engine:
@@ -97,6 +104,24 @@ class Simulation:
                 event_log=self.event_log,
                 current_tick=self.tick,
             )
+        return None
+
+    def get_settlement_books(self, settlement_id: str, library_type=None):
+        """Returns all books stored in a settlement's libraries and archives."""
+        if self.lore_engine and self.lore_engine.enabled:
+            return self.lore_engine.get_settlement_books(settlement_id, library_type)
+        return []
+
+    def get_book(self, book_id: str):
+        """Retrieves a book by its unique ID."""
+        if self.lore_engine and self.lore_engine.enabled:
+            return self.lore_engine.get_book(book_id)
+        return None
+
+    def export_minecraft_book(self, book_id: str):
+        """Exports a book to Minecraft Written Book JSON structure."""
+        if self.lore_engine and self.lore_engine.enabled:
+            return self.lore_engine.export_minecraft_book(book_id)
         return None
 
     def get_relationship(self, source_id: str, target_id: str) -> Relationship:
@@ -337,7 +362,26 @@ class Simulation:
             self._register_and_perceive_events(religion_start)
 
         # -------------------------------------------------------------
-        # Step 5: Advance Simulation Tick
+        # Step 5: Standalone Procedural Literature Engine (Milestone L0)
+        # -------------------------------------------------------------
+        if self.lore_engine and self.lore_engine.enabled:
+            recent_month_events = self.event_log.all_events()[events_start:]
+            lore_start = len(self.event_log)
+            self.lore_engine.update_tick(
+                tick=self.tick,
+                event_log=self.event_log,
+                characters=self.characters,
+                settlements=self.settlements,
+                beliefs_by_character=self.beliefs_by_character,
+                memories=self.memories,
+                religion_engine=self.religion_engine,
+                trade_routes=self.trade_routes,
+                recent_events=recent_month_events,
+            )
+            self._register_and_perceive_events(lore_start)
+
+        # -------------------------------------------------------------
+        # Step 6: Advance Simulation Tick
         # -------------------------------------------------------------
         self.tick += 1
 

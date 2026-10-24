@@ -264,4 +264,37 @@ def form_memories_from_belief(
         )
         mem_id += 1
 
+    elif b_type == EventType.BOOK_WRITTEN:
+        if actor_id and actor_id != believer.id:
+            memories.append(
+                Memory(
+                    id=mem_id,
+                    observer_id=believer.id,
+                    belief_event_ref=belief.event_ref,
+                    target_entity_id=actor_id,
+                    emotion=Emotion.RESPECT,
+                    initial_intensity=40.0,
+                    decay_rate=0.01,
+                    tick_formed=tick,
+                    source_belief_id=belief.belief_id,
+                )
+            )
+            mem_id += 1
+
+    elif b_type == EventType.ARCHIVE_DAMAGED:
+        memories.append(
+            Memory(
+                id=mem_id,
+                observer_id=believer.id,
+                belief_event_ref=belief.event_ref,
+                target_entity_id=believer.settlement_id,
+                emotion=Emotion.GRIEF,
+                initial_intensity=50.0,
+                decay_rate=0.015,
+                tick_formed=tick,
+                source_belief_id=belief.belief_id,
+            )
+        )
+        mem_id += 1
+
     return memories
