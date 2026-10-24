@@ -19,6 +19,7 @@ from minemesis.religion.religion_models import (
     Religion,
     ReligiousFigure,
     ReligiousRole,
+    SiteTier,
 )
 
 
@@ -160,3 +161,41 @@ def process_pilgrimage_economic_benefit(
         "impact": "Pilgrimage route established between settlements.",
         "prosperity_bonus": 0.10,
     }
+
+
+def check_and_elevate_holy_site(
+    site: HolySite,
+    religion: Religion,
+    tick: int,
+    rng: Optional[random.Random] = None,
+) -> Optional[dict[str, Any]]:
+    """
+    R2.7: Sacred Geography Evolution.
+    Evolves holy sites as pilgrimage traffic grows:
+    NaturalSanctuary -> LocalShrine -> Temple -> RegionalPilgrimageSite -> HolyCapital.
+    """
+    tier_transitions = {
+        SiteTier.NATURAL_SANCTUARY: (5, SiteTier.LOCAL_SHRINE),
+        SiteTier.LOCAL_SHRINE: (15, SiteTier.TEMPLE),
+        SiteTier.TEMPLE: (30, SiteTier.REGIONAL_PILGRIMAGE_SITE),
+        SiteTier.REGIONAL_PILGRIMAGE_SITE: (60, SiteTier.HOLY_CAPITAL),
+    }
+
+    if site.tier in tier_transitions:
+        threshold, next_tier = tier_transitions[site.tier]
+        if site.pilgrims_visited >= threshold:
+            old_tier = site.tier
+            site.tier = next_tier
+            return {
+                "site_id": site.id,
+                "site_name": site.name,
+                "religion_id": religion.id,
+                "religion_name": religion.name,
+                "old_tier": old_tier.value,
+                "new_tier": next_tier.value,
+                "pilgrims_visited": site.pilgrims_visited,
+                "settlement_id": site.settlement_id,
+                "tick": tick,
+            }
+
+    return None

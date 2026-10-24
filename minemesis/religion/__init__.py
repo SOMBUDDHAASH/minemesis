@@ -14,22 +14,46 @@ from minemesis.religion.religion_analytics import (
     generate_religious_analytics,
 )
 from minemesis.religion.religion_config import ENABLE_RELIGION_ENGINE
+from minemesis.religion.religion_culture import (
+    absorb_folk_tradition_into_religion,
+    celebrate_local_customs,
+    get_cultural_behavioral_pressure,
+    initialize_settlement_culture,
+    process_cultural_mixing,
+)
 from minemesis.religion.religion_engine import ReligionEngine
+from minemesis.religion.religion_figures import determine_hero_archetype
+from minemesis.religion.religion_geography import check_and_elevate_holy_site
 from minemesis.religion.religion_interpretation import apply_religious_interpretation_filter
 from minemesis.religion.religion_models import (
     CharacterFaith,
+    CulturalProfile,
+    CustomType,
+    FolkTradition,
+    FolkTraditionType,
+    HeroArchetype,
     HolySite,
     HolySiteType,
+    LocalCustom,
     LoreStage,
+    RegionalDoctrineProfile,
     Religion,
     ReligionTrait,
     ReligiousFigure,
     ReligiousFigureType,
+    ReligiousIdentityStrength,
     ReligiousMyth,
     ReligiousRelationshipType,
     ReligiousRole,
     Saint,
+    SiteTier,
     TraitCategory,
+)
+from minemesis.religion.religion_myths import exchange_myths_across_trade_routes
+from minemesis.religion.religion_syncretism import (
+    calculate_jaccard_similarity,
+    evaluate_doctrinal_borrowing,
+    evaluate_syncretic_fusion,
 )
 from minemesis.religion.religion_tensions import (
     calculate_religious_relationship_modifier,
@@ -61,6 +85,15 @@ __all__ = [
     "LoreStage",
     "ReligiousMyth",
     "ReligiousAnalyticsReport",
+    "SiteTier",
+    "ReligiousIdentityStrength",
+    "HeroArchetype",
+    "FolkTraditionType",
+    "CustomType",
+    "FolkTradition",
+    "LocalCustom",
+    "RegionalDoctrineProfile",
+    "CulturalProfile",
     "get_all_traits",
     "get_trait",
     "get_traits_by_category",
@@ -73,4 +106,15 @@ __all__ = [
     "generate_religious_analytics",
     "format_religious_analytics_summary",
     "format_religion_family_tree",
+    "calculate_jaccard_similarity",
+    "evaluate_doctrinal_borrowing",
+    "evaluate_syncretic_fusion",
+    "initialize_settlement_culture",
+    "absorb_folk_tradition_into_religion",
+    "celebrate_local_customs",
+    "process_cultural_mixing",
+    "get_cultural_behavioral_pressure",
+    "check_and_elevate_holy_site",
+    "determine_hero_archetype",
+    "exchange_myths_across_trade_routes",
 ]

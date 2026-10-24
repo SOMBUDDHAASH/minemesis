@@ -17,12 +17,41 @@ from minemesis.core.types import EventType, Intent
 from minemesis.models.character import Character
 from minemesis.religion.religion_models import (
     CharacterFaith,
+    HeroArchetype,
     Religion,
     ReligiousFigure,
     ReligiousFigureType,
     ReligiousRole,
     Saint,
 )
+
+
+def determine_hero_archetype(
+    religion: Optional[Religion],
+    character: Character,
+    figure_type: ReligiousFigureType,
+) -> HeroArchetype:
+    """
+    R2.6: Maps historical veneration according to tradition:
+    - Ancestor traditions -> Ancestor / Protective Spirit
+    - Animist traditions -> Protective Spirit
+    - Martial / Warrior traditions -> Hero / Cultural Icon
+    - Priesthood / Institutional -> Saint
+    """
+    if religion:
+        traits = set(religion.traits.keys())
+        if "ancestor_worship" in traits or "ancestral_veneration" in traits:
+            return HeroArchetype.ANCESTOR
+        if "animism_cosmology" in traits:
+            return HeroArchetype.PROTECTIVE_SPIRIT
+        if "warrior_tradition" in traits or "warrior_honor" in traits:
+            return HeroArchetype.HERO
+        if "hierarchical_priesthood" in traits:
+            return HeroArchetype.SAINT
+
+    if character.age_ticks > 600:
+        return HeroArchetype.CULTURAL_ICON
+    return HeroArchetype.HERO
 
 
 def create_religious_figure(
@@ -37,6 +66,7 @@ def create_religious_figure(
     associated_event_id: Optional[int] = None,
 ) -> ReligiousFigure:
     """Instantiates and registers a new Great Religious Figure within a religion."""
+    archetype = determine_hero_archetype(religion, character, figure_type)
     fig = ReligiousFigure(
         id=figure_id,
         character_id=character.id,
@@ -48,6 +78,7 @@ def create_religious_figure(
         tick_recognized=tick,
         is_alive=character.alive,
         associated_event_id=associated_event_id,
+        archetype=archetype,
     )
     religion.figures.append(fig)
 
@@ -90,6 +121,7 @@ def evaluate_martyrdom(
         title = f"Martyr of {religion.name}"
         deed = f"Slain while holding fast to the sacred tenets during the {cause_type.value} at tick {tick}."
 
+        archetype = determine_hero_archetype(religion, deceased_char, ReligiousFigureType.MARTYR)
         fig = ReligiousFigure(
             id=fig_id,
             character_id=deceased_char.id,
@@ -101,6 +133,7 @@ def evaluate_martyrdom(
             tick_recognized=tick,
             is_alive=False,
             associated_event_id=death_event_id,
+            archetype=archetype,
         )
         religion.figures.append(fig)
 
@@ -111,6 +144,7 @@ def evaluate_martyrdom(
             title=title,
             canonized_tick=tick,
             deed=deed,
+            archetype=archetype,
         )
         religion.saints.append(saint)
         return fig

@@ -287,6 +287,65 @@ CAUSE_GRAMMAR: Mapping[EventType, GrammarRule] = {
             EventType.HOLY_SITE_DISCOVERED,
         }),
     ),
+    # Milestone R1.5 + R2: Syncretism, Cultural Evolution & Living Faith Systems
+    EventType.RELIGIOUS_SYNCRETISM: GrammarRule(
+        root_allowed=True,
+        allowed_cause_types=frozenset({
+            EventType.MIGRATION,
+            EventType.MARRIAGE,
+            EventType.PILGRIMAGE,
+            EventType.TRADE_ROUTE_FOUNDED,
+            EventType.PEACE,
+            EventType.RELIGIOUS_REFORM,
+        }),
+    ),
+    EventType.DOCTRINAL_BORROWING: GrammarRule(
+        root_allowed=True,
+        allowed_cause_types=frozenset({
+            EventType.TRADE_ROUTE_FOUNDED,
+            EventType.PILGRIMAGE,
+            EventType.MARRIAGE,
+            EventType.MIGRATION,
+            EventType.PEACE,
+        }),
+    ),
+    EventType.FOLK_TRADITION_ABSORBED: GrammarRule(
+        root_allowed=True,
+        allowed_cause_types=frozenset({
+            EventType.HOLY_SITE_DISCOVERED,
+            EventType.MYTH_RECORDED,
+            EventType.DEATH,
+            EventType.REVELATION,
+        }),
+    ),
+    EventType.LOCAL_CUSTOM_CELEBRATED: GrammarRule(
+        root_allowed=True,
+        allowed_cause_types=frozenset({
+            EventType.HOLY_SITE_DISCOVERED,
+            EventType.FOLK_TRADITION_ABSORBED,
+            EventType.PEACE,
+            EventType.PILGRIMAGE,
+            EventType.BIRTH,
+        }),
+    ),
+    EventType.HOLY_SITE_ELEVATED: GrammarRule(
+        root_allowed=True,
+        allowed_cause_types=frozenset({
+            EventType.PILGRIMAGE,
+            EventType.HOLY_SITE_DISCOVERED,
+            EventType.SAINT_CANONIZED,
+            EventType.GREAT_FIGURE_EMERGENCE,
+        }),
+    ),
+    EventType.MYTH_EXCHANGED: GrammarRule(
+        root_allowed=True,
+        allowed_cause_types=frozenset({
+            EventType.MYTH_RECORDED,
+            EventType.TRADE_ROUTE_FOUNDED,
+            EventType.PILGRIMAGE,
+            EventType.MIGRATION,
+        }),
+    ),
 }
 
 

@@ -1,12 +1,13 @@
 """
-Data Models for the Standalone Religion Engine (Milestone R0 & R1).
+Data Models for the Standalone Religion Engine (Milestones R0, R1, R1.5 & R2).
 
 Core Philosophy:
-- Religion is NOT a faction, kingdom, or village.
-- Religion is an emergent collection of theological, moral, and social ideas.
-- Settlements and characters adhere to religions independently of political borders.
-- Religion is a historical force that filters interpretation, drives conflict/reformation,
-  and builds genealogical trees of faith, myth, and sacred geography.
+- Religion is NOT a church, kingdom, faction, or denomination.
+- Religion is an emergent, living collection of ideas, myths, rituals, sacred places,
+  cultural practices, and historical memory.
+- R1.5: Syncretism, regional doctrinal drift, folk traditions, trait borrowing, convergence.
+- R2: Religion shapes culture and civilization (cultural profiles, dimensions, traditions,
+  hero worship, sacred geography evolution, cultural mixing).
 """
 
 from __future__ import annotations
@@ -72,14 +73,74 @@ class HolySiteType(str, Enum):
     SHRINE = "Shrine"
 
 
+class SiteTier(str, Enum):
+    """
+    R2.7: Evolutionary tiers of sacred places.
+    NaturalSanctuary -> LocalShrine -> Temple -> RegionalPilgrimageSite -> HolyCapital
+    """
+    NATURAL_SANCTUARY = "NaturalSanctuary"
+    LOCAL_SHRINE = "LocalShrine"
+    TEMPLE = "Temple"
+    REGIONAL_PILGRIMAGE_SITE = "RegionalPilgrimageSite"
+    HOLY_CAPITAL = "HolyCapital"
+
+
 class LoreStage(str, Enum):
     """
-    R1.7: Evolutionary stages of religious myth formation.
-    Event -> Story -> Legend -> Myth
+    R1.7 & R2.5: Evolutionary stages of religious myth & cultural memory formation.
+    Event -> Story -> Legend -> Myth -> Tradition -> Culture
     """
     STORY = "Story"
     LEGEND = "Legend"
     MYTH = "Myth"
+    TRADITION = "Tradition"
+    CULTURE = "Culture"
+
+
+class ReligiousIdentityStrength(str, Enum):
+    """
+    R1.5.6: Individual variation in personal religious attachment.
+    """
+    ZEALOUS = "Zealous"
+    DEVOUT = "Devout"
+    AVERAGE = "Average"
+    NOMINAL = "Nominal"
+    CULTURAL_MEMBER = "CulturalMember"
+    NON_PRACTICING = "NonPracticing"
+
+
+class HeroArchetype(str, Enum):
+    """
+    R2.6: Diverse models of venerating historical figures.
+    """
+    HERO = "Hero"
+    FOUNDER = "Founder"
+    ANCESTOR = "Ancestor"
+    PROTECTIVE_SPIRIT = "ProtectiveSpirit"
+    SAINT = "Saint"
+    CULTURAL_ICON = "CulturalIcon"
+
+
+class FolkTraditionType(str, Enum):
+    """
+    R1.5.3: Sub-stratum folk traditions.
+    """
+    VILLAGE_SPIRIT = "VillageSpirit"
+    SACRED_TREE = "SacredTree"
+    RIVER_GUARDIAN = "RiverGuardian"
+    MOUNTAIN_LEGEND = "MountainLegend"
+    ANCESTOR_HERO = "AncestorHero"
+
+
+class CustomType(str, Enum):
+    """
+    R2.4: Recurring village ceremonies and annual cultural customs.
+    """
+    HARVEST_FESTIVAL = "HarvestFestival"
+    ANCESTOR_CEREMONY = "AncestorCeremony"
+    WINTER_PILGRIMAGE = "WinterPilgrimage"
+    RIVER_IMMERSION = "RiverImmersion"
+    HERO_REMEMBRANCE = "HeroRemembrance"
 
 
 @dataclass(frozen=True)
@@ -128,6 +189,8 @@ class HolySite:
     site_type: str
     significance: str
     founded_tick: int
+    tier: SiteTier = SiteTier.NATURAL_SANCTUARY
+    pilgrims_visited: int = 0
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -137,11 +200,23 @@ class HolySite:
             "site_type": self.site_type,
             "significance": self.significance,
             "founded_tick": self.founded_tick,
+            "tier": self.tier.value,
+            "pilgrims_visited": self.pilgrims_visited,
         }
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> HolySite:
-        return cls(**data)
+        tier_val = data.get("tier", SiteTier.NATURAL_SANCTUARY.value)
+        return cls(
+            id=data["id"],
+            name=data["name"],
+            settlement_id=data["settlement_id"],
+            site_type=data["site_type"],
+            significance=data["significance"],
+            founded_tick=int(data["founded_tick"]),
+            tier=SiteTier(tier_val),
+            pilgrims_visited=int(data.get("pilgrims_visited", 0)),
+        )
 
 
 @dataclass
@@ -152,6 +227,7 @@ class Saint:
     title: str
     canonized_tick: int
     deed: str
+    archetype: HeroArchetype = HeroArchetype.SAINT
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -160,17 +236,26 @@ class Saint:
             "title": self.title,
             "canonized_tick": self.canonized_tick,
             "deed": self.deed,
+            "archetype": self.archetype.value,
         }
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Saint:
-        return cls(**data)
+        archetype_val = data.get("archetype", HeroArchetype.SAINT.value)
+        return cls(
+            character_id=data["character_id"],
+            character_name=data["character_name"],
+            title=data["title"],
+            canonized_tick=int(data["canonized_tick"]),
+            deed=data["deed"],
+            archetype=HeroArchetype(archetype_val),
+        )
 
 
 @dataclass
 class ReligiousFigure:
     """
-    R1.4: Great religious leaders, visionaries, martyrs, and reformers.
+    R1.4 & R2.6: Great religious leaders, visionaries, martyrs, reformers, and cultural icons.
     """
     id: str
     character_id: str
@@ -182,6 +267,7 @@ class ReligiousFigure:
     tick_recognized: int = 0
     is_alive: bool = True
     associated_event_id: Optional[int] = None
+    archetype: HeroArchetype = HeroArchetype.HERO
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -195,10 +281,12 @@ class ReligiousFigure:
             "tick_recognized": self.tick_recognized,
             "is_alive": self.is_alive,
             "associated_event_id": self.associated_event_id,
+            "archetype": self.archetype.value,
         }
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> ReligiousFigure:
+        arch_val = data.get("archetype", HeroArchetype.HERO.value)
         return cls(
             id=data["id"],
             character_id=data["character_id"],
@@ -210,15 +298,15 @@ class ReligiousFigure:
             tick_recognized=int(data.get("tick_recognized", 0)),
             is_alive=bool(data.get("is_alive", True)),
             associated_event_id=data.get("associated_event_id"),
+            archetype=HeroArchetype(arch_val),
         )
 
 
 @dataclass
 class ReligiousMyth:
     """
-    R1.7: Myth Creation System.
-    Stores how a religion distorts and remembers objective history over generations:
-    Event -> Story -> Legend -> Myth
+    R1.7 & R2.5: Myth Creation & Cultural Memory System.
+    Event -> Story -> Legend -> Myth -> Tradition -> Culture
     """
     myth_id: str
     religion_id: str
@@ -232,6 +320,8 @@ class ReligiousMyth:
     retellings: int = 0
     origin_tick: int = 0
     last_retold_tick: int = 0
+    origin_settlement_id: Optional[str] = None
+    known_by_settlements: set[str] = field(default_factory=set)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -247,6 +337,8 @@ class ReligiousMyth:
             "retellings": self.retellings,
             "origin_tick": self.origin_tick,
             "last_retold_tick": self.last_retold_tick,
+            "origin_settlement_id": self.origin_settlement_id,
+            "known_by_settlements": sorted(list(self.known_by_settlements)),
         }
 
     @classmethod
@@ -264,6 +356,135 @@ class ReligiousMyth:
             retellings=int(data.get("retellings", 0)),
             origin_tick=int(data.get("origin_tick", 0)),
             last_retold_tick=int(data.get("last_retold_tick", 0)),
+            origin_settlement_id=data.get("origin_settlement_id"),
+            known_by_settlements=set(data.get("known_by_settlements", [])),
+        )
+
+
+@dataclass
+class FolkTradition:
+    """
+    R1.5.3: Local folk spirits, sacred trees, and ancestral legends.
+    """
+    id: str
+    name: str
+    tradition_type: FolkTraditionType
+    settlement_id: str
+    significance: str
+    is_absorbed_into_religion: bool = False
+    absorbed_by_religion_id: Optional[str] = None
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "name": self.name,
+            "tradition_type": self.tradition_type.value,
+            "settlement_id": self.settlement_id,
+            "significance": self.significance,
+            "is_absorbed_into_religion": self.is_absorbed_into_religion,
+            "absorbed_by_religion_id": self.absorbed_by_religion_id,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> FolkTradition:
+        return cls(
+            id=data["id"],
+            name=data["name"],
+            tradition_type=FolkTraditionType(data["tradition_type"]),
+            settlement_id=data["settlement_id"],
+            significance=data["significance"],
+            is_absorbed_into_religion=bool(data.get("is_absorbed_into_religion", False)),
+            absorbed_by_religion_id=data.get("absorbed_by_religion_id"),
+        )
+
+
+@dataclass
+class LocalCustom:
+    """
+    R2.4: Annual village customs, seasonal immersions, and ceremonies.
+    """
+    id: str
+    name: str
+    custom_type: CustomType
+    settlement_id: str
+    season_month: int
+    description: str
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "name": self.name,
+            "custom_type": self.custom_type.value,
+            "settlement_id": self.settlement_id,
+            "season_month": self.season_month,
+            "description": self.description,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> LocalCustom:
+        return cls(
+            id=data["id"],
+            name=data["name"],
+            custom_type=CustomType(data["custom_type"]),
+            settlement_id=data["settlement_id"],
+            season_month=int(data["season_month"]),
+            description=data["description"],
+        )
+
+
+@dataclass
+class RegionalDoctrineProfile:
+    """
+    R1.5.2: Regional doctrinal drift and trait emphasis without schism.
+    """
+    region_id: str
+    trait_weights: dict[str, float] = field(default_factory=dict)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "region_id": self.region_id,
+            "trait_weights": dict(self.trait_weights),
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> RegionalDoctrineProfile:
+        return cls(
+            region_id=data["region_id"],
+            trait_weights=dict(data.get("trait_weights", {})),
+        )
+
+
+@dataclass
+class CulturalProfile:
+    """
+    R2.1 & R2.3: Multi-dimensional cultural composition of a settlement.
+    """
+    settlement_id: str
+    religious_composition: dict[str, float] = field(default_factory=dict)  # {rel_id: proportion}
+    social_values: dict[str, float] = field(default_factory=dict)          # family_loyalty, honor, discipline, compassion, etc.
+    historical_biases: dict[str, float] = field(default_factory=dict)
+    folk_traditions: list[FolkTradition] = field(default_factory=list)
+    local_customs: list[LocalCustom] = field(default_factory=list)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "settlement_id": self.settlement_id,
+            "religious_composition": {k: round(v, 3) for k, v in self.religious_composition.items()},
+            "social_values": {k: round(v, 3) for k, v in self.social_values.items()},
+            "historical_biases": {k: round(v, 3) for k, v in self.historical_biases.items()},
+            "folk_traditions": [ft.to_dict() for ft in self.folk_traditions],
+            "local_customs": [lc.to_dict() for lc in self.local_customs],
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> CulturalProfile:
+        return cls(
+            settlement_id=data["settlement_id"],
+            religious_composition=dict(data.get("religious_composition", {})),
+            social_values=dict(data.get("social_values", {})),
+            historical_biases=dict(data.get("historical_biases", {})),
+            folk_traditions=[FolkTradition.from_dict(ft) for ft in data.get("folk_traditions", [])],
+            local_customs=[LocalCustom.from_dict(lc) for lc in data.get("local_customs", [])],
         )
 
 
@@ -271,12 +492,17 @@ class ReligiousMyth:
 class Religion:
     """
     An emergent religion formed from a coherent combination of religious traits.
-    Tracks lineage (parent_religion_id, child_religion_ids) to document historical schisms.
+    Tracks lineage (parent_religion_id, child_religion_ids), syncretism, and regional drift.
     """
     id: str
     name: str
     parent_religion_id: Optional[str] = None
     child_religion_ids: list[str] = field(default_factory=list)
+    syncretic_parents: list[str] = field(default_factory=list)  # R1.5.1
+    borrowed_traits: dict[str, str] = field(default_factory=dict)  # R1.5.4 {trait_id: donor_rel_id}
+    absorbed_folk_traditions: list[str] = field(default_factory=list)  # R1.5.3
+    regional_profiles: dict[str, RegionalDoctrineProfile] = field(default_factory=dict)  # R1.5.2
+    cultural_traditions: list[str] = field(default_factory=list)  # R2.5
     founded_tick: int = 0
     founded_year: int = 1
     traits: dict[str, ReligionTrait] = field(default_factory=dict)
@@ -313,6 +539,10 @@ class Religion:
             visited.add(curr_parent)
             parent_rel = religions.get(curr_parent)
             curr_parent = parent_rel.parent_religion_id if parent_rel else None
+
+        # Check syncretic parents as well
+        if ancestor_id in self.syncretic_parents:
+            return True
         return False
 
     def get_root_ancestor_id(self, religions: Mapping[str, Religion]) -> str:
@@ -346,6 +576,11 @@ class Religion:
             "name": self.name,
             "parent_religion_id": self.parent_religion_id,
             "child_religion_ids": list(self.child_religion_ids),
+            "syncretic_parents": list(self.syncretic_parents),
+            "borrowed_traits": dict(self.borrowed_traits),
+            "absorbed_folk_traditions": list(self.absorbed_folk_traditions),
+            "regional_profiles": {k: v.to_dict() for k, v in self.regional_profiles.items()},
+            "cultural_traditions": list(self.cultural_traditions),
             "founded_tick": self.founded_tick,
             "founded_year": self.founded_year,
             "traits": {t_id: t.to_dict() for t_id, t in self.traits.items()},
@@ -370,11 +605,18 @@ class Religion:
         saints = [Saint.from_dict(s) for s in data.get("saints", [])]
         figures = [ReligiousFigure.from_dict(f) for f in data.get("figures", [])]
         myths = [ReligiousMyth.from_dict(m) for m in data.get("myths", [])]
+        regional = {k: RegionalDoctrineProfile.from_dict(v) for k, v in data.get("regional_profiles", {}).items()}
+
         return cls(
             id=data["id"],
             name=data["name"],
             parent_religion_id=data.get("parent_religion_id"),
             child_religion_ids=list(data.get("child_religion_ids", [])),
+            syncretic_parents=list(data.get("syncretic_parents", [])),
+            borrowed_traits=dict(data.get("borrowed_traits", {})),
+            absorbed_folk_traditions=list(data.get("absorbed_folk_traditions", [])),
+            regional_profiles=regional,
+            cultural_traditions=list(data.get("cultural_traditions", [])),
             founded_tick=data.get("founded_tick", 0),
             founded_year=data.get("founded_year", 1),
             traits=traits,
@@ -407,6 +649,22 @@ class CharacterFaith:
     is_zealot: bool = False
     pilgrimages_completed: int = 0
     former_religion_ids: list[str] = field(default_factory=list)
+    identity_strength: ReligiousIdentityStrength = ReligiousIdentityStrength.DEVOUT  # R1.5.6
+
+    @property
+    def adherence_weight(self) -> float:
+        """
+        R1.5.6: Computes behavioral weight scaled by religious identity strength.
+        """
+        multipliers = {
+            ReligiousIdentityStrength.ZEALOUS: 1.3,
+            ReligiousIdentityStrength.DEVOUT: 1.0,
+            ReligiousIdentityStrength.AVERAGE: 0.7,
+            ReligiousIdentityStrength.NOMINAL: 0.4,
+            ReligiousIdentityStrength.CULTURAL_MEMBER: 0.25,
+            ReligiousIdentityStrength.NON_PRACTICING: 0.1,
+        }
+        return self.devotion * multipliers.get(self.identity_strength, 1.0)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -419,10 +677,12 @@ class CharacterFaith:
             "is_zealot": self.is_zealot,
             "pilgrimages_completed": self.pilgrimages_completed,
             "former_religion_ids": list(self.former_religion_ids),
+            "identity_strength": self.identity_strength.value,
         }
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> CharacterFaith:
+        id_str_val = data.get("identity_strength", ReligiousIdentityStrength.DEVOUT.value)
         return cls(
             character_id=data["character_id"],
             religion_id=data["religion_id"],
@@ -433,4 +693,5 @@ class CharacterFaith:
             is_zealot=bool(data.get("is_zealot", False)),
             pilgrimages_completed=int(data.get("pilgrimages_completed", 0)),
             former_religion_ids=list(data.get("former_religion_ids", [])),
+            identity_strength=ReligiousIdentityStrength(id_str_val),
         )

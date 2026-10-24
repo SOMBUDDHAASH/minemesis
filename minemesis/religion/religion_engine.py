@@ -30,15 +30,27 @@ from minemesis.religion.religion_analytics import (
 from minemesis.religion.religion_config import (
     CLERGY_POPULATION_RATIO,
     COUNTER_REFORMATION_CHANCE,
+    CULTURAL_MIXING_RATE,
     DEVOTION_DECAY_RATE,
+    DOCTRINAL_BORROWING_CHANCE,
     ENABLE_RELIGION_ENGINE,
+    FOLK_TRADITION_ABSORPTION_CHANCE,
     GREAT_FIGURE_EMERGENCE_CHANCE,
     HERESY_EMERGENCE_CHANCE,
     INITIAL_RELIGIONS_PER_WORLD,
+    MYTH_EXCHANGE_CHANCE,
     MYTH_RETELL_INTERVAL,
     PILGRIMAGE_CHANCE,
     SCHISM_CHANCE_PER_TICK,
     SECT_REUNIFICATION_CHANCE,
+    SYNCRETISM_CHANCE,
+)
+from minemesis.religion.religion_culture import (
+    absorb_folk_tradition_into_religion,
+    celebrate_local_customs,
+    get_cultural_behavioral_pressure,
+    initialize_settlement_culture,
+    process_cultural_mixing,
 )
 from minemesis.religion.religion_effects import (
     get_character_effective_modifiers,
@@ -51,6 +63,7 @@ from minemesis.religion.religion_figures import (
 )
 from minemesis.religion.religion_generation import generate_world_religions
 from minemesis.religion.religion_geography import (
+    check_and_elevate_holy_site,
     evaluate_holy_site_discovery_or_construction,
     process_pilgrimage_economic_benefit,
 )
@@ -63,6 +76,7 @@ from minemesis.religion.religion_heresies import (
 from minemesis.religion.religion_interpretation import apply_religious_interpretation_filter
 from minemesis.religion.religion_models import (
     CharacterFaith,
+    CulturalProfile,
     HolySite,
     HolySiteType,
     LoreStage,
@@ -73,9 +87,11 @@ from minemesis.religion.religion_models import (
     ReligiousRelationshipType,
     ReligiousRole,
     Saint,
+    SiteTier,
 )
 from minemesis.religion.religion_myths import (
     create_initial_story_from_event,
+    exchange_myths_across_trade_routes,
     retell_and_evolve_myths,
 )
 from minemesis.religion.religion_schisms import (
@@ -97,6 +113,10 @@ from minemesis.religion.religion_spread import (
     process_trade_route_evangelism,
     update_settlement_dominant_religions,
 )
+from minemesis.religion.religion_syncretism import (
+    evaluate_doctrinal_borrowing,
+    evaluate_syncretic_fusion,
+)
 from minemesis.religion.religion_tensions import (
     calculate_religious_relationship_modifier,
     calculate_settlement_religious_tension,
@@ -117,10 +137,13 @@ class ReligionEngine:
         self.rng = random.Random(seed + 777)
         self.religions: dict[str, Religion] = {}
         self.faiths: dict[str, CharacterFaith] = {}
+        self.cultural_profiles: dict[str, CulturalProfile] = {}
         self.rel_counter = [1]
         self.site_counter = [1]
         self.figure_counter = [1]
         self.myth_counter = [1]
+        self.folk_counter = [1]
+        self.custom_counter = [1]
         self.dominant_by_settlement: dict[str, str] = {}
         self.settlement_tensions: dict[str, float] = {}
 
@@ -145,6 +168,18 @@ class ReligionEngine:
             settlement_ids=settlement_ids,
         )
         self.rel_counter[0] = len(self.religions) + 1
+
+        # Initialize Cultural Profiles (Milestone R2.1 & R2.3)
+        for s_id in settlement_ids:
+            s_obj = settlements.get(s_id) if settlements else None
+            s_name = getattr(s_obj, "name", s_id.replace("set_", "").capitalize())
+            self.cultural_profiles[s_id] = initialize_settlement_culture(
+                settlement_id=s_id,
+                settlement_name=s_name,
+                folk_counter=self.folk_counter,
+                custom_counter=self.custom_counter,
+                rng=self.rng,
+            )
 
         if characters:
             char_list = sorted(list(characters.values()), key=lambda c: c.id)
@@ -533,6 +568,20 @@ class ReligionEngine:
                             rng=self.rng,
                         )
 
+                        chosen_site.pilgrims_visited += 1
+                        elevation_payload = check_and_elevate_holy_site(site=chosen_site, religion=c_rel, tick=tick, rng=self.rng)
+                        if elevation_payload:
+                            elev_event = {
+                                "type": "HolySiteElevated",
+                                "tick": tick,
+                                "location": chosen_site.settlement_id,
+                                "causes": [],
+                                "participants": [("holy_site", chosen_site.name), ("religion", c_rel.name)],
+                                "payload": elevation_payload,
+                            }
+                            emitted_events.append(elev_event)
+                            self._emit_to_event_log(event_log, elev_event)
+
                         event_data = {
                             "type": "Pilgrimage",
                             "tick": tick,
@@ -673,7 +722,149 @@ class ReligionEngine:
                     self._emit_to_event_log(event_log, event_data)
 
         # -------------------------------------------------------------
-        # 8. Devotion Maintenance & Dominant Faith Recalculation
+        # 8. Local Customs & Seasonal Celebrations (R2.4)
+        # -------------------------------------------------------------
+        if self.cultural_profiles:
+            for s_id, cp in sorted(self.cultural_profiles.items()):
+                custom_events = celebrate_local_customs(s_id, cp, tick)
+                for ce in custom_events:
+                    event_data = {
+                        "type": "LocalCustomCelebrated",
+                        "tick": tick,
+                        "location": s_id,
+                        "causes": [],
+                        "participants": [("settlement", s_id), ("custom", ce["custom_name"])],
+                        "payload": ce,
+                    }
+                    emitted_events.append(event_data)
+                    self._emit_to_event_log(event_log, event_data)
+
+        # -------------------------------------------------------------
+        # 9. Religious Syncretism & Doctrinal Borrowing (R1.5.1 & R1.5.4)
+        # -------------------------------------------------------------
+        if active_trade_routes and len(self.religions) >= 2 and living:
+            active_pairs = []
+            for (s_a, s_b), route in active_trade_routes.items():
+                is_route_active = getattr(route, "active", getattr(route, "is_active", True))
+                if is_route_active:
+                    rel_a = self.get_settlement_religion(s_a)
+                    rel_b = self.get_settlement_religion(s_b)
+                    if rel_a and rel_b and rel_a.id != rel_b.id:
+                        active_pairs.append((s_a, s_b, rel_a, rel_b))
+
+            if active_pairs:
+                s_a, s_b, r_a, r_b = self.rng.choice(active_pairs)
+
+                # Doctrinal Borrowing
+                if self.rng.random() < DOCTRINAL_BORROWING_CHANCE:
+                    borrow_payload = evaluate_doctrinal_borrowing(
+                        donor_rel=r_a,
+                        recipient_rel=r_b,
+                        all_traits=ALL_RELIGION_TRAITS,
+                        tick=tick,
+                        rng=self.rng,
+                    )
+                    if borrow_payload:
+                        borrow_event = {
+                            "type": "DoctrinalBorrowing",
+                            "tick": tick,
+                            "location": s_b,
+                            "causes": [],
+                            "participants": [("recipient", borrow_payload["recipient_religion_name"]), ("source", borrow_payload["donor_religion_name"])],
+                            "payload": borrow_payload,
+                        }
+                        emitted_events.append(borrow_event)
+                        self._emit_to_event_log(event_log, borrow_event)
+
+                # Syncretic Fusion
+                if self.rng.random() < SYNCRETISM_CHANCE:
+                    settlement_chars = [c for c in living if c.settlement_id == s_b]
+                    fusion_res = evaluate_syncretic_fusion(
+                        rel_a=r_a,
+                        rel_b=r_b,
+                        settlement_id=s_b,
+                        settlement_characters=settlement_chars,
+                        faiths=self.faiths,
+                        all_traits=ALL_RELIGION_TRAITS,
+                        rel_counter=self.rel_counter,
+                        tick=tick,
+                        rng=self.rng,
+                    )
+                    if fusion_res:
+                        new_sync_rel, sync_payload = fusion_res
+                        self.religions[new_sync_rel.id] = new_sync_rel
+                        sync_event = {
+                            "type": "ReligiousSyncretism",
+                            "tick": tick,
+                            "location": s_b,
+                            "causes": [],
+                            "participants": [("syncretic_faith", new_sync_rel.name), ("parent_a", sync_payload["parent_rel_a_name"]), ("parent_b", sync_payload["parent_rel_b_name"])],
+                            "payload": sync_payload,
+                        }
+                        emitted_events.append(sync_event)
+                        self._emit_to_event_log(event_log, sync_event)
+
+        # -------------------------------------------------------------
+        # 10. Folk Tradition Absorption (R1.5.3)
+        # -------------------------------------------------------------
+        if self.cultural_profiles and self.rng.random() < FOLK_TRADITION_ABSORPTION_CHANCE:
+            for s_id in sorted(self.cultural_profiles.keys()):
+                cp = self.cultural_profiles[s_id]
+                dom_rel = self.get_settlement_religion(s_id)
+                if dom_rel:
+                    unabsorbed = [ft for ft in cp.folk_traditions if not ft.is_absorbed_into_religion]
+                    if unabsorbed:
+                        ft_to_absorb = self.rng.choice(unabsorbed)
+                        absorb_payload = absorb_folk_tradition_into_religion(dom_rel, ft_to_absorb, tick)
+                        absorb_event = {
+                            "type": "FolkTraditionAbsorbed",
+                            "tick": tick,
+                            "location": s_id,
+                            "causes": [],
+                            "participants": [("religion", dom_rel.name), ("tradition", ft_to_absorb.name)],
+                            "payload": absorb_payload,
+                        }
+                        emitted_events.append(absorb_event)
+                        self._emit_to_event_log(event_log, absorb_event)
+                        break
+
+        # -------------------------------------------------------------
+        # 11. Myth Exchange across Trade Routes (R1.5.7)
+        # -------------------------------------------------------------
+        if active_trade_routes and self.rng.random() < MYTH_EXCHANGE_CHANCE:
+            exchanges = exchange_myths_across_trade_routes(
+                active_trade_routes=active_trade_routes,
+                religions=self.religions,
+                dominant_by_settlement=self.dominant_by_settlement,
+                current_tick=tick,
+                rng=self.rng,
+                myth_counter=self.myth_counter,
+            )
+            for mex in exchanges:
+                mex_event = {
+                    "type": "MythExchanged",
+                    "tick": tick,
+                    "location": mex["destination_settlement"],
+                    "causes": [mex["root_event_id"]] if mex.get("root_event_id") else [],
+                    "participants": [("hero", mex["hero_name"]), ("origin_religion", mex["origin_religion"]), ("adopting_religion", mex["adopting_religion"])],
+                    "payload": mex,
+                }
+                emitted_events.append(mex_event)
+                self._emit_to_event_log(event_log, mex_event)
+
+        # -------------------------------------------------------------
+        # 12. Cultural Mixing across Trade Corridors (R2.9)
+        # -------------------------------------------------------------
+        if active_trade_routes and self.cultural_profiles:
+            process_cultural_mixing(
+                settlements=settlements or {},
+                active_trade_routes=active_trade_routes,
+                cultural_profiles=self.cultural_profiles,
+                mixing_rate=CULTURAL_MIXING_RATE,
+            )
+
+        # -------------------------------------------------------------
+        # 13. Devotion Maintenance & Dominant Faith Recalculation
         # -------------------------------------------------------------
         for f in self.faiths.values():
             f.devotion = max(0.1, round(f.devotion - DEVOTION_DECAY_RATE, 3))
@@ -767,6 +958,18 @@ class ReligionEngine:
         rel = self.get_settlement_religion(settlement_id)
         return get_settlement_consumption_multiplier(rel)
 
+    def get_settlement_culture(self, settlement_id: str) -> Optional[CulturalProfile]:
+        """Returns the CulturalProfile of a settlement."""
+        if not self.enabled:
+            return None
+        return self.cultural_profiles.get(settlement_id)
+
+    def get_cultural_pressure(self, settlement_id: str) -> dict[str, float]:
+        """Returns behavioral decision modifiers exerted by settlement culture."""
+        if not self.enabled:
+            return {}
+        return get_cultural_behavioral_pressure(settlement_id, self.cultural_profiles)
+
     def generate_analytics(
         self,
         settlements: Mapping[str, Any],
@@ -774,8 +977,11 @@ class ReligionEngine:
         event_log: Any = None,
         current_tick: int = 0,
     ) -> ReligiousAnalyticsReport:
-        """Generates comprehensive Milestone R1.10 analytics report."""
+        """Generates comprehensive Milestones R1.10 and R2.10 analytics report."""
         living = [c for c in characters.values() if c.alive]
+        all_myths = []
+        for r in self.religions.values():
+            all_myths.extend(r.myths)
         return generate_religious_analytics(
             religions=self.religions,
             faiths=self.faiths,
@@ -783,6 +989,8 @@ class ReligionEngine:
             living_characters=living,
             event_log=event_log,
             current_tick=current_tick,
+            cultural_profiles=self.cultural_profiles,
+            myths=all_myths,
         )
 
     def serialize(self) -> dict[str, Any]:
@@ -797,6 +1005,9 @@ class ReligionEngine:
             seed=self.seed,
             figure_counter=self.figure_counter[0],
             myth_counter=self.myth_counter[0],
+            cultural_profiles=self.cultural_profiles,
+            folk_counter=self.folk_counter[0],
+            custom_counter=self.custom_counter[0],
         )
         data["enabled"] = True
         return data
@@ -815,4 +1026,8 @@ class ReligionEngine:
         self.seed = res[4]
         self.figure_counter = [res[5]]
         self.myth_counter = [res[6]]
+        if len(res) > 7:
+            self.cultural_profiles = res[7]
+            self.folk_counter = [res[8]]
+            self.custom_counter = [res[9]]
         self.rng = random.Random(self.seed + 777)

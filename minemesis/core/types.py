@@ -42,6 +42,14 @@ class EventType(str, Enum):
     GREAT_FIGURE_EMERGENCE = "GreatFigureEmergence"
     MYTH_RECORDED = "MythRecorded"
 
+    # Milestone R1.5 + R2: Syncretism, Cultural Evolution & Living Faith Systems
+    RELIGIOUS_SYNCRETISM = "ReligiousSyncretism"
+    DOCTRINAL_BORROWING = "DoctrinalBorrowing"
+    FOLK_TRADITION_ABSORBED = "FolkTraditionAbsorbed"
+    LOCAL_CUSTOM_CELEBRATED = "LocalCustomCelebrated"
+    HOLY_SITE_ELEVATED = "HolySiteElevated"
+    MYTH_EXCHANGED = "MythExchanged"
+
     # Alias for backwards compatibility
     FEUD_BEGINS = "Feud"
 
