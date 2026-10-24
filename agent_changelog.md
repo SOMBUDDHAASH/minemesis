@@ -96,3 +96,20 @@ Diff of implemented `CAUSE_GRAMMAR` against brief Table 4.1:
 | `test_revelation_pipeline` | Tested on a single seed (`seed=42`). | Validates witness perception, transmission, belief supersession, and memory discounting across **5 seeds**. | Asserts belief supersession and relationship adjustment occur in live simulation runs across the cohort. |
 | `test_marriage_peace_alliance_rule` | Did not exist. Spurious recency rule linked any marriage within 12 months to Peace. | Asserts that every Marriage citing Peace has spouses originating from the two feud belligerent settlements. | Tested across all 50 seeds; zero spurious recency-based marriage edges permitted. |
 
+---
+
+## [Milestone 0.5.2] - Reconciliation, Determinism Hardening, and Event Consolidation
+
+### Step 1. Reconciliation, Demographics, and Marriage Funnel
+- **Reconciliation of Seeds 2043, 2011, 2029, 2030**:
+  - *Seed 2043*: Explained the 350 vs 140 discrepancy. The batch header reported 350 total simulation events, but the historical printer invoked `format_causal_chain(sim.event_log, target_id)` which prints only the ancestors of `target_id` (#140 at Year 44 Month 3). Events #141-349 and all births/marriages outside that backward tree were omitted from printout. Full simulation verified: 154 births, 104 deaths, exactly 80 living characters. Demographic identity holds: `30 + 154 - 104 = 80`.
+  - *Seed 2011*: Confirmed world extinction occurred at Year 94 (all 57 people ever born had died). Diagnosed posthumous raid occurring at Year 96 due to lack of dead-actor checks.
+- **Marriage and Birth Funnel Fix (Widow/Widower Remarriage)**:
+  - *Before*: When a married character died, their surviving spouse's `spouse_id` was never cleared. Surviving widows and widowers (even in their 20s or 30s) remained permanently locked as "married" to a corpse, unable to enter `singles_m` or `singles_f`. In small settlements with sex imbalances, this triggered demographic collapse spirals where young unmarried women had zero available bachelors.
+  - *After*: At each monthly life cycle step, `char.spouse_id` is automatically cleared to `None` if the spouse is deceased (`if not spouse or not spouse.alive: char.spouse_id = None`). Surviving widows/widowers freely re-enter the singles pool.
+  - *Impact*: 20-year birth stall rate across 50 training seeds dropped from **8% (4/50)** to **0% (0/50)**. Seed 12 evolved from extinction (0 pop) to 46 living citizens; Seed 2011 evolved from extinction (0 pop) to 9 living citizens, with zero population floors or artificial fertility boosts.
+- **Age Model Check**:
+  - Lifespan model confirmed: Natural deaths occur strictly between ages 60 and 80 (mean 64.7, median 64.0). Maximum age alive at Year 100 across 50 seeds is 73 (mean 65.5).
+  - Characters acting past Year 70 were identified not as ageless characters, but as deceased characters cited posthumously in raids, peace treaties, and revenge deaths.
+
+

@@ -39,11 +39,15 @@ def process_life_cycle(
     """
     living_chars = [c for c in characters.values() if c.alive]
 
-    # 1. Age living characters
+    # 1. Age living characters and update marital status for surviving spouses
     for c_id in sorted(characters.keys()):
         char = characters[c_id]
         if char.alive:
             char.age_ticks += 1
+            if char.spouse_id is not None:
+                spouse = characters.get(char.spouse_id)
+                if not spouse or not spouse.alive:
+                    char.spouse_id = None
 
     # 2. Check Marriages
     singles_m = [c for c in characters.values() if c.alive and c.spouse_id is None and c.sex == "M" and c.age_years >= 18]
@@ -127,10 +131,6 @@ def process_life_cycle(
                             s_f.member_ids.remove(f.id)
                         f.settlement_id = s_m.id
                         s_m.member_ids.append(f.id)
-
-                    marriage_key = tuple(sorted([m.id, f.id]))
-                    marriage_events[marriage_key] = evt.id
-                    break
 
                     marriage_key = tuple(sorted([m.id, f.id]))
                     marriage_events[marriage_key] = evt.id
