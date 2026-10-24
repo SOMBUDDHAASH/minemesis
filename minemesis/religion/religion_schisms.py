@@ -8,8 +8,8 @@ Core Philosophy:
 """
 
 from __future__ import annotations
-import random
 from typing import Any, Mapping, Sequence
+from minemesis.core.rng import KeyedRNG
 from minemesis.religion.religion_models import (
     CharacterFaith,
     HolySite,
@@ -43,7 +43,7 @@ def check_and_canonize_saint(
     religion: Religion | None,
     cause_of_death: str,
     tick: int,
-    rng: random.Random,
+    rng: KeyedRNG,
 ) -> tuple[Saint, Religion] | None:
     """
     Evaluates whether a deceased devout character is canonized as a Saint.
@@ -81,7 +81,7 @@ def trigger_religious_reformation(
     religion: Religion,
     trigger_cause: str,
     tick: int,
-    rng: random.Random,
+    rng: KeyedRNG,
 ) -> tuple[str, str] | None:
     """
     Mutates a religion by acquiring a new theological trait in response to historical crises.
@@ -111,7 +111,7 @@ def trigger_religious_schism(
     faiths: dict[str, CharacterFaith],
     new_rel_counter: int,
     tick: int,
-    rng: random.Random,
+    rng: KeyedRNG,
 ) -> tuple[Religion, list[str]] | None:
     """
     Spawns a new sect / daughter religion from an existing faith.

@@ -17,8 +17,8 @@ Core Philosophy:
 """
 
 from __future__ import annotations
-import random
 from typing import Any, Mapping, Optional, Sequence
+from minemesis.core.rng import KeyedRNG
 from minemesis.models.character import Character
 from minemesis.models.settlement import Settlement
 from minemesis.religion.religion_config import (
@@ -43,7 +43,7 @@ def process_family_faith_inheritance(
     father_faith: CharacterFaith | None,
     mother_faith: CharacterFaith | None,
     settlement_dominant_rel_id: str | None,
-    rng: random.Random,
+    rng: KeyedRNG,
     tick: int,
 ) -> CharacterFaith | None:
     """Assigns religious affiliation to a newborn child based on parents' faith."""
@@ -100,7 +100,7 @@ def process_family_faith_inheritance(
 def process_marriage_conversion(
     spouse1_faith: CharacterFaith,
     spouse2_faith: CharacterFaith,
-    rng: random.Random,
+    rng: KeyedRNG,
     tick: int,
 ) -> tuple[str, str, str] | None:
     """Evaluates whether an inter-faith marriage leads to conversion of the less devout spouse."""
@@ -133,7 +133,7 @@ def process_trade_route_evangelism(
     characters_in_town: Sequence[Any],
     faiths: dict[str, CharacterFaith],
     foreign_dominant_rel_id: str,
-    rng: random.Random,
+    rng: KeyedRNG,
     tick: int,
 ) -> tuple[str, str, str] | None:
     """Active trade corridors expose locals to foreign faith ideas."""
@@ -166,7 +166,7 @@ def process_clergy_missionary_work(
     clergy_char_id: str,
     settlement_characters: Sequence[Any],
     faiths: dict[str, CharacterFaith],
-    rng: random.Random,
+    rng: KeyedRNG,
     tick: int,
 ) -> tuple[str, str, str] | None:
     """Clergy (Priests, Prophets, Monks, Shamans) actively preach to citizens in their settlement."""
@@ -200,7 +200,7 @@ def process_religious_refugee_migration(
     settlements: Mapping[str, Settlement],
     faiths: dict[str, CharacterFaith],
     dominant_by_settlement: Mapping[str, str],
-    rng: random.Random,
+    rng: KeyedRNG,
     tick: int,
 ) -> Optional[tuple[Character, str, str, str]]:
     """
@@ -249,7 +249,7 @@ def process_conquest_conversion(
     faiths: dict[str, CharacterFaith],
     dominant_by_settlement: Mapping[str, str],
     religions: Mapping[str, Religion],
-    rng: random.Random,
+    rng: KeyedRNG,
     tick: int,
 ) -> list[tuple[str, str, str]]:
     """
@@ -287,7 +287,7 @@ def process_saint_cult_conversions(
     religion: Religion,
     settlement_characters: Sequence[Character],
     faiths: dict[str, CharacterFaith],
-    rng: random.Random,
+    rng: KeyedRNG,
     tick: int,
 ) -> list[tuple[str, str, str]]:
     """

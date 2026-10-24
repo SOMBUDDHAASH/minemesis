@@ -72,8 +72,10 @@ class Simulation:
 
         # Procedural Literature Engine (Milestone L0)
         try:
-            from minemesis.lore.lore_engine import LoreEngine
-            self.lore_engine: Optional[LoreEngine] = LoreEngine(seed=self.seed, enabled=True)
+            from minemesis.lore.lore_engine import LoreEngine, ENABLE_LORE_ENGINE
+            self.lore_engine: Optional[LoreEngine] = (
+                LoreEngine(seed=self.seed, enabled=ENABLE_LORE_ENGINE)
+            )
         except ImportError:
             self.lore_engine = None
 

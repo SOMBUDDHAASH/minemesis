@@ -14,9 +14,9 @@ Synthesizes 9 distinct procedural book genres from simulation state:
 """
 
 from __future__ import annotations
-import random
 from typing import Any, Mapping, Optional, Sequence
 
+from minemesis.core.rng import KeyedRNG
 from minemesis.core.types import EventType, Intent
 from minemesis.lore.lore_models import Book, BookGenre, LiteracyLevel
 from minemesis.lore.lore_templates import get_term, paginate_text, render_event_sentence
@@ -34,7 +34,7 @@ def generate_family_history(
     kin_characters: Sequence[Character],
     family_events: Sequence[Event],
     tick: int,
-    rng: random.Random,
+    rng: KeyedRNG,
     literacy: LiteracyLevel = LiteracyLevel.EDUCATED,
 ) -> Book:
     """
@@ -127,7 +127,7 @@ def generate_personal_journal(
     beliefs: Sequence[Any],
     relationships: Mapping[str, Any],
     tick: int,
-    rng: random.Random,
+    rng: KeyedRNG,
     literacy: LiteracyLevel = LiteracyLevel.BASIC_LITERACY,
 ) -> Book:
     """
@@ -210,7 +210,7 @@ def generate_religious_text(
     religion: Any,
     author: Character,
     tick: int,
-    rng: random.Random,
+    rng: KeyedRNG,
     literacy: LiteracyLevel = LiteracyLevel.PRIEST,
 ) -> Book:
     """
@@ -290,7 +290,7 @@ def generate_myth_collection(
     author: Character,
     myths: Sequence[Any],
     tick: int,
-    rng: random.Random,
+    rng: KeyedRNG,
     literacy: LiteracyLevel = LiteracyLevel.PRIEST,
 ) -> Book:
     """
@@ -348,7 +348,7 @@ def generate_historical_chronicle(
     author_name: str,
     author_id: str,
     tick: int,
-    rng: random.Random,
+    rng: KeyedRNG,
     literacy: LiteracyLevel = LiteracyLevel.HISTORIAN,
 ) -> Book:
     """
@@ -425,7 +425,7 @@ def generate_local_folklore(
     cultural_profile: Any,
     author: Character,
     tick: int,
-    rng: random.Random,
+    rng: KeyedRNG,
     literacy: LiteracyLevel = LiteracyLevel.EDUCATED,
 ) -> Book:
     """
@@ -482,7 +482,7 @@ def generate_legal_record(
     author_name: str,
     author_id: str,
     tick: int,
-    rng: random.Random,
+    rng: KeyedRNG,
     literacy: LiteracyLevel = LiteracyLevel.SCHOLAR,
 ) -> Book:
     """
@@ -550,7 +550,7 @@ def generate_travel_account(
     holy_site_name: str,
     holy_site_settlement: str,
     tick: int,
-    rng: random.Random,
+    rng: KeyedRNG,
     literacy: LiteracyLevel = LiteracyLevel.EDUCATED,
 ) -> Book:
     """
@@ -615,7 +615,7 @@ def generate_biography(
     author: Character,
     subject_events: Sequence[Event],
     tick: int,
-    rng: random.Random,
+    rng: KeyedRNG,
     literacy: LiteracyLevel = LiteracyLevel.HISTORIAN,
 ) -> Book:
     """

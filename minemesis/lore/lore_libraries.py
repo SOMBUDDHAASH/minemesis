@@ -8,8 +8,8 @@ Operationalizes:
 """
 
 from __future__ import annotations
-import random
 from typing import Any, Mapping, Optional, Sequence
+from minemesis.core.rng import KeyedRNG
 
 from minemesis.lore.lore_models import Book, BookGenre, Library, LibraryType
 
@@ -102,7 +102,7 @@ class LibraryManager:
         self,
         settlement_id: str,
         damage_ratio: float,
-        rng: random.Random,
+        rng: KeyedRNG,
     ) -> list[Book]:
         """
         Simulates physical devastation to archives during a raid or catastrophe.

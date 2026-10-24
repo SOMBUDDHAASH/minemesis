@@ -8,8 +8,8 @@ Core Philosophy:
 """
 
 from __future__ import annotations
-import random
 from typing import Mapping, Sequence
+from minemesis.core.rng import KeyedRNG
 from minemesis.religion.religion_models import HolySite, Religion, TraitCategory
 from minemesis.religion.religion_traits import (
     get_all_traits,
@@ -74,7 +74,7 @@ _SCRIPTURE_TEMPLATES = [
 ]
 
 
-def generate_religion_name(rng: random.Random) -> str:
+def generate_religion_name(rng: KeyedRNG) -> str:
     template = rng.choice(_NAME_TEMPLATES)
     return template.format(
         adj=rng.choice(_ADJECTIVES),
@@ -88,7 +88,7 @@ def generate_religion_name(rng: random.Random) -> str:
     )
 
 
-def generate_scripture_name(rng: random.Random, religion_name: str) -> str:
+def generate_scripture_name(rng: KeyedRNG, religion_name: str) -> str:
     template = rng.choice(_SCRIPTURE_TEMPLATES)
     return template.format(
         title=religion_name.replace("Faith of the ", "").replace("Children of the ", ""),
@@ -99,7 +99,7 @@ def generate_scripture_name(rng: random.Random, religion_name: str) -> str:
     )
 
 
-def generate_coherent_traits(rng: random.Random, min_traits: int = 4, max_traits: int = 6) -> dict[str, Any]:
+def generate_coherent_traits(rng: KeyedRNG, min_traits: int = 4, max_traits: int = 6) -> dict[str, Any]:
     """
     Selects a coherent set of compatible traits spanning core theological categories.
     """
@@ -156,7 +156,7 @@ def generate_world_religions(
     """
     Deterministically generates initial religions for a newly generated world.
     """
-    rng = random.Random(seed + 9999)
+    rng = KeyedRNG(seed + 9999, stream="religion_generation")
     religions: dict[str, Religion] = {}
 
     settlement_list = list(settlement_ids) if settlement_ids else ["set_oakhaven", "set_riverbend", "set_ironpeak"]

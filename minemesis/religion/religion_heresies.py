@@ -14,8 +14,8 @@ Models doctrinal divergence beyond simple random schisms:
 """
 
 from __future__ import annotations
-import random
 from typing import Any, Mapping, Optional, Sequence
+from minemesis.core.rng import KeyedRNG
 from minemesis.core.types import EventType
 from minemesis.models.character import Character
 from minemesis.religion.religion_models import (
@@ -35,7 +35,7 @@ def check_and_declare_heresy(
     faiths: dict[str, CharacterFaith],
     all_traits: Mapping[str, ReligionTrait],
     tick: int,
-    rng: random.Random,
+    rng: KeyedRNG,
     figure_counter: list[int],
 ) -> Optional[tuple[ReligiousFigure, list[str], str, dict[str, Any]]]:
     """
@@ -135,7 +135,7 @@ def establish_heretical_schism(
     all_traits: Mapping[str, ReligionTrait],
     rel_counter: list[int],
     tick: int,
-    rng: random.Random,
+    rng: KeyedRNG,
 ) -> tuple[Religion, dict[str, Any]]:
     """
     Transforms an active heresy into a full breakaway child religion.
@@ -206,7 +206,7 @@ def evaluate_counter_reformation(
     child_religion: Religion,
     all_traits: Mapping[str, ReligionTrait],
     tick: int,
-    rng: random.Random,
+    rng: KeyedRNG,
 ) -> Optional[dict[str, Any]]:
     """
     Orthodox parent religion reacts to a schism by launching a Counter-Reformation.
@@ -238,7 +238,7 @@ def evaluate_sect_reunification(
     all_religions: Mapping[str, Religion],
     faiths: dict[str, CharacterFaith],
     tick: int,
-    rng: random.Random,
+    rng: KeyedRNG,
 ) -> Optional[dict[str, Any]]:
     """
     Checks if two related sects heal their schism and reunify into a single communion.

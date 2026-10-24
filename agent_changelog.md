@@ -112,4 +112,19 @@ Diff of implemented `CAUSE_GRAMMAR` against brief Table 4.1:
   - Lifespan model confirmed: Natural deaths occur strictly between ages 60 and 80 (mean 64.7, median 64.0). Maximum age alive at Year 100 across 50 seeds is 73 (mean 65.5).
   - Characters acting past Year 70 were identified not as ageless characters, but as deceased characters cited posthumously in raids, peace treaties, and revenge deaths.
 
+### Step 2. Determinism Hardening & Cross-Process Isolation
+- **Elimination of `hash()` and Unseeded State**:
+  - *Before*: `lore_engine.py` computed literacy rolls using `(self.seed << 16) ^ hash(character.id) ^ salt`. In Python 3, string `hash()` is randomized per process unless `PYTHONHASHSEED` is pinned, causing divergence across processes.
+  - *After*: Replaced all `hash()` calls with `keyed_float(self.seed, "character_literacy", character.id, 0, salt)`. Zero calls to `hash()` exist in the codebase outside `core/rng.py`.
+- **`KeyedRNG` Implementation**:
+  - Implemented `KeyedRNG` in `minemesis/core/rng.py`: A process-independent, platform-independent pseudo-random number generator backed entirely by keyed SHA-256 hashing.
+  - Replaced all uses of `random.Random` across all subsystems (`lore_engine`, `lore_generators`, `lore_libraries`, `lore_templates`, `religion_engine`, `religion_generation`, `religion_culture`, `religion_figures`, `religion_geography`, `religion_heresies`, `religion_interpretation`, `religion_myths`, `religion_schisms`, `religion_spread`, `religion_syncretism`) with `KeyedRNG`.
+- **Engine Zero-Overhead Toggles**:
+  - Added `ENABLE_LORE_ENGINE` config alongside `ENABLE_RELIGION_ENGINE`.
+  - When toggled off, `Simulation` instantiates zero religious or lore structures and bypasses all lore updates, generating zero religious/lore events in the event log.
+- **Cross-Process Determinism & Toggle Tests**:
+  - `test_cross_process_determinism_under_different_hashseeds`: Spawns two independent Python subprocesses with `PYTHONHASHSEED=0` and `PYTHONHASHSEED=12345` on seed 42. Verifies byte-identical event log SHA-256 digests (`hash_0 == hash_12345`). Includes negative control asserting that different seeds produce different digests.
+  - `test_engine_toggle_off_zero_overhead_and_determinism`: Asserts that running with engines OFF produces zero religious/lore events and byte-identical outputs across runs. Includes negative control asserting engines ON produce religious and lore events.
+
+
 

@@ -11,8 +11,8 @@ Operationalizes:
 """
 
 from __future__ import annotations
-import random
 from typing import Any, Mapping, Optional, Sequence
+from minemesis.core.rng import KeyedRNG
 from minemesis.models.character import Character
 from minemesis.models.settlement import Settlement
 from minemesis.religion.religion_models import (
@@ -54,7 +54,7 @@ def initialize_settlement_culture(
     settlement_name: str,
     folk_counter: list[int],
     custom_counter: list[int],
-    rng: random.Random,
+    rng: KeyedRNG,
 ) -> CulturalProfile:
     """Initializes a rich cultural profile for a settlement."""
     # Base social values on 0.0 - 1.0 spectrum

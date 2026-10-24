@@ -9,8 +9,8 @@ Connects emergent religions to physical and spiritual geography:
 """
 
 from __future__ import annotations
-import random
 from typing import Any, Mapping, Optional, Sequence
+from minemesis.core.rng import KeyedRNG
 from minemesis.models.character import Character
 from minemesis.models.settlement import Settlement
 from minemesis.religion.religion_models import (
@@ -41,7 +41,7 @@ def generate_holy_site(
     site_type: HolySiteType,
     tick: int,
     site_counter: list[int],
-    rng: random.Random,
+    rng: KeyedRNG,
     discoverer: Optional[Character] = None,
 ) -> tuple[HolySite, dict[str, Any]]:
     """
@@ -90,7 +90,7 @@ def evaluate_holy_site_discovery_or_construction(
     settlements: Mapping[str, Settlement],
     living_characters: Sequence[Character],
     tick: int,
-    rng: random.Random,
+    rng: KeyedRNG,
     site_counter: list[int],
 ) -> Optional[tuple[HolySite, dict[str, Any]]]:
     """
@@ -136,7 +136,7 @@ def process_pilgrimage_economic_benefit(
     pilgrim_home_id: str,
     holy_site_settlement_id: str,
     active_trade_routes: Any,
-    rng: random.Random,
+    rng: KeyedRNG,
 ) -> Optional[dict[str, Any]]:
     """
     Simulates economic prosperity boost and commercial route seeding from pilgrims.
@@ -167,7 +167,7 @@ def check_and_elevate_holy_site(
     site: HolySite,
     religion: Religion,
     tick: int,
-    rng: Optional[random.Random] = None,
+    rng: Optional[KeyedRNG] = None,
 ) -> Optional[dict[str, Any]]:
     """
     R2.7: Sacred Geography Evolution.

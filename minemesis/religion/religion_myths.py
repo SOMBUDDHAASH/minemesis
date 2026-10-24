@@ -8,8 +8,8 @@ Operationalizes:
 """
 
 from __future__ import annotations
-import random
 from typing import Any, Mapping, Optional, Sequence
+from minemesis.core.rng import KeyedRNG
 from minemesis.core.event_log import Event
 from minemesis.models.character import Character
 from minemesis.religion.religion_models import (
@@ -101,7 +101,7 @@ def create_initial_story_from_event(
 def retell_and_evolve_myths(
     religion: Religion,
     current_tick: int,
-    rng: random.Random,
+    rng: KeyedRNG,
 ) -> list[dict[str, Any]]:
     """
     Simulates the generational evolution of stories across deep time:
@@ -177,7 +177,7 @@ def exchange_myths_across_trade_routes(
     religions: Mapping[str, Religion],
     dominant_by_settlement: Mapping[str, str],
     current_tick: int,
-    rng: random.Random,
+    rng: KeyedRNG,
     myth_counter: list[int],
 ) -> list[dict[str, Any]]:
     """

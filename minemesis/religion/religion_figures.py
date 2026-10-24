@@ -11,8 +11,8 @@ Models prominent religious archetypes beyond merely canonized saints:
 """
 
 from __future__ import annotations
-import random
 from typing import Mapping, Optional, Sequence
+from minemesis.core.rng import KeyedRNG
 from minemesis.core.types import EventType, Intent
 from minemesis.models.character import Character
 from minemesis.religion.religion_models import (
@@ -158,7 +158,7 @@ def evaluate_prophet_or_mystic_emergence(
     religion: Religion,
     trigger_event_id: Optional[int],
     tick: int,
-    rng: random.Random,
+    rng: KeyedRNG,
     figure_counter: list[int],
 ) -> Optional[ReligiousFigure]:
     """

@@ -9,8 +9,8 @@ Operationalizes living religious evolution:
 """
 
 from __future__ import annotations
-import random
 from typing import Any, Mapping, Optional, Sequence
+from minemesis.core.rng import KeyedRNG
 from minemesis.models.character import Character
 from minemesis.religion.religion_models import (
     CharacterFaith,
@@ -35,7 +35,7 @@ def evaluate_doctrinal_borrowing(
     recipient_rel: Religion,
     all_traits: Mapping[str, ReligionTrait],
     tick: int,
-    rng: random.Random,
+    rng: KeyedRNG,
 ) -> Optional[dict[str, Any]]:
     """
     R1.5.4: Recipient faith adopts an idea / trait from donor faith without converting.
@@ -85,7 +85,7 @@ def evaluate_syncretic_fusion(
     all_traits: Mapping[str, ReligionTrait],
     rel_counter: list[int],
     tick: int,
-    rng: random.Random,
+    rng: KeyedRNG,
 ) -> Optional[tuple[Religion, dict[str, Any]]]:
     """
     R1.5.1: Merges two cohabiting religions in a settlement into a novel syncretic faith.

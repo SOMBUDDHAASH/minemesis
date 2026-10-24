@@ -16,8 +16,8 @@ Subsystem Architecture:
 """
 
 from __future__ import annotations
-import random
 from typing import Any, Mapping, Optional, Sequence
+from minemesis.core.rng import KeyedRNG
 from minemesis.core.types import EventType, Intent, Scale
 from minemesis.models.character import Character
 from minemesis.models.settlement import Settlement
@@ -134,7 +134,7 @@ class ReligionEngine:
     def __init__(self, seed: int = 42, enabled: bool | None = None) -> None:
         self.seed = seed
         self.enabled = ENABLE_RELIGION_ENGINE if enabled is None else enabled
-        self.rng = random.Random(seed + 777)
+        self.rng = KeyedRNG(seed + 777, stream="religion_engine")
         self.religions: dict[str, Religion] = {}
         self.faiths: dict[str, CharacterFaith] = {}
         self.cultural_profiles: dict[str, CulturalProfile] = {}
@@ -156,7 +156,7 @@ class ReligionEngine:
         """Initializes religions and populates starting faiths."""
         if seed is not None:
             self.seed = seed
-            self.rng = random.Random(seed + 777)
+            self.rng = KeyedRNG(seed + 777, stream="religion_engine")
 
         if not self.enabled:
             return
@@ -1030,4 +1030,4 @@ class ReligionEngine:
             self.cultural_profiles = res[7]
             self.folk_counter = [res[8]]
             self.custom_counter = [res[9]]
-        self.rng = random.Random(self.seed + 777)
+        self.rng = KeyedRNG(self.seed + 777, stream="religion_engine")

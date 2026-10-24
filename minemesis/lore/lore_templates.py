@@ -7,8 +7,8 @@ and dynamic page formatting.
 """
 
 from __future__ import annotations
-import random
 from typing import Any, Mapping, Optional, Sequence
+from minemesis.core.rng import KeyedRNG
 from minemesis.lore.lore_models import LiteracyLevel
 
 
@@ -82,7 +82,7 @@ VOCABULARY = {
 VOCABULARY[LiteracyLevel.ILLITERATE] = VOCABULARY[LiteracyLevel.BASIC_LITERACY]
 
 
-def get_term(literacy: LiteracyLevel, category: str, rng: random.Random) -> str:
+def get_term(literacy: LiteracyLevel, category: str, rng: KeyedRNG) -> str:
     """Returns a context-appropriate word or phrase for the given literacy tier."""
     vocab_tier = VOCABULARY.get(literacy, VOCABULARY[LiteracyLevel.EDUCATED])
     terms = vocab_tier.get(category, [category])
@@ -97,7 +97,7 @@ def render_event_sentence(
     literacy: LiteracyLevel,
     context: Mapping[str, Any],
     perspective_bias: str,
-    rng: random.Random,
+    rng: KeyedRNG,
 ) -> str:
     """
     Synthesizes a descriptive sentence from an event record, author literacy,

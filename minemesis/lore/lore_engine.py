@@ -11,11 +11,11 @@ Operationalizes:
 """
 
 from __future__ import annotations
-import random
 from typing import Any, Mapping, Optional, Sequence
 
 from minemesis.core.causal_grammar import CAUSE_GRAMMAR
 from minemesis.core.event_log import Event, EventLog
+from minemesis.core.rng import KeyedRNG, keyed_float
 from minemesis.core.types import EventType, Intent, Scale
 from minemesis.lore.lore_generators import (
     generate_biography,
@@ -32,6 +32,8 @@ from minemesis.lore.lore_libraries import LibraryManager
 from minemesis.lore.lore_models import Book, BookGenre, LibraryType, LiteracyLevel
 from minemesis.models.character import Character
 
+ENABLE_LORE_ENGINE: bool = True
+
 
 class LoreEngine:
     """
@@ -39,11 +41,11 @@ class LoreEngine:
     historical chronicles, and settlement archives for Minemesis.
     """
 
-    def __init__(self, seed: int, enabled: bool = True) -> None:
+    def __init__(self, seed: int, enabled: Optional[bool] = None) -> None:
         self.seed = seed
-        self.enabled = enabled
+        self.enabled = ENABLE_LORE_ENGINE if enabled is None else enabled
         # Distinct keyed PRNG for Lore System to preserve simulation core isolation
-        self.rng = random.Random(seed ^ 0x4C4F5245)  # ASCII 'LORE'
+        self.rng = KeyedRNG(seed ^ 0x4C4F5245, stream="lore_engine")
         self.library_manager = LibraryManager()
         self.book_counter = 0
         self.character_literacy: dict[str, LiteracyLevel] = {}
@@ -67,8 +69,7 @@ class LoreEngine:
             level = LiteracyLevel.PRIEST
         elif character.age_years >= 55:
             # Deterministic keyed roll for elders
-            sub_rng = random.Random((self.seed << 16) ^ hash(character.id) ^ 0x7391)
-            r = sub_rng.random()
+            r = keyed_float(self.seed, "character_literacy", character.id, 0, salt=0x7391)
             if r < 0.25:
                 level = LiteracyLevel.HISTORIAN
             elif r < 0.50:
@@ -81,8 +82,7 @@ class LoreEngine:
                 level = LiteracyLevel.ILLITERATE
         else:
             # Deterministic roll for general adult population
-            sub_rng = random.Random((self.seed << 16) ^ hash(character.id) ^ 0x51A7)
-            r = sub_rng.random()
+            r = keyed_float(self.seed, "character_literacy", character.id, 0, salt=0x51A7)
             if r < 0.20:
                 level = LiteracyLevel.ILLITERATE
             elif r < 0.65:

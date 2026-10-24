@@ -13,8 +13,8 @@ through radically different theological lenses:
 """
 
 from __future__ import annotations
-import random
 from typing import Any, Mapping, Optional, Tuple
+from minemesis.core.rng import KeyedRNG
 from minemesis.core.types import EventType, Intent
 from minemesis.models.belief import Belief
 from minemesis.models.character import Character
@@ -31,7 +31,7 @@ def apply_religious_interpretation_filter(
     faith: Optional[CharacterFaith],
     religion: Optional[Religion],
     event_intent: Intent,
-    rng: Optional[random.Random] = None,
+    rng: Optional[KeyedRNG] = None,
 ) -> Belief:
     """
     Filters a raw perceptual belief through the observer's religious framework.

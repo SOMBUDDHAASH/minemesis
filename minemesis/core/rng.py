@@ -97,3 +97,84 @@ def keyed_sample(
         pick_idx = keyed_int(seed, system, entity, tick, 0, len(pool) - 1, salt=f"{salt}:{i}")
         result.append(pool.pop(pick_idx))
     return result
+
+
+class KeyedRNG:
+    """
+    Deterministic pseudo-random number generator backed by keyed SHA-256 hashing.
+    Process-independent, platform-independent, and immune to Python's hash randomization.
+    Provides standard PRNG methods: random, uniform, randint, randrange, choice, sample, shuffle.
+    """
+
+    def __init__(self, seed: int | str, stream: str = "default", step: int = 0) -> None:
+        self.seed = str(seed)
+        self.stream = stream
+        self.step = step
+
+    def _next_uint64(self, salt: str | int = 0) -> int:
+        self.step += 1
+        key = f"{self.seed}:{self.stream}:{self.step}:{salt}".encode("utf-8")
+        digest = hashlib.sha256(key).digest()
+        (val,) = struct.unpack(">Q", digest[:8])
+        return val
+
+    def random(self) -> float:
+        """Returns a deterministic float in [0.0, 1.0) with 53 bits of precision."""
+        val = self._next_uint64()
+        return (val >> 11) / (1 << 53)
+
+    def uniform(self, a: float, b: float) -> float:
+        """Returns a deterministic float in [a, b]."""
+        return a + (b - a) * self.random()
+
+    def randint(self, a: int, b: int) -> int:
+        """Returns a deterministic integer in [a, b] inclusive."""
+        if a > b:
+            raise ValueError(f"a ({a}) cannot be greater than b ({b})")
+        if a == b:
+            return a
+        span = (b - a) + 1
+        return a + (self._next_uint64() % span)
+
+    def randrange(self, start: int, stop: int | None = None, step: int = 1) -> int:
+        """Returns a chosen element from range(start, stop, step)."""
+        if stop is None:
+            stop = start
+            start = 0
+        if step == 1:
+            if start >= stop:
+                raise ValueError(f"empty range for randrange({start}, {stop})")
+            return self.randint(start, stop - 1)
+        width = stop - start
+        n = (width + step - 1) // step if step > 0 else (width + step + 1) // step
+        if n <= 0:
+            raise ValueError(f"empty range for randrange({start}, {stop}, {step})")
+        return start + step * self.randint(0, n - 1)
+
+    def choice(self, sequence: Sequence[T]) -> T:
+        """Returns a deterministic random element from non-empty sequence."""
+        if not sequence:
+            raise IndexError("Cannot choose from an empty sequence")
+        idx = self.randint(0, len(sequence) - 1)
+        return sequence[idx]
+
+    def sample(self, sequence: Sequence[T], k: int) -> list[T]:
+        """Returns k unique deterministic elements sampled from sequence."""
+        n = len(sequence)
+        if k > n:
+            raise ValueError(f"Sample larger than population: {k} > {n}")
+        if k == 0:
+            return []
+        pool = list(sequence)
+        result: list[T] = []
+        for _ in range(k):
+            idx = self.randint(0, len(pool) - 1)
+            result.append(pool.pop(idx))
+        return result
+
+    def shuffle(self, seq: list[T]) -> None:
+        """In-place Fisher-Yates shuffle."""
+        for i in range(len(seq) - 1, 0, -1):
+            j = self.randint(0, i)
+            seq[i], seq[j] = seq[j], seq[i]
+
