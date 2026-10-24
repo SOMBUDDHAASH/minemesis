@@ -111,6 +111,9 @@ class EventLog:
             raise KeyError(f"Event ID {event_id} not found in EventLog")
         return self._by_id[event_id]
 
+    def get_event(self, event_id: int) -> Event | None:
+        return self._by_id.get(event_id)
+
     def all_events(self) -> Sequence[Event]:
         return list(self._events)
 

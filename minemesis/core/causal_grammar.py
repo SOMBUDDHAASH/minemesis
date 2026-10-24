@@ -230,6 +230,61 @@ CAUSE_GRAMMAR: Mapping[EventType, GrammarRule] = {
             EventType.FAMINE,
             EventType.DEATH,
             EventType.RELIGIOUS_REFORM,
+            EventType.GREAT_FIGURE_EMERGENCE,
+        }),
+    ),
+    # Milestone R1: Religion Becomes History rules
+    EventType.HERESY_DECLARED: GrammarRule(
+        root_allowed=True,
+        allowed_cause_types=frozenset({
+            EventType.DEATH,
+            EventType.FAMINE,
+            EventType.RELIGIOUS_REFORM,
+            EventType.FEUD,
+            EventType.GREAT_FIGURE_EMERGENCE,
+            EventType.RELIGIOUS_SCHISM,
+        }),
+    ),
+    EventType.SECT_REUNIFICATION: GrammarRule(
+        root_allowed=False,
+        allowed_cause_types=frozenset({
+            EventType.RELIGIOUS_SCHISM,
+            EventType.HERESY_DECLARED,
+            EventType.PEACE,
+            EventType.RELIGIOUS_REFORM,
+        }),
+    ),
+    EventType.RELIGIOUS_REFUGEE_MIGRATION: GrammarRule(
+        root_allowed=False,
+        allowed_cause_types=frozenset({
+            EventType.HERESY_DECLARED,
+            EventType.RELIGIOUS_SCHISM,
+            EventType.RAID,
+            EventType.FEUD,
+        }),
+    ),
+    EventType.GREAT_FIGURE_EMERGENCE: GrammarRule(
+        root_allowed=True,
+        allowed_cause_types=frozenset({
+            EventType.DEATH,
+            EventType.FAMINE,
+            EventType.HOLY_SITE_DISCOVERED,
+            EventType.PILGRIMAGE,
+            EventType.REVELATION,
+            EventType.HERESY_DECLARED,
+            EventType.RELIGIOUS_REFORM,
+        }),
+    ),
+    EventType.MYTH_RECORDED: GrammarRule(
+        root_allowed=False,
+        allowed_cause_types=frozenset({
+            EventType.DEATH,
+            EventType.RAID,
+            EventType.FEUD,
+            EventType.SAINT_CANONIZED,
+            EventType.GREAT_FIGURE_EMERGENCE,
+            EventType.FAMINE,
+            EventType.HOLY_SITE_DISCOVERED,
         }),
     ),
 }

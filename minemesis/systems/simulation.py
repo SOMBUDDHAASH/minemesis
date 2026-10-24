@@ -12,6 +12,7 @@ Adheres strictly to agent.md Architecture Freeze v1.0 and Milestone 0.5:
 from __future__ import annotations
 from typing import Callable, Optional, Set
 from minemesis.core.event_log import Event, EventLog
+from minemesis.core.types import EventType
 from minemesis.models.belief import Belief
 from minemesis.models.character import Character
 from minemesis.models.memory import Memory
@@ -87,6 +88,17 @@ class Simulation:
             return self.religion_engine.get_religion_modifiers(target_id)
         return {}
 
+    def generate_religious_analytics(self):
+        """Generates comprehensive religious analytics and chronicle report."""
+        if self.religion_engine and self.religion_engine.enabled:
+            return self.religion_engine.generate_analytics(
+                settlements=self.settlements,
+                characters=self.characters,
+                event_log=self.event_log,
+                current_tick=self.tick,
+            )
+        return None
+
     def get_relationship(self, source_id: str, target_id: str) -> Relationship:
         """
         Dynamically computes the relationship view between two characters from active memories.
@@ -111,7 +123,7 @@ class Simulation:
 
         source_memories = [m for m in self.memories if m.observer_id == source_id]
 
-        return compute_relationship(
+        base_rel = compute_relationship(
             source_id=source_id,
             target_id=target_id,
             memories=source_memories,
@@ -122,12 +134,57 @@ class Simulation:
             superseded_memory_ids=self.superseded_memory_ids,
         )
 
+        if self.religion_engine and self.religion_engine.enabled:
+            faith_a = self.religion_engine.get_character_faith(source_id)
+            faith_b = self.religion_engine.get_character_faith(target_id)
+            rel_a = self.religion_engine.get_character_religion(source_id)
+            rel_b = self.religion_engine.get_character_religion(target_id)
+            if faith_a and faith_b and rel_a and rel_b:
+                from minemesis.religion.religion_tensions import calculate_religious_relationship_modifier
+                t_off, h_off, f_off, _ = calculate_religious_relationship_modifier(
+                    faith_a=faith_a,
+                    faith_b=faith_b,
+                    rel_a=rel_a,
+                    rel_b=rel_b,
+                    all_religions=self.religion_engine.religions,
+                )
+                if t_off != 0.0 or h_off != 0.0 or f_off != 0.0:
+                    return Relationship(
+                        source_id=source_id,
+                        target_id=target_id,
+                        trust=max(-100.0, min(100.0, base_rel.trust + t_off)),
+                        fear=max(0.0, min(100.0, base_rel.fear + f_off)),
+                        respect=base_rel.respect,
+                        hatred=max(0.0, min(100.0, base_rel.hatred + h_off)),
+                        loyalty=base_rel.loyalty,
+                    )
+
+        return base_rel
+
     def _register_and_perceive_events(self, events_before: int) -> None:
         """
         Runs perception and memory formation for all events added since events_before.
         """
         new_events = self.event_log.all_events()[events_before:]
         for evt in new_events:
+            # R1.8: Evaluate character action against virtues
+            if self.religion_engine and self.religion_engine.enabled:
+                actor_id = evt.participants_dict.get("actor") or evt.participants_dict.get("instigator_char") or evt.participants_dict.get("initiator")
+                if actor_id and actor_id in self.characters:
+                    a_char = self.characters[actor_id]
+                    a_faith = self.religion_engine.get_character_faith(actor_id)
+                    a_rel = self.religion_engine.get_character_religion(actor_id)
+                    if a_faith and a_rel:
+                        from minemesis.religion.religion_virtues import evaluate_action_against_virtues
+                        evaluate_action_against_virtues(
+                            character=a_char,
+                            faith=a_faith,
+                            religion=a_rel,
+                            action_type=evt.type,
+                            action_role="actor",
+                            action_payload=evt.payload,
+                        )
+
             # 1. Perception: Event -> Beliefs
             new_beliefs = perceive_event(
                 event=evt,
@@ -137,6 +194,22 @@ class Simulation:
                 belief_counter=self.belief_counter,
             )
             for b in new_beliefs:
+                # Milestone R1.1: Religion Interpretation Filter
+                if self.religion_engine and self.religion_engine.enabled:
+                    observer = self.characters.get(b.believer_id)
+                    if observer:
+                        faith = self.religion_engine.get_character_faith(b.believer_id)
+                        rel = self.religion_engine.get_character_religion(b.believer_id)
+                        from minemesis.religion.religion_interpretation import apply_religious_interpretation_filter
+                        b = apply_religious_interpretation_filter(
+                            belief=b,
+                            observer=observer,
+                            faith=faith,
+                            religion=rel,
+                            event_intent=evt.intent,
+                            rng=self.religion_engine.rng,
+                        )
+
                 char_beliefs = self.beliefs_by_character.setdefault(b.believer_id, {})
                 char_beliefs[b.event_ref] = b
 
@@ -224,7 +297,7 @@ class Simulation:
         self._register_and_perceive_events(conflict_start)
 
         # -------------------------------------------------------------
-        # Step 4: Standalone Religion Engine (Milestone R0)
+        # Step 4: Standalone Religion Engine (Milestone R0 & R1)
         # -------------------------------------------------------------
         if self.religion_engine and self.religion_engine.enabled:
             # Register newly born characters if any
@@ -237,6 +310,21 @@ class Simulation:
                         settlement_id=c.settlement_id,
                         tick=self.tick,
                     )
+
+            # Gather deaths from this month for martyrdom / saint checks
+            recent_deaths = []
+            for evt in self.event_log.all_events()[events_start:]:
+                if evt.type == EventType.DEATH:
+                    deceased_id = evt.participants_dict.get("deceased") or evt.participants_dict.get("target") or evt.participants_dict.get("victim")
+                    if deceased_id and deceased_id in self.characters:
+                        d_char = self.characters[deceased_id]
+                        cause_type = EventType.DEATH
+                        if evt.causes:
+                            prior_evt = self.event_log.get_event(evt.causes[0])
+                            if prior_evt:
+                                cause_type = prior_evt.type
+                        recent_deaths.append((d_char, cause_type, evt.id))
+
             religion_start = len(self.event_log)
             self.religion_engine.update_tick(
                 tick=self.tick,
@@ -244,6 +332,7 @@ class Simulation:
                 settlements=self.settlements,
                 characters=self.characters,
                 active_trade_routes=self.trade_routes,
+                recent_deaths=recent_deaths,
             )
             self._register_and_perceive_events(religion_start)
 

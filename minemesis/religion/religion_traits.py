@@ -554,6 +554,7 @@ _ALL_TRAITS: list[ReligionTrait] = [
 ]
 
 _TRAITS_BY_ID: dict[str, ReligionTrait] = {t.id: t for t in _ALL_TRAITS}
+ALL_RELIGION_TRAITS: dict[str, ReligionTrait] = _TRAITS_BY_ID
 _TRAITS_BY_CATEGORY: dict[TraitCategory, list[ReligionTrait]] = {}
 for _t in _ALL_TRAITS:
     _TRAITS_BY_CATEGORY.setdefault(_t.category, []).append(_t)

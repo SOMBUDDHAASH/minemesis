@@ -35,6 +35,13 @@ class EventType(str, Enum):
     PILGRIMAGE = "Pilgrimage"
     HOLY_SITE_DISCOVERED = "HolySiteDiscovered"
 
+    # Milestone R1: Religion Becomes History event types
+    HERESY_DECLARED = "HeresyDeclared"
+    SECT_REUNIFICATION = "SectReunification"
+    RELIGIOUS_REFUGEE_MIGRATION = "ReligiousRefugeeMigration"
+    GREAT_FIGURE_EMERGENCE = "GreatFigureEmergence"
+    MYTH_RECORDED = "MythRecorded"
+
     # Alias for backwards compatibility
     FEUD_BEGINS = "Feud"
 

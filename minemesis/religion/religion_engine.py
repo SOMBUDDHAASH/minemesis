@@ -1,39 +1,82 @@
 """
-Religion Engine Orchestrator (Milestone R0).
+Central Orchestrator for the Standalone Religion Engine (Milestone R0 & R1: Religion Becomes History).
 
-Core Philosophy:
-- Operates as a self-contained, standalone plugin.
-- Exposes clean published interfaces for external engines without leaking internal complexity.
-- Implements the complete lifecycle: generation, social spread, evolution, schisms, and behavioral effects.
-- Can be cleanly toggled on/off via ENABLE_RELIGION_ENGINE with zero impact on other systems.
+Subsystem Architecture:
+1. Procedural Emergent Generation (Traits Knowledge Library)
+2. Religious Interpretation Layer (Perception -> Religion Filter -> Belief)
+3. Religious Tension System (Inter-faith & Sectarian Dynamics)
+4. Religion Family Tree (Genealogy of Faiths)
+5. Great Religious Figures (Prophets, Saints, Mystics, Martyrs, Reformers, Heretics)
+6. Religious Heresy Engine (Orthodoxy, Heresy, Reformation, Counter-Reformation, Reunification)
+7. Sacred Geography & Pilgrimages (Mountains, Forests, Rivers, Trees, Temples, Shrines)
+8. Myth Creation Engine (Event -> Story -> Legend -> Myth)
+9. Religious Virtue System (Moral codes & Character standing)
+10. Dynamic Spread (Marriage, Trade, Family, Pilgrimages, Refugees, Missionaries, Conquests, Saint Cults)
+11. Religious Analytics & Chronicle
 """
 
 from __future__ import annotations
 import random
 from typing import Any, Mapping, Optional, Sequence
-
+from minemesis.core.types import EventType, Intent, Scale
+from minemesis.models.character import Character
+from minemesis.models.settlement import Settlement
+from minemesis.religion.religion_analytics import (
+    ReligiousAnalyticsReport,
+    format_religion_family_tree,
+    format_religious_analytics_summary,
+    generate_religious_analytics,
+)
 from minemesis.religion.religion_config import (
     CLERGY_POPULATION_RATIO,
+    COUNTER_REFORMATION_CHANCE,
     DEVOTION_DECAY_RATE,
     ENABLE_RELIGION_ENGINE,
+    GREAT_FIGURE_EMERGENCE_CHANCE,
+    HERESY_EMERGENCE_CHANCE,
     INITIAL_RELIGIONS_PER_WORLD,
+    MYTH_RETELL_INTERVAL,
     PILGRIMAGE_CHANCE,
-    REFORMATION_CHANCE_ON_CRISIS,
     SCHISM_CHANCE_PER_TICK,
+    SECT_REUNIFICATION_CHANCE,
 )
 from minemesis.religion.religion_effects import (
     get_character_effective_modifiers,
-    get_character_modifier,
     get_religion_aggregate_modifiers,
     get_settlement_consumption_multiplier,
 )
+from minemesis.religion.religion_figures import (
+    evaluate_martyrdom,
+    evaluate_prophet_or_mystic_emergence,
+)
 from minemesis.religion.religion_generation import generate_world_religions
+from minemesis.religion.religion_geography import (
+    evaluate_holy_site_discovery_or_construction,
+    process_pilgrimage_economic_benefit,
+)
+from minemesis.religion.religion_heresies import (
+    check_and_declare_heresy,
+    establish_heretical_schism,
+    evaluate_counter_reformation,
+    evaluate_sect_reunification,
+)
+from minemesis.religion.religion_interpretation import apply_religious_interpretation_filter
 from minemesis.religion.religion_models import (
     CharacterFaith,
     HolySite,
+    HolySiteType,
+    LoreStage,
     Religion,
+    ReligiousFigure,
+    ReligiousFigureType,
+    ReligiousMyth,
+    ReligiousRelationshipType,
     ReligiousRole,
     Saint,
+)
+from minemesis.religion.religion_myths import (
+    create_initial_story_from_event,
+    retell_and_evolve_myths,
 )
 from minemesis.religion.religion_schisms import (
     check_and_canonize_saint,
@@ -46,16 +89,26 @@ from minemesis.religion.religion_serialization import (
 )
 from minemesis.religion.religion_spread import (
     process_clergy_missionary_work,
+    process_conquest_conversion,
     process_family_faith_inheritance,
     process_marriage_conversion,
+    process_religious_refugee_migration,
+    process_saint_cult_conversions,
     process_trade_route_evangelism,
     update_settlement_dominant_religions,
 )
+from minemesis.religion.religion_tensions import (
+    calculate_religious_relationship_modifier,
+    calculate_settlement_religious_tension,
+    get_religious_relationship,
+)
+from minemesis.religion.religion_traits import ALL_RELIGION_TRAITS
+from minemesis.religion.religion_virtues import evaluate_action_against_virtues
 
 
 class ReligionEngine:
     """
-    Self-contained Religion Engine subsystem.
+    Self-contained Religion Engine subsystem for Minemesis.
     """
 
     def __init__(self, seed: int = 42, enabled: bool | None = None) -> None:
@@ -64,9 +117,12 @@ class ReligionEngine:
         self.rng = random.Random(seed + 777)
         self.religions: dict[str, Religion] = {}
         self.faiths: dict[str, CharacterFaith] = {}
-        self.rel_counter = 1
-        self.site_counter = 1
+        self.rel_counter = [1]
+        self.site_counter = [1]
+        self.figure_counter = [1]
+        self.myth_counter = [1]
         self.dominant_by_settlement: dict[str, str] = {}
+        self.settlement_tensions: dict[str, float] = {}
 
     def initialize(
         self,
@@ -74,9 +130,7 @@ class ReligionEngine:
         settlements: Mapping[str, Any] | None = None,
         characters: Mapping[str, Any] | None = None,
     ) -> None:
-        """
-        Initializes the religion engine, generating starting faiths and assigning them to settlements/characters.
-        """
+        """Initializes religions and populates starting faiths."""
         if seed is not None:
             self.seed = seed
             self.rng = random.Random(seed + 777)
@@ -90,13 +144,11 @@ class ReligionEngine:
             num_religions=INITIAL_RELIGIONS_PER_WORLD,
             settlement_ids=settlement_ids,
         )
-        self.rel_counter = len(self.religions) + 1
+        self.rel_counter[0] = len(self.religions) + 1
 
-        # Populate initial faiths for characters if provided
         if characters:
             char_list = sorted(list(characters.values()), key=lambda c: c.id)
             for idx, char in enumerate(char_list):
-                # Assign religion matching settlement or alternating
                 s_id = char.settlement_id
                 target_rel_id = None
                 for r_id, r in sorted(self.religions.items()):
@@ -107,7 +159,6 @@ class ReligionEngine:
                     rel_keys = sorted(list(self.religions.keys()))
                     target_rel_id = rel_keys[idx % len(rel_keys)]
 
-                # Assign role: a small percentage become clergy
                 is_clergy = self.rng.random() < CLERGY_POPULATION_RATIO
                 role = self.rng.choice([ReligiousRole.PRIEST, ReligiousRole.SHAMAN, ReligiousRole.MONK]) if is_clergy else ReligiousRole.LAITY
                 devotion = round(self.rng.uniform(0.7, 0.95) if is_clergy else self.rng.uniform(0.4, 0.8), 3)
@@ -116,6 +167,7 @@ class ReligionEngine:
                     character_id=char.id,
                     religion_id=target_rel_id,
                     devotion=devotion,
+                    religious_standing=round(self.rng.uniform(45.0, 65.0), 1),
                     conversion_tick=0,
                     role=role,
                     is_zealot=is_clergy and (devotion > 0.85),
@@ -139,7 +191,7 @@ class ReligionEngine:
             num_religions=INITIAL_RELIGIONS_PER_WORLD,
             settlement_ids=settlement_ids,
         )
-        self.rel_counter = len(self.religions) + 1
+        self.rel_counter[0] = len(self.religions) + 1
         return self.religions
 
     def register_newborn(
@@ -180,12 +232,7 @@ class ReligionEngine:
         recent_deaths: Sequence[Any] | None = None,
     ) -> list[dict[str, Any]]:
         """
-        Executes one monthly tick of religious simulation:
-        1. Social spread (marriage, trade routes, missionaries).
-        2. Evolution (crisis reformations, saint canonization).
-        3. Schisms & sect formation.
-        4. Devotion decay & maintenance.
-        5. Recalculate settlement dominant faiths.
+        Executes one monthly tick of religious simulation across all R1 subsystems.
         """
         if not self.enabled:
             return []
@@ -193,34 +240,84 @@ class ReligionEngine:
         emitted_events: list[dict[str, Any]] = []
         living = [c for c in characters.values() if c.alive] if characters else []
 
-        # 1. Saint canonization for recent deaths
+        # -------------------------------------------------------------
+        # 1. Martyrdom, Saint Canonization & Myth Seeding for Deaths
+        # -------------------------------------------------------------
         if recent_deaths:
             for d_char, cause_type, d_event_id in recent_deaths:
                 c_faith = self.faiths.get(d_char.id)
                 rel = self.religions.get(c_faith.religion_id) if c_faith else None
-                canon_res = check_and_canonize_saint(
-                    deceased_char=d_char,
-                    deceased_faith=c_faith,
-                    religion=rel,
-                    cause_of_death=cause_type,
-                    tick=tick,
-                    rng=self.rng,
-                )
-                if canon_res:
-                    saint, r = canon_res
-                    event_data = {
-                        "type": "SaintCanonized",
-                        "tick": tick,
-                        "location": d_char.settlement_id,
-                        "causes": [d_event_id] if d_event_id is not None else [],
-                        "participants": [("saint", saint.character_name), ("religion", r.name)],
-                        "payload": saint.to_dict(),
-                    }
-                    emitted_events.append(event_data)
-                    self._emit_to_event_log(event_log, event_data)
+                if c_faith and rel:
+                    # Check for Martyrdom (R1.4)
+                    martyr = evaluate_martyrdom(
+                        deceased_char=d_char,
+                        deceased_faith=c_faith,
+                        religion=rel,
+                        cause_type=cause_type,
+                        death_event_id=d_event_id,
+                        tick=tick,
+                        figure_counter=self.figure_counter,
+                    )
+                    if martyr:
+                        event_data = {
+                            "type": "GreatFigureEmergence",
+                            "tick": tick,
+                            "location": d_char.settlement_id,
+                            "causes": [d_event_id] if d_event_id is not None else [],
+                            "participants": [("martyr", martyr.character_name), ("religion", rel.name)],
+                            "payload": martyr.to_dict(),
+                        }
+                        emitted_events.append(event_data)
+                        self._emit_to_event_log(event_log, event_data)
 
-        # 2. Marriage conversion
+                        # Seed Myth from Martyrdom (R1.7)
+                        m_obj, m_payload = create_initial_story_from_event(
+                            religion=rel,
+                            event=event_log.get_event(d_event_id) if (event_log and d_event_id is not None) else None,
+                            hero=d_char,
+                            objective_summary=f"{d_char.name} was slain in the {cause_type.value}.",
+                            tick=tick,
+                            myth_counter=self.myth_counter,
+                        )
+                        myth_evt = {
+                            "type": "MythRecorded",
+                            "tick": tick,
+                            "location": d_char.settlement_id,
+                            "causes": [d_event_id] if d_event_id is not None else [],
+                            "participants": [("hero", d_char.name), ("religion", rel.name)],
+                            "payload": m_payload,
+                        }
+                        emitted_events.append(myth_evt)
+                        self._emit_to_event_log(event_log, myth_evt)
+
+                    else:
+                        # Regular Saint Canonization check (R0)
+                        canon_res = check_and_canonize_saint(
+                            deceased_char=d_char,
+                            deceased_faith=c_faith,
+                            religion=rel,
+                            cause_of_death=cause_type,
+                            tick=tick,
+                            rng=self.rng,
+                        )
+                        if canon_res:
+                            saint, r = canon_res
+                            event_data = {
+                                "type": "SaintCanonized",
+                                "tick": tick,
+                                "location": d_char.settlement_id,
+                                "causes": [d_event_id] if d_event_id is not None else [],
+                                "participants": [("saint", saint.character_name), ("religion", r.name)],
+                                "payload": saint.to_dict(),
+                            }
+                            emitted_events.append(event_data)
+                            self._emit_to_event_log(event_log, event_data)
+
+        # -------------------------------------------------------------
+        # 2. Dynamic Spread: Marriage, Trade, Clergy, Saint Cults
+        # -------------------------------------------------------------
         if living:
+            # Marriage Conversion
             processed_pairs = set()
             for c in living:
                 if c.spouse_id and c.spouse_id in self.faiths and c.id in self.faiths:
@@ -251,36 +348,35 @@ class ReligionEngine:
                             emitted_events.append(event_data)
                             self._emit_to_event_log(event_log, event_data)
 
-        # 3. Trade route evangelism
-        if active_trade_routes and settlements and characters:
-            for (s_a, s_b), route in active_trade_routes.items():
-                is_route_active = getattr(route, "active", getattr(route, "is_active", True))
-                if is_route_active:
-                    dom_a = self.dominant_by_settlement.get(s_a)
-                    dom_b = self.dominant_by_settlement.get(s_b)
-                    if dom_a and dom_b and dom_a != dom_b:
-                        chars_in_b = [c for c in living if c.settlement_id == s_b]
-                        conv = process_trade_route_evangelism(chars_in_b, self.faiths, dom_a, self.rng, tick)
-                        if conv:
-                            c_id, old_rel, new_rel = conv
-                            event_data = {
-                                "type": "Conversion",
-                                "tick": tick,
-                                "location": s_b,
-                                "causes": [],
-                                "participants": [("convert", characters[c_id].name if characters else c_id)],
-                                "payload": {
-                                    "character_id": c_id,
-                                    "old_religion": old_rel,
-                                    "new_religion": new_rel,
-                                    "reason": "TradeRoute",
-                                },
-                            }
-                            emitted_events.append(event_data)
-                            self._emit_to_event_log(event_log, event_data)
+            # Trade Route Evangelism
+            if active_trade_routes and settlements and characters:
+                for (s_a, s_b), route in active_trade_routes.items():
+                    is_route_active = getattr(route, "active", getattr(route, "is_active", True))
+                    if is_route_active:
+                        dom_a = self.dominant_by_settlement.get(s_a)
+                        dom_b = self.dominant_by_settlement.get(s_b)
+                        if dom_a and dom_b and dom_a != dom_b:
+                            chars_in_b = [c for c in living if c.settlement_id == s_b]
+                            conv = process_trade_route_evangelism(chars_in_b, self.faiths, dom_a, self.rng, tick)
+                            if conv:
+                                c_id, old_rel, new_rel = conv
+                                event_data = {
+                                    "type": "Conversion",
+                                    "tick": tick,
+                                    "location": s_b,
+                                    "causes": [],
+                                    "participants": [("convert", characters[c_id].name if characters else c_id)],
+                                    "payload": {
+                                        "character_id": c_id,
+                                        "old_religion": old_rel,
+                                        "new_religion": new_rel,
+                                        "reason": "TradeRoute",
+                                    },
+                                }
+                                emitted_events.append(event_data)
+                                self._emit_to_event_log(event_log, event_data)
 
-        # 4. Clergy proselytization
-        if characters and living:
+            # Clergy Missionary Work
             clergy = [c for c in living if self.faiths.get(c.id) and self.faiths[c.id].role != ReligiousRole.LAITY]
             for cl in clergy:
                 town_chars = [c for c in living if c.settlement_id == cl.settlement_id]
@@ -303,51 +399,282 @@ class ReligionEngine:
                     emitted_events.append(event_data)
                     self._emit_to_event_log(event_log, event_data)
 
-        # 5. Religious Schisms (Occasional spontaneous reform / sect formation)
-        if settlements and living and len(self.religions) < 6:
-            if self.rng.random() < SCHISM_CHANCE_PER_TICK:
-                # Pick a major religion
-                viable_parents = [r for r in self.religions.values() if not r.is_extinct and len(r.adherents) >= 6]
-                if viable_parents:
-                    parent_rel = self.rng.choice(viable_parents)
-                    # Pick a town with followers of this religion
-                    target_settlements = [s_id for s_id in settlements.keys() if any(c.settlement_id == s_id and self.faiths.get(c.id) and self.faiths[c.id].religion_id == parent_rel.id for c in living)]
-                    if target_settlements:
-                        s_id = self.rng.choice(target_settlements)
-                        town_followers = [c for c in living if c.settlement_id == s_id and self.faiths.get(c.id) and self.faiths[c.id].religion_id == parent_rel.id]
-                        if town_followers:
-                            instigator = self.rng.choice(town_followers)
-                            schism_res = trigger_religious_schism(
-                                parent_religion=parent_rel,
-                                schism_settlement_id=s_id,
-                                instigator_character_id=instigator.id,
-                                living_characters=living,
-                                faiths=self.faiths,
-                                new_rel_counter=self.rel_counter,
+            # Saint Cult Conversions (R1.9)
+            for r in self.religions.values():
+                if r.saints:
+                    cult_converts = process_saint_cult_conversions(r, living, self.faiths, self.rng, tick)
+                    for c_id, o_rel, n_rel in cult_converts:
+                        event_data = {
+                            "type": "Conversion",
+                            "tick": tick,
+                            "location": characters[c_id].settlement_id if characters else "unknown",
+                            "causes": [],
+                            "participants": [("convert", characters[c_id].name if characters else c_id), ("religion", r.name)],
+                            "payload": {
+                                "character_id": c_id,
+                                "old_religion": o_rel,
+                                "new_religion": n_rel,
+                                "reason": "SaintCultVeneration",
+                            },
+                        }
+                        emitted_events.append(event_data)
+                        self._emit_to_event_log(event_log, event_data)
+
+        # -------------------------------------------------------------
+        # 3. Sectarian Tension & Religious Refugees (R1.2 & R1.9)
+        # -------------------------------------------------------------
+        if settlements and living:
+            for s_id in settlements.keys():
+                tension = calculate_settlement_religious_tension(s_id, living, self.faiths, self.religions)
+                self.settlement_tensions[s_id] = tension
+                refugee_res = process_religious_refugee_migration(
+                    settlement_id=s_id,
+                    settlement_tension=tension,
+                    settlement_characters=living,
+                    settlements=settlements,
+                    faiths=self.faiths,
+                    dominant_by_settlement=self.dominant_by_settlement,
+                    rng=self.rng,
+                    tick=tick,
+                )
+                if refugee_res:
+                    refugee, old_set, new_set, r_id = refugee_res
+                    event_data = {
+                        "type": "ReligiousRefugeeMigration",
+                        "tick": tick,
+                        "location": new_set,
+                        "causes": [],
+                        "participants": [("refugee", refugee.name), ("origin", old_set), ("destination", new_set)],
+                        "payload": {
+                            "character_id": refugee.id,
+                            "origin_settlement": old_set,
+                            "destination_settlement": new_set,
+                            "religion_id": r_id,
+                            "tension_level": round(tension, 1),
+                        },
+                    }
+                    emitted_events.append(event_data)
+                    self._emit_to_event_log(event_log, event_data)
+
+        # -------------------------------------------------------------
+        # 4. Great Figures: Prophets & Mystics (R1.4)
+        # -------------------------------------------------------------
+        if living and self.rng.random() < GREAT_FIGURE_EMERGENCE_CHANCE:
+            for r in self.religions.values():
+                if not r.is_extinct and len(r.adherents) >= 4:
+                    fig = evaluate_prophet_or_mystic_emergence(
+                        candidates=living,
+                        faiths=self.faiths,
+                        religion=r,
+                        trigger_event_id=None,
+                        tick=tick,
+                        rng=self.rng,
+                        figure_counter=self.figure_counter,
+                    )
+                    if fig:
+                        c_obj = characters.get(fig.character_id) if characters else None
+                        event_data = {
+                            "type": "GreatFigureEmergence",
+                            "tick": tick,
+                            "location": c_obj.settlement_id if c_obj else "unknown",
+                            "causes": [],
+                            "participants": [(fig.figure_type.value.lower(), fig.character_name), ("religion", r.name)],
+                            "payload": fig.to_dict(),
+                        }
+                        emitted_events.append(event_data)
+                        self._emit_to_event_log(event_log, event_data)
+                        break
+
+        # -------------------------------------------------------------
+        # 5. Sacred Geography & Pilgrimages (R1.6)
+        # -------------------------------------------------------------
+        if settlements and living:
+            # Chance to discover/consecrate a Holy Site
+            if self.rng.random() < 0.02 and len(self.religions) > 0:
+                active_r = self.rng.choice(list(self.religions.values()))
+                if len(active_r.holy_sites) < 3:
+                    site_res = evaluate_holy_site_discovery_or_construction(
+                        religion=active_r,
+                        settlements=settlements,
+                        living_characters=living,
+                        tick=tick,
+                        rng=self.rng,
+                        site_counter=self.site_counter,
+                    )
+                    if site_res:
+                        site, site_payload = site_res
+                        event_data = {
+                            "type": "HolySiteDiscovered",
+                            "tick": tick,
+                            "location": site.settlement_id,
+                            "causes": [],
+                            "participants": [("religion", active_r.name), ("site", site.name)],
+                            "payload": site_payload,
+                        }
+                        emitted_events.append(event_data)
+                        self._emit_to_event_log(event_log, event_data)
+
+            # Process pilgrimages by devout adherents
+            for c in living:
+                c_faith = self.faiths.get(c.id)
+                if c_faith and c_faith.devotion >= 0.70 and self.rng.random() < PILGRIMAGE_CHANCE:
+                    c_rel = self.religions.get(c_faith.religion_id)
+                    if c_rel and c_rel.holy_sites:
+                        chosen_site = self.rng.choice(c_rel.holy_sites)
+                        c_faith.pilgrimages_completed += 1
+                        c_faith.devotion = min(1.0, round(c_faith.devotion + 0.05, 3))
+                        c_faith.religious_standing = min(100.0, c_faith.religious_standing + 10.0)
+
+                        # Economic benefit (R1.6)
+                        econ_res = process_pilgrimage_economic_benefit(
+                            pilgrim_home_id=c.settlement_id,
+                            holy_site_settlement_id=chosen_site.settlement_id,
+                            active_trade_routes=active_trade_routes,
+                            rng=self.rng,
+                        )
+
+                        event_data = {
+                            "type": "Pilgrimage",
+                            "tick": tick,
+                            "location": chosen_site.settlement_id,
+                            "causes": [],
+                            "participants": [("pilgrim", c.name), ("holy_site", chosen_site.name), ("religion", c_rel.name)],
+                            "payload": {
+                                "character_id": c.id,
+                                "site_id": chosen_site.id,
+                                "site_name": chosen_site.name,
+                                "home_settlement": c.settlement_id,
+                                "site_settlement": chosen_site.settlement_id,
+                                "economic_benefit": econ_res,
+                            },
+                        }
+                        emitted_events.append(event_data)
+                        self._emit_to_event_log(event_log, event_data)
+
+        # -------------------------------------------------------------
+        # 6. Heresy, Schisms, Counter-Reformation & Reunification (R1.3 & R1.5)
+        # -------------------------------------------------------------
+        if settlements and living:
+            # Check Heresy emergence
+            if self.rng.random() < HERESY_EMERGENCE_CHANCE and len(self.religions) < 8:
+                viable_rels = [r for r in self.religions.values() if not r.is_extinct and len(r.adherents) >= 4]
+                if viable_rels:
+                    chosen_rel = self.rng.choice(viable_rels)
+                    heresy_res = check_and_declare_heresy(
+                        religion=chosen_rel,
+                        settlement_characters=living,
+                        faiths=self.faiths,
+                        all_traits=ALL_RELIGION_TRAITS,
+                        tick=tick,
+                        rng=self.rng,
+                        figure_counter=self.figure_counter,
+                    )
+                    if heresy_res:
+                        heretic_fig, followers, adopted_t_id, h_payload = heresy_res
+                        h_event = {
+                            "type": "HeresyDeclared",
+                            "tick": tick,
+                            "location": h_payload["settlement_id"],
+                            "causes": [],
+                            "participants": [("heretic", heretic_fig.character_name), ("mother_religion", chosen_rel.name)],
+                            "payload": h_payload,
+                        }
+                        emitted_events.append(h_event)
+                        self._emit_to_event_log(event_log, h_event)
+
+                        # Establish breakaway schism
+                        child_rel, schism_payload = establish_heretical_schism(
+                            parent_religion=chosen_rel,
+                            heretic_fig=heretic_fig,
+                            follower_ids=followers,
+                            adopted_trait_id=adopted_t_id,
+                            faiths=self.faiths,
+                            all_traits=ALL_RELIGION_TRAITS,
+                            rel_counter=self.rel_counter,
+                            tick=tick,
+                            rng=self.rng,
+                        )
+                        self.religions[child_rel.id] = child_rel
+
+                        schism_event = {
+                            "type": "ReligiousSchism",
+                            "tick": tick,
+                            "location": h_payload["settlement_id"],
+                            "causes": [],
+                            "participants": [("founder", heretic_fig.character_name), ("sect", child_rel.name), ("parent_religion", chosen_rel.name)],
+                            "payload": schism_payload,
+                        }
+                        emitted_events.append(schism_event)
+                        self._emit_to_event_log(event_log, schism_event)
+
+                        # Counter-Reformation by parent faith (R1.5)
+                        if self.rng.random() < COUNTER_REFORMATION_CHANCE:
+                            cr_payload = evaluate_counter_reformation(
+                                parent_religion=chosen_rel,
+                                child_religion=child_rel,
+                                all_traits=ALL_RELIGION_TRAITS,
                                 tick=tick,
                                 rng=self.rng,
                             )
-                            if schism_res:
-                                child_rel, converted_ids = schism_res
-                                self.religions[child_rel.id] = child_rel
-                                self.rel_counter += 1
-                                event_data = {
-                                    "type": "ReligiousSchism",
+                            if cr_payload:
+                                cr_event = {
+                                    "type": "ReligiousReform",
                                     "tick": tick,
-                                    "location": s_id,
+                                    "location": h_payload["settlement_id"],
                                     "causes": [],
-                                    "participants": [("prophet", instigator.name), ("parent_religion", parent_rel.name), ("sect", child_rel.name)],
-                                    "payload": {
-                                        "parent_religion_id": parent_rel.id,
-                                        "child_religion_id": child_rel.id,
-                                        "child_religion_name": child_rel.name,
-                                        "converts_count": len(converted_ids),
-                                    },
+                                    "participants": [("religion", chosen_rel.name)],
+                                    "payload": cr_payload,
                                 }
-                                emitted_events.append(event_data)
-                                self._emit_to_event_log(event_log, event_data)
+                                emitted_events.append(cr_event)
+                                self._emit_to_event_log(event_log, cr_event)
 
-        # 6. Recalculate Dominant Settlement Faiths & Devotion Decay
+            # Check Sectarian Reunification (R1.5)
+            if self.rng.random() < SECT_REUNIFICATION_CHANCE and len(self.religions) > 2:
+                all_rel_list = list(self.religions.values())
+                for i in range(len(all_rel_list)):
+                    for j in range(i + 1, len(all_rel_list)):
+                        reun_payload = evaluate_sect_reunification(
+                            rel_a=all_rel_list[i],
+                            rel_b=all_rel_list[j],
+                            all_religions=self.religions,
+                            faiths=self.faiths,
+                            tick=tick,
+                            rng=self.rng,
+                        )
+                        if reun_payload:
+                            reun_event = {
+                                "type": "SectReunification",
+                                "tick": tick,
+                                "location": living[0].settlement_id if living else "unknown",
+                                "causes": [],
+                                "participants": [("surviving", reun_payload["surviving_religion_name"]), ("absorbed", reun_payload["absorbed_religion_name"])],
+                                "payload": reun_payload,
+                            }
+                            emitted_events.append(reun_event)
+                            self._emit_to_event_log(event_log, reun_event)
+                            break
+
+        # -------------------------------------------------------------
+        # 7. Myth Generational Evolution (R1.7)
+        # -------------------------------------------------------------
+        if tick % MYTH_RETELL_INTERVAL == 0:
+            for r in self.religions.values():
+                myth_evolutions = retell_and_evolve_myths(r, tick, self.rng)
+                for me in myth_evolutions:
+                    event_data = {
+                        "type": "MythRecorded",
+                        "tick": tick,
+                        "location": living[0].settlement_id if living else "unknown",
+                        "causes": [me["root_event_id"]],
+                        "participants": [("hero", me["hero_name"]), ("religion", r.name)],
+                        "payload": me,
+                    }
+                    emitted_events.append(event_data)
+                    self._emit_to_event_log(event_log, event_data)
+
+        # -------------------------------------------------------------
+        # 8. Devotion Maintenance & Dominant Faith Recalculation
+        # -------------------------------------------------------------
         for f in self.faiths.values():
             f.devotion = max(0.1, round(f.devotion - DEVOTION_DECAY_RATE, 3))
 
@@ -362,13 +689,11 @@ class ReligionEngine:
         return emitted_events
 
     def _emit_to_event_log(self, event_log: Any, event_data: dict[str, Any]) -> None:
-        """Safely appends religious event to EventLog if provided and registered."""
+        """Safely appends religious event to EventLog if provided."""
         if event_log is None:
             return
         try:
-            from minemesis.core.types import EventType, Intent, Scale
             type_val = event_data["type"]
-            # Find matching enum value
             enum_type = None
             for e_t in EventType:
                 if e_t.value == type_val:
@@ -386,14 +711,13 @@ class ReligionEngine:
                     payload=event_data.get("payload", {}),
                 )
         except Exception:
-            # Plugin isolation: failures to append to event_log do not crash religion engine
             pass
 
     # -------------------------------------------------------------------------
     # Published External Interfaces
     # -------------------------------------------------------------------------
     def get_character_religion(self, character_id: str) -> Optional[Religion]:
-        """Returns the Religion object adhered to by a character, or None."""
+        """Returns the Religion adhered to by a character, or None."""
         if not self.enabled:
             return None
         faith = self.faiths.get(character_id)
@@ -417,24 +741,18 @@ class ReligionEngine:
         return self.religions.get(rel_id)
 
     def get_religion_modifiers(self, target_id: str) -> dict[str, float]:
-        """
-        Calculates active religion modifiers.
-        Accepts character_id, settlement_id, or religion_id.
-        """
+        """Calculates active religion modifiers for character, settlement, or religion ID."""
         if not self.enabled:
             return {}
 
-        # 1. Direct religion_id
         if target_id in self.religions:
             return get_religion_aggregate_modifiers(self.religions[target_id])
 
-        # 2. character_id
         if target_id in self.faiths:
             faith = self.faiths[target_id]
             rel = self.religions.get(faith.religion_id)
             return get_character_effective_modifiers(faith, rel)
 
-        # 3. settlement_id
         if target_id in self.dominant_by_settlement:
             rel_id = self.dominant_by_settlement[target_id]
             rel = self.religions.get(rel_id)
@@ -449,6 +767,24 @@ class ReligionEngine:
         rel = self.get_settlement_religion(settlement_id)
         return get_settlement_consumption_multiplier(rel)
 
+    def generate_analytics(
+        self,
+        settlements: Mapping[str, Any],
+        characters: Mapping[str, Any],
+        event_log: Any = None,
+        current_tick: int = 0,
+    ) -> ReligiousAnalyticsReport:
+        """Generates comprehensive Milestone R1.10 analytics report."""
+        living = [c for c in characters.values() if c.alive]
+        return generate_religious_analytics(
+            religions=self.religions,
+            faiths=self.faiths,
+            settlements=settlements,
+            living_characters=living,
+            event_log=event_log,
+            current_tick=current_tick,
+        )
+
     def serialize(self) -> dict[str, Any]:
         """Serializes religion engine state to plain JSON-compatible dictionary."""
         if not self.enabled:
@@ -456,9 +792,11 @@ class ReligionEngine:
         data = serialize_religion_state(
             religions=self.religions,
             faiths=self.faiths,
-            rel_counter=self.rel_counter,
-            site_counter=self.site_counter,
+            rel_counter=self.rel_counter[0],
+            site_counter=self.site_counter[0],
             seed=self.seed,
+            figure_counter=self.figure_counter[0],
+            myth_counter=self.myth_counter[0],
         )
         data["enabled"] = True
         return data
@@ -469,7 +807,12 @@ class ReligionEngine:
             self.enabled = False
             return
         self.enabled = True
-        self.religions, self.faiths, self.rel_counter, self.site_counter, self.seed = (
-            deserialize_religion_state(data)
-        )
+        res = deserialize_religion_state(data)
+        self.religions = res[0]
+        self.faiths = res[1]
+        self.rel_counter = [res[2]]
+        self.site_counter = [res[3]]
+        self.seed = res[4]
+        self.figure_counter = [res[5]]
+        self.myth_counter = [res[6]]
         self.rng = random.Random(self.seed + 777)
