@@ -12,6 +12,7 @@ Adheres strictly to agent.md Architecture Freeze v1.0 and Milestone 0.5:
 from __future__ import annotations
 from typing import Callable, Optional, Set
 from minemesis.core.event_log import Event, EventLog
+from minemesis.core.invariants import InvariantViolationError, validate_event_actors_alive
 from minemesis.core.types import EventType
 from minemesis.models.belief import Belief
 from minemesis.models.character import Character
@@ -194,6 +195,7 @@ class Simulation:
         """
         new_events = self.event_log.all_events()[events_before:]
         for evt in new_events:
+            validate_event_actors_alive(evt, self.characters)
             # R1.8: Evaluate character action against virtues
             if self.religion_engine and self.religion_engine.enabled:
                 actor_id = evt.participants_dict.get("actor") or evt.participants_dict.get("instigator_char") or evt.participants_dict.get("initiator")
@@ -254,6 +256,10 @@ class Simulation:
         """
         Executes a single monthly simulation tick in strictly deterministic order.
         """
+        # Directive 4: Stop on world extinction (pop == 0)
+        if len(self.living_characters) == 0:
+            return
+
         # Ensure belief maps exist for newly born characters
         for c_id in self.characters.keys():
             if c_id not in self.beliefs_by_character:
@@ -390,9 +396,12 @@ class Simulation:
     def run_years(self, years: int) -> None:
         """
         Runs the simulation for the specified number of simulated years (12 ticks/year).
+        Terminates immediately if living population drops to 0 (world extinction).
         """
         total_ticks = years * 12
         for _ in range(total_ticks):
+            if len(self.living_characters) == 0:
+                break
             self.step_month()
 
     @property

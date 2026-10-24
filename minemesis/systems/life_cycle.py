@@ -224,7 +224,7 @@ def process_life_cycle(
         if char.age_years >= 16:
             acc_roll = keyed_float(seed, "accidental_death", char.id, tick)
             if acc_roll < 0.0010:
-                peers = [p for p in living_chars if p.id != char.id and p.age_years >= 16]
+                peers = [p for p in characters.values() if p.alive and p.id != char.id and p.age_years >= 16]
                 if peers:
                     partner = keyed_choice(seed, "acc_partner", char.id, tick, peers)
                     char.alive = False

@@ -488,7 +488,23 @@ def process_conflicts_and_economy(
 
         attacker_set_id = feud.instigator_settlement_id
         defender_set_id = feud.target_settlement_id
+
+        # Skip collapsed settlements
+        if attacker_set_id in collapsed_settlements or defender_set_id in collapsed_settlements:
+            feud.active = False
+            continue
+
         if attacker_set_id == defender_set_id:
+            continue
+
+        # Invariant: Raids require a living instigator in attacking settlement with an active grievance
+        instigator = characters.get(feud.instigator_char_id)
+        if not instigator or not instigator.alive or instigator.settlement_id != attacker_set_id:
+            continue
+
+        # Instigator must hold active grievance (hatred >= 20.0)
+        rel_feud = get_relationship(instigator.id, feud.target_char_id)
+        if rel_feud.hatred < 20.0:
             continue
 
         # Raid Cooldown: at least 12 months between raids by this settlement pair
@@ -520,7 +536,7 @@ def process_conflicts_and_economy(
                 participants={
                     "initiator": attacker_set.id,
                     "target": defender_set.id,
-                    "instigator_char": feud.instigator_char_id,
+                    "instigator_char": instigator.id,
                 },
                 causes=causes,
                 intent=Intent.MILITARY_ACTION,
@@ -532,7 +548,7 @@ def process_conflicts_and_economy(
                 },
             )
 
-            defender_living = [c for c in living_chars if c.settlement_id == defender_set.id and c.age_years >= 16]
+            defender_living = [c for c in characters.values() if c.alive and c.settlement_id == defender_set.id and c.age_years >= 16]
             if len(defender_living) > 3:
                 casualty_roll = keyed_float(seed, "raid_casualty", str(raid_evt.id), tick)
                 if casualty_roll < 0.08:
@@ -542,7 +558,7 @@ def process_conflicts_and_economy(
                         tick=tick,
                         location=defender_set.id,
                         event_type=EventType.DEATH,
-                        participants={"actor": feud.instigator_char_id, "target": casualty.id},
+                        participants={"actor": instigator.id, "target": casualty.id},
                         causes=[raid_evt.id],
                         intent=Intent.MILITARY_ACTION,
                         scale=Scale.INDIVIDUAL,
@@ -660,6 +676,25 @@ def process_conflicts_and_economy(
                         memories.extend(reappraisal_mems)
 
                         feud.active = False
+
+                        target_char = characters.get(feud.target_char_id)
+                        if target_char and target_char.alive:
+                            party2_id = target_char.id
+                            party2_name = target_char.full_name
+                        else:
+                            s_tgt = settlements.get(feud.target_settlement_id)
+                            party2_char = None
+                            if s_tgt and s_tgt.leader_id and characters.get(s_tgt.leader_id) and characters[s_tgt.leader_id].alive:
+                                party2_char = characters[s_tgt.leader_id]
+                            else:
+                                tgt_living = [c for c in characters.values() if c.alive and c.settlement_id == feud.target_settlement_id]
+                                if tgt_living:
+                                    party2_char = tgt_living[0]
+                            if not party2_char:
+                                continue
+                            party2_id = party2_char.id
+                            party2_name = party2_char.full_name
+
                         event_log.append(
                             tick=tick,
                             location=feud.instigator_settlement_id,
@@ -668,14 +703,14 @@ def process_conflicts_and_economy(
                                 "initiator": feud.instigator_settlement_id,
                                 "target": feud.target_settlement_id,
                                 "party1": instigator.id,
-                                "party2": feud.target_char_id,
+                                "party2": party2_id,
                             },
                             causes=[feud.id, rev_evt.id],
                             intent=Intent.INTENTIONAL,
                             scale=Scale.AGGREGATE,
                             payload={
                                 "description": (
-                                    f"Reconciliation and Peace between {instigator.full_name} and {feud.target_char_id}: "
+                                    f"Reconciliation and Peace between {instigator.full_name} and {party2_name}: "
                                     f"Truth revealed in #{rev_evt.id}. Feud #{feud.id} resolved."
                                 ),
                                 "feud_id": feud.id,
@@ -692,7 +727,23 @@ def process_conflicts_and_economy(
                 leader = characters[s_inst.leader_id]
 
         if elapsed_ticks >= 72 and leader and leader.alive:
-            rel = get_relationship(leader.id, feud.target_char_id)
+            target_char = characters.get(feud.target_char_id)
+            if target_char and target_char.alive:
+                party2_id = target_char.id
+            else:
+                s_tgt = settlements.get(feud.target_settlement_id)
+                party2_char = None
+                if s_tgt and s_tgt.leader_id and characters.get(s_tgt.leader_id) and characters[s_tgt.leader_id].alive:
+                    party2_char = characters[s_tgt.leader_id]
+                else:
+                    tgt_living = [c for c in characters.values() if c.alive and c.settlement_id == feud.target_settlement_id]
+                    if tgt_living:
+                        party2_char = tgt_living[0]
+                if not party2_char:
+                    continue
+                party2_id = party2_char.id
+
+            rel = get_relationship(leader.id, party2_id)
             if rel.hatred < 20.0:
                 peace_roll = keyed_float(seed, "exhaustion_peace", str(feud.id), tick)
                 if peace_roll < 0.008:
@@ -714,7 +765,7 @@ def process_conflicts_and_economy(
                             "initiator": feud.instigator_settlement_id,
                             "target": feud.target_settlement_id,
                             "party1": leader.id,
-                            "party2": feud.target_char_id,
+                            "party2": party2_id,
                         },
                         causes=[feud.id, exhaustion_evt_id],
                         intent=Intent.INTENTIONAL,
@@ -775,6 +826,13 @@ def process_conflicts_and_economy(
 
             collapsed_settlements.add(s_id)
 
+            # Deactivate and mark feuds dormant (Directive 5: do NOT log Peace)
+            dormant_feud_ids: list[int] = []
+            for feud in active_feuds:
+                if feud.active and (feud.instigator_settlement_id == s_id or feud.target_settlement_id == s_id):
+                    feud.active = False
+                    dormant_feud_ids.append(feud.id)
+
             collapse_evt = event_log.append(
                 tick=tick,
                 location=s_id,
@@ -788,6 +846,7 @@ def process_conflicts_and_economy(
                     "settlement_id": s_id,
                     "remaining_population": len(survivors),
                     "trigger_cause_id": collapse_causes[0],
+                    "dormant_feuds": dormant_feud_ids,
                 },
             )
 

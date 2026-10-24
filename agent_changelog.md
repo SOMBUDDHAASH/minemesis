@@ -126,5 +126,26 @@ Diff of implemented `CAUSE_GRAMMAR` against brief Table 4.1:
   - `test_cross_process_determinism_under_different_hashseeds`: Spawns two independent Python subprocesses with `PYTHONHASHSEED=0` and `PYTHONHASHSEED=12345` on seed 42. Verifies byte-identical event log SHA-256 digests (`hash_0 == hash_12345`). Includes negative control asserting that different seeds produce different digests.
   - `test_engine_toggle_off_zero_overhead_and_determinism`: Asserts that running with engines OFF produces zero religious/lore events and byte-identical outputs across runs. Includes negative control asserting engines ON produce religious and lore events.
 
+### Step 3. Invariants: Dead Actors, World Extinction, and Collapse Feuds
+- **Dead Actors Invariant Enforcement**:
+  - Implemented `minemesis/core/invariants.py` with `validate_event_actors_alive` and `validate_entire_history_no_dead_actors`.
+  - Every active participant (`actor`, `instigator`, `instigator_char`, `initiator`, `witness`, `recipient`, `spouse`, `spouse1`, `spouse2`, `author`, `party1`, `party2`) must be strictly alive at the tick of the event.
+  - The subject may only be dead in a `Death` event (where `target`, `deceased`, `victim` is allowed), and if a killer/instigator acts, the killer must be alive.
+  - Pipeline enforcement: `_register_and_perceive_events` validates all newly emitted events at every simulation tick, throwing `InvariantViolationError` if any deceased character acts.
+- **Stop on World Extinction**:
+  - In `simulation.py`, `step_month` and `run_years` immediately terminate when `len(self.living_characters) == 0`.
+  - Prohibits any posthumous updates, phantom ghost migrations, or spurious events after extinction.
+- **Settlement Collapse & Feud Invariants**:
+  - *No False Peace*: Collapsing is an abandonment/extinction, not a reconciliation. When a settlement collapses, zero `Peace` events are emitted.
+  - *Dormant Feuds*: Feuds involving the collapsed settlement are deactivated and logged as `dormant_feuds` in the `SettlementCollapse` event payload. Personal grievances and memories persist with surviving migrants.
+  - *Raid Instigator Requirement*: Raids strictly require a living instigator residing in the attacking settlement with an active grievance (`hatred >= 20.0`). If the original instigator is dead or has forgiven the offense, the raid does not fire.
+  - *Peace Treaty Representatives*: In Truth Revelation and Exhaustion peace events, both `party1` and `party2` are strictly living representatives (instigator/target or living settlement chiefs). Dead characters are never cited as signatories.
+- **Test Hardening & Negative Controls**:
+  - Added `test_dead_actors_invariant` in `test_pipeline_invariants.py`: Audits 50-year live simulation run with `validate_entire_history_no_dead_actors`.
+  - Includes Negative Control 1: Verifies `validate_event_actors_alive` rejects events citing deceased actors at runtime.
+  - Includes Negative Control 2: Verifies `validate_entire_history_no_dead_actors` detects and raises `InvariantViolationError` on posthumous actions.
+  - Added `test_world_extinction_invariant`: Verifies zero posthumous events are emitted after world population drops to 0, with a negative control proving living worlds continue to advance.
+
+
 
 
