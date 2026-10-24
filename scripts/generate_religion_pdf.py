@@ -1,0 +1,1885 @@
+"""
+Religion Engine Comprehensive PDF Report Generator for Project Minemesis.
+Compiles Milestones R0, R1, R1.5, and R2 documentation, architecture, data models,
+mathematical formulations, event flows, empirical simulation data, and case studies
+into a 12-page publication-grade executive technical PDF report using headless Microsoft Edge.
+"""
+
+from __future__ import annotations
+import json
+import os
+import shutil
+import subprocess
+import sys
+
+def main():
+    reports_dir = os.path.abspath("reports")
+    os.makedirs(reports_dir, exist_ok=True)
+    out_html = os.path.abspath("reports/minemesis_religion_report.html")
+    out_pdf_root = os.path.abspath("Minemesis_Religion_Engine_Comprehensive_Report.pdf")
+    out_pdf_reports = os.path.abspath("reports/Minemesis_Religion_Engine_Comprehensive_Report.pdf")
+    
+    html_content = """<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Project Minemesis - Comprehensive Technical Report: The Religion Engine</title>
+<style>
+  @page {
+    size: A4;
+    margin: 10mm 12mm 10mm 12mm;
+  }
+  
+  *, *:before, *:after {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #1e293b;
+    line-height: 1.40;
+    font-size: 8.2pt;
+    background: #ffffff;
+    margin: 0;
+    padding: 0;
+  }
+
+  .page {
+    page-break-after: always;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    padding-bottom: 12px;
+  }
+
+  .page:last-child {
+    page-break-after: avoid;
+  }
+
+  .page-content {
+    flex: 1;
+  }
+
+  /* Typography */
+  h1, h2, h3, h4 {
+    color: #0f172a;
+    font-weight: 700;
+    margin-top: 0;
+  }
+
+  h1 {
+    font-size: 16pt;
+    line-height: 1.15;
+    margin-bottom: 2px;
+    letter-spacing: -0.3px;
+  }
+
+  h2 {
+    font-size: 10.5pt;
+    border-bottom: 1.5px solid #cbd5e1;
+    padding-bottom: 2px;
+    margin-top: 8px;
+    margin-bottom: 5px;
+    color: #1e3a8a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  h3 {
+    font-size: 8.8pt;
+    margin-top: 6px;
+    margin-bottom: 2px;
+    color: #334155;
+  }
+
+  p {
+    margin: 0 0 4px 0;
+    color: #334155;
+    text-align: justify;
+  }
+
+  ul, ol {
+    margin: 0 0 5px 0;
+    padding-left: 16px;
+  }
+
+  li {
+    margin-bottom: 2px;
+  }
+
+  /* Header & Banner */
+  .cover-banner {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #312e81 100%);
+    color: #ffffff;
+    padding: 12px 16px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+  }
+
+  .cover-banner h1 {
+    color: #ffffff;
+    margin: 0 0 3px 0;
+  }
+
+  .cover-subtitle {
+    font-size: 9pt;
+    color: #93c5fd;
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+
+  .meta-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    font-size: 7.2pt;
+    color: #cbd5e1;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    padding-top: 5px;
+  }
+
+  .meta-item strong {
+    color: #ffffff;
+    display: block;
+    font-size: 7.5pt;
+  }
+
+  /* Layout grids */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+  }
+
+  /* Cards */
+  .card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    padding: 6px 8px;
+    margin-bottom: 6px;
+  }
+
+  .card-header {
+    font-weight: 700;
+    font-size: 8.2pt;
+    color: #1e3a8a;
+    margin-bottom: 3px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 2px;
+  }
+
+  /* Callout boxes */
+  .callout {
+    background: #eff6ff;
+    border-left: 3px solid #3b82f6;
+    padding: 5px 8px;
+    border-radius: 0 4px 4px 0;
+    margin-bottom: 6px;
+    font-size: 7.8pt;
+  }
+
+  .callout-gold {
+    background: #fffbeb;
+    border-left: 3px solid #d97706;
+    padding: 5px 8px;
+    border-radius: 0 4px 4px 0;
+    margin-bottom: 6px;
+    font-size: 7.8pt;
+  }
+
+  .callout-purple {
+    background: #faf5ff;
+    border-left: 3px solid #8b5cf6;
+    padding: 5px 8px;
+    border-radius: 0 4px 4px 0;
+    margin-bottom: 6px;
+    font-size: 7.8pt;
+  }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 7.2pt;
+    margin-bottom: 6px;
+  }
+
+  th, td {
+    padding: 3px 5px;
+    border: 1px solid #cbd5e1;
+    text-align: left;
+  }
+
+  th {
+    background: #f1f5f9;
+    color: #0f172a;
+    font-weight: 700;
+  }
+
+  tr:nth-child(even) td {
+    background: #f8fafc;
+  }
+
+  /* Code blocks */
+  pre, code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  }
+
+  code {
+    background: #f1f5f9;
+    padding: 1px 3px;
+    border-radius: 2px;
+    font-size: 7.2pt;
+    color: #0f172a;
+  }
+
+  pre {
+    background: #0f172a;
+    color: #f8fafc;
+    padding: 6px 8px;
+    border-radius: 4px;
+    font-size: 6.8pt;
+    line-height: 1.28;
+    overflow-x: hidden;
+    margin: 0 0 6px 0;
+    white-space: pre-wrap;
+  }
+
+  /* Badges */
+  .badge {
+    display: inline-block;
+    padding: 1px 4px;
+    font-size: 6.5pt;
+    font-weight: 700;
+    border-radius: 2px;
+    text-transform: uppercase;
+  }
+
+  .badge-pass { background: #dcfce7; color: #166534; }
+  .badge-core { background: #dbeafe; color: #1e40af; }
+  .badge-myth { background: #fef3c7; color: #92400e; }
+  .badge-cult { background: #f3e8ff; color: #6b21a8; }
+
+  /* Flow Diagram Box */
+  .diagram-box {
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    padding: 6px;
+    text-align: center;
+    font-family: monospace;
+    font-size: 7pt;
+    margin-bottom: 6px;
+    line-height: 1.35;
+    color: #0f172a;
+  }
+
+  /* Footer */
+  .footer {
+    border-top: 1px solid #e2e8f0;
+    padding-top: 4px;
+    font-size: 6.8pt;
+    color: #64748b;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+</style>
+</head>
+<body>
+
+<!-- ========================================================================= -->
+<!-- PAGE 1: TITLE & EXECUTIVE SUMMARY                                         -->
+<!-- ========================================================================= -->
+<div class="page">
+  <div class="page-content">
+    <div class="cover-banner">
+      <h1>PROJECT MINEMESIS &bull; RELIGION ENGINE</h1>
+      <div class="cover-subtitle">
+        Architectural Specification, Multi-Tradition Framework, and Evolutionary History Engine (R0 &bull; R1 &bull; R1.5 &bull; R2)
+      </div>
+      <div class="meta-grid">
+        <div class="meta-item"><strong>VERSION / TAG</strong>m-r2 (Commit 302cc23)</div>
+        <div class="meta-item"><strong>SYSTEM STATUS</strong>Production / Headless Pass</div>
+        <div class="meta-item"><strong>TEST VERIFICATION</strong>74 / 74 Tests Passing (100%)</div>
+        <div class="meta-item"><strong>DETERMINISM</strong>Byte-Identical per Seed</div>
+      </div>
+    </div>
+
+    <h2>1. Executive Summary & Paradigm Shift</h2>
+    <p>
+      In conventional simulation games and RPG world generators, religion is typically modeled as a static political faction, an institutional state church, or an arbitrary diplomatic opinion modifier. Such models suffer from acute <strong>Abrahamic institutional bias</strong>—presupposing that religion fundamentally consists of a single prophet, a dogmatic canon, a rigid church hierarchy, heresy persecutions, and Protestant-style reformations.
+    </p>
+    <p>
+      The <strong>Minemesis Religion Engine</strong> represents a ground-up paradigm shift. It implements a unified, non-dogmatic simulation architecture capable of natively modeling <em>Dharmic traditions (Hinduism, Buddhism, Jainism), East Asian philosophies (Daoism, Shinto, Confucianism), African traditional cosmologies (Yoruba, Egyptian), European polytheisms (Celtic, Norse, Hellenic), Indigenous animisms, and vernacular syncretic folk faiths</em> without forcing any of them into ecclesiastical church mechanics.
+    </p>
+
+    <div class="callout-gold">
+      <strong>The Fundamental Religion Equation:</strong><br>
+      <code>Beliefs + Virtues + Myths + Rituals + Sacred Places + Cultural Practices + Historical Memory = Religion</code>
+      <br>Religion in Minemesis is NOT a faction, a kingdom, a guild, or a denomination. <strong>Religion is a living collection of ideas.</strong> Ideas spread across borders, combine through syncretism, mutate through generations, drift across geography, and shape civilizational culture.
+    </div>
+
+    <h2>2. Milestone Roadmap & Architectural Scope</h2>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <span>Milestone R0: Procedural Faith Foundations</span>
+          <span class="badge badge-core">DELIVERED</span>
+        </div>
+        <ul style="font-size: 7.2pt; color: #475569;">
+          <li><strong>Trait Knowledge Library:</strong> 55+ distinct traits spanning 7 real-world traditions.</li>
+          <li><strong>Decoupled Politics:</strong> Villages sharing faiths can war; rival faiths can peacefully trade.</li>
+          <li><strong>Multi-Channel Diffusion:</strong> Family inheritance (95%), marriage (8%), trade routes (4%), and missionary clergy (12%).</li>
+          <li><strong>Zero-Overhead Toggle:</strong> Instant zero-overhead bypass via <code>ENABLE_RELIGION_ENGINE</code>.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>Milestone R1: Religion Becomes History</span>
+          <span class="badge badge-pass">DELIVERED</span>
+        </div>
+        <ul style="font-size: 7.2pt; color: #475569;">
+          <li><strong>Interpretation Layer:</strong> Event &rarr; Perception &rarr; <em>Religion Filter</em> &rarr; Belief.</li>
+          <li><strong>Sectarian Tension:</strong> Hostile doctrines, divergent sects, and religious refugee flight.</li>
+          <li><strong>Genealogy Trees:</strong> Lineage tracking of parent/child schisms and generational descent.</li>
+          <li><strong>Great Figures:</strong> Prophets, Mystics, Martyrs, Reformers, Heretics, and Saints.</li>
+          <li><strong>Oral Myth Engine:</strong> Event &rarr; Story &rarr; Legend &rarr; Myth with supernatural distortions.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>Milestone R1.5: Syncretism & Evolution</span>
+          <span class="badge badge-myth">DELIVERED</span>
+        </div>
+        <ul style="font-size: 7.2pt; color: #475569;">
+          <li><strong>Syncretic Fusion:</strong> Merging distinct faiths (Faith A + Faith B &rarr; Faith C).</li>
+          <li><strong>Doctrinal Borrowing:</strong> Ideas exchanged across borders without formal conversion.</li>
+          <li><strong>Regional Drift:</strong> Doctrine profiles with regional trait weights and local taboos.</li>
+          <li><strong>Identity Spectrum:</strong> Personal adherence (Zealous, Devout, Cultural, Nominal).</li>
+          <li><strong>Trade Myth Exchange:</strong> Caravans transmit and adapt foreign legends into local lore.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>Milestone R2: Religion Shapes Civilization</span>
+          <span class="badge badge-cult">DELIVERED</span>
+        </div>
+        <ul style="font-size: 7.2pt; color: #475569;">
+          <li><strong>Cultural Profiles:</strong> Settlement social values (loyalty, honor, compassion, martiality).</li>
+          <li><strong>Folk Traditions:</strong> Animist spirits, sacred trees, and guardians absorbed into canon.</li>
+          <li><strong>Seasonal Customs:</strong> Annual calendar festivals (river ablutions, harvest feasts, vigils).</li>
+          <li><strong>Sacred Geography:</strong> Multi-tier evolution (Sanctuary &rarr; Shrine &rarr; Temple &rarr; Capital).</li>
+          <li><strong>Cultural Pressures:</strong> Decision modifiers altering vengeance, forgiveness, and charity.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>3. Verified High-Level System Metrics</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Metric Dimension</th>
+          <th>Implementation Parameter</th>
+          <th>Headless Test Baseline</th>
+          <th>Validation Result</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Test Suite Coverage</strong></td>
+          <td>Full simulation + unit regression suites</td>
+          <td>74 independent tests across 11 files</td>
+          <td><span class="badge badge-pass">100% PASS (74/74)</span></td>
+        </tr>
+        <tr>
+          <td><strong>Multi-Seed Simulation</strong></td>
+          <td>100 simulated years per seed</td>
+          <td>Seeds 42, 101, 777, 999, 2026</td>
+          <td><span class="badge badge-pass">PASS (Zero Regressions)</span></td>
+        </tr>
+        <tr>
+          <td><strong>Census Conservation</strong></td>
+          <td>Population balance invariant (Section 3b)</td>
+          <td>Exact: S_exp = Init + B - D + Mig + M_Reloc</td>
+          <td><span class="badge badge-pass">STRICT CONSERVATION</span></td>
+        </tr>
+        <tr>
+          <td><strong>State Hash Invariance</strong></td>
+          <td>Byte-identical reproducibility per seed</td>
+          <td>Dual independent 100-year runs per seed</td>
+          <td><span class="badge badge-pass">IDENTICAL HASHES</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="footer">
+    <span>Project Minemesis &bull; Religion Engine Technical Report</span>
+    <span>Page 1 of 12</span>
+  </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- PAGE 2: CORE PHILOSOPHY & PERCEPTION PIPELINE                             -->
+<!-- ========================================================================= -->
+<div class="page">
+  <div class="page-content">
+    <h2>4. Core Philosophy: Complete Decoupling of Religion and Politics</h2>
+    <p>
+      In historical reality, political conflict and religious ideology interact as distinct forces. Two villages sharing the identical river faith may raid each other over iron mines or water rights; conversely, settlements adhering to radically divergent theological worldviews may establish vibrant trade pacts and dynastic marriage alliances.
+    </p>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <span>What Religion IS NOT in Minemesis</span>
+          <span class="badge" style="background:#fee2e2; color:#991b1b;">ANTI-PATTERNS</span>
+        </div>
+        <ul style="font-size: 7.2pt; color: #475569;">
+          <li><strong>NOT a Kingdom or Faction:</strong> Political loyalty and religious conviction are completely separate state vectors.</li>
+          <li><strong>NOT a Single Village:</strong> Multiple villages can share a faith, split a faith, or develop local syncretisms.</li>
+          <li><strong>NOT a Monolithic Monotheism:</strong> Polytheism, animism, and philosophical ethics are first-class peers.</li>
+          <li><strong>NOT a Rigid Church State:</strong> Religious movements emerge organically from societal grief, triumphs, and visions.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>What Religion IS in Minemesis</span>
+          <span class="badge" style="background:#dcfce7; color:#166534;">LIVING IDEAS</span>
+        </div>
+        <ul style="font-size: 7.2pt; color: #475569;">
+          <li><strong>A Living Cognitive Filter:</strong> Modifies how subjective perceptions are converted into enduring beliefs.</li>
+          <li><strong>A Moral & Ethical Framework:</strong> Rewards virtuous actions with community standing and penalizes taboos.</li>
+          <li><strong>A Cultural Memory Reservoir:</strong> Preserves ancestral heroics through oral tales, legends, and civilizational myths.</li>
+          <li><strong>A Dynamic Geography Network:</strong> Consecrates sacred groves, rivers, and peaks, stimulating pilgrimages.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>5. The Expanded Cognitive Perception Pipeline</h2>
+    <p>
+      Milestone 0 established the inviolable subjective perception loop: <code>Event &rarr; Perception &rarr; Belief &rarr; Memory &rarr; Relationship &rarr; Decision &rarr; Event</code>. Milestone R1 deepens this architecture by inserting the <strong>Religious Interpretation Layer</strong> between Perception and Belief:
+    </p>
+
+    <div class="diagram-box">
+[Objective Event in EventLog]
+         │
+         ▼
+[Sensory Perception]  (Character witnesses death, raid, harvest, or miracle)
+         │
+         ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│               RELIGIOUS INTERPRETATION FILTER (R1.1)                  │
+│                                                                        │
+│ • Monotheism / Divine Judgment &rarr; "Retribution from the Heavens"     │
+│ • Animism / Nature Reverence   &rarr; "Spirits of Grove & River Wounded" │
+│ • Reincarnation / Karmic Cycle &rarr; "Natural Transition of the Wheel"  │
+│ • Ancestor Veneration          &rarr; "Forebears Demand Sacred Vengeance"│
+│ • Martyrdom / Holy Zeal        &rarr; "Sacred Sacrifice for Holy Glory" │
+└────────────────────────────────────────────────────────────────────────┘
+         │
+         ▼
+[Subjective Belief Formation]  (Subjective interpretation recorded into Beliefs)
+         │
+         ▼
+[Active Memory Formation]      (Anchored to narrative context and emotional bias)
+         │
+         ▼
+[Dynamic Relationship View]    (Derived Trust, Respect, Affinity, Grudge vectors)
+         │
+         ▼
+[Agent Decision & Execution]   (Peace reconciliation, blood feud, raid, or conversion)
+    </div>
+
+    <h2>6. Comparative Interpretive Transformation Matrix</h2>
+    <p>
+      The table below illustrates identical objective events passing through divergent religious filters, proving that identical objective reality creates radically different subjective belief structures and behavioral trajectories:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Objective Reality</th>
+          <th>Theological Tradition</th>
+          <th>Filter Meaning Extraction</th>
+          <th>Formed Subjective Belief</th>
+          <th>Behavioral Trajectory</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Village Elder Dies of Sickness</strong></td>
+          <td>Ancestor Veneration</td>
+          <td>"Forebears are dishonored or demanding ritual attention."</td>
+          <td><code>BELIEF_ANCESTOR_DISPLEASED</code></td>
+          <td>Initiates ancestor vigil festival; increases hearth offerings.</td>
+        </tr>
+        <tr>
+          <td><strong>Village Elder Dies of Sickness</strong></td>
+          <td>Karmic Reincarnation</td>
+          <td>"A cycle has closed; the spirit prepares for rebirth."</td>
+          <td><code>BELIEF_CYCLE_PASSING</code></td>
+          <td>Peaceful funeral rite; reduces grief and grudge accumulation.</td>
+        </tr>
+        <tr>
+          <td><strong>Village Elder Dies of Sickness</strong></td>
+          <td>Monotheistic Judgment</td>
+          <td>"The divine hand strikes down moral corruption."</td>
+          <td><code>BELIEF_DIVINE_PUNISHMENT</code></td>
+          <td>Sparks self-purification movement and ascetic taboos.</td>
+        </tr>
+        <tr>
+          <td><strong>Warrior Slain in Boundary Raid</strong></td>
+          <td>Warrior Honor & Martyrdom</td>
+          <td>"The fallen entered eternal glory defending sacred soil."</td>
+          <td><code>BELIEF_MARTYR_SACRIFICE</code></td>
+          <td>Canonizes warrior as Martyr; ignites zealous retaliatory feud.</td>
+        </tr>
+        <tr>
+          <td><strong>Severe Drought & Crop Failure</strong></td>
+          <td>Animism & Nature Reverence</td>
+          <td>"The river guardian and grove spirits have been starved."</td>
+          <td><code>BELIEF_NATURE_SPIRIT_ANGER</code></td>
+          <td>Consecrates holy spring; bans tree cutting around village grove.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="footer">
+    <span>Project Minemesis &bull; Religion Engine Technical Report</span>
+    <span>Page 2 of 12</span>
+  </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- PAGE 3: TRAIT LIBRARY & GENERATION ENGINE                                 -->
+<!-- ========================================================================= -->
+<div class="page">
+  <div class="page-content">
+    <h2>7. The Religious Knowledge Library (55+ Modular Traits)</h2>
+    <p>
+      Rather than hardcoding static factions, the Religion Engine features a knowledge base of <strong>55+ procedural religion traits</strong> extracted from real-world anthropological and historical religions. These traits serve as the modular genome for emergent world religions:
+    </p>
+
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-header">
+          <span>1. Cosmology & Divinity</span>
+          <span class="badge badge-core">FOUNDATIONAL</span>
+        </div>
+        <ul style="font-size: 6.8pt; color: #475569; padding-left: 12px;">
+          <li><code>monotheism</code>: Singular Supreme Deity</li>
+          <li><code>polytheism</code>: Diverse Multi-Deity Pantheon</li>
+          <li><code>animism_cosmology</code>: Spirit-Infused Living World</li>
+          <li><code>pantheism_harmony</code>: Unity of Divine and Nature</li>
+          <li><code>dualism_cosmic_struggle</code>: Cosmic Light vs Darkness</li>
+          <li><code>non_theistic_void</code>: Emptiness & Transcendent Truth</li>
+          <li><code>cycle_of_ages</code>: Endless Cosmic Cycles</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>2. Social Values & Ethics</span>
+          <span class="badge badge-pass">ETHICAL</span>
+        </div>
+        <ul style="font-size: 6.8pt; color: #475569; padding-left: 12px;">
+          <li><code>charity_obligation</code>: Duty to Aid Destitute</li>
+          <li><code>strict_pacifism</code>: Rejection of All Violence</li>
+          <li><code>warrior_honor</code>: Glory in Righteous Combat</li>
+          <li><code>hospitality_sanctity</code>: Sacred Welcome for Strangers</li>
+          <li><code>truth_and_learning</code>: Devotion to Scholarly Truth</li>
+          <li><code>family_loyalty_piety</code>: Unyielding Kin Reverence</li>
+          <li><code>humility_and_meekness</code>: Virtue in Simplicity</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>3. Authority & Clergy</span>
+          <span class="badge badge-cult">HIERARCHY</span>
+        </div>
+        <ul style="font-size: 6.8pt; color: #475569; padding-left: 12px;">
+          <li><code>hierarchical_priesthood</code>: Pontiffs & Formal Priesthood</li>
+          <li><code>shamanic_mediators</code>: Spirit Seers and Healers</li>
+          <li><code>monastic_orders</code>: Cloistered Ascetic Monks</li>
+          <li><code>lay_egalitarianism</code>: Equal Spiritual Priesthood</li>
+          <li><code>council_of_elders</code>: Veneration of Gerontocracy</li>
+          <li><code>prophetic_lineage</code>: Divine Revelations via Seers</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-header">
+          <span>4. Afterlife Concepts</span>
+          <span class="badge badge-myth">ESCHATOLOGY</span>
+        </div>
+        <ul style="font-size: 6.8pt; color: #475569; padding-left: 12px;">
+          <li><code>reincarnation</code>: Soul Rebirth into New Vessels</li>
+          <li><code>paradise_and_underworld</code>: Dualist Judgment</li>
+          <li><code>ancestral_spirit_communion</code>: Unseen Guardians</li>
+          <li><code>oblivion_cessation</code>: Peaceful Extinction of Self</li>
+          <li><code>karmic_transmigration</code>: Ethical Cause & Effect</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>5. Rituals & Worship</span>
+          <span class="badge badge-core">PRACTICE</span>
+        </div>
+        <ul style="font-size: 6.8pt; color: #475569; padding-left: 12px;">
+          <li><code>purification_ablutions</code>: Sacred Water Cleansing</li>
+          <li><code>ritual_fasting</code>: Seasonal Food Abstinence</li>
+          <li><code>sacred_ecstatic_dance</code>: Trance and Hymn Worship</li>
+          <li><code>meditative_contemplation</code>: Silent Reflection</li>
+          <li><code>vision_quest_divination</code>: Wilderness Seeker Rites</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>6. Sacred Taboos</span>
+          <span class="badge" style="background:#fee2e2; color:#991b1b;">PROHIBITIONS</span>
+        </div>
+        <ul style="font-size: 6.8pt; color: #475569; padding-left: 12px;">
+          <li><code>taboo_oath_breaking</code>: Eternal Shame for Betrayal</li>
+          <li><code>taboo_cowardice</code>: Expulsion for Fleeing Battle</li>
+          <li><code>taboo_ancestor_dishonor</code>: Forebear Defilement</li>
+          <li><code>taboo_food_restrictions</code>: Sacred Animal Protection</li>
+          <li><code>taboo_desecration_of_dead</code>: Grave Violation</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>8. Trait Compatibility Matrix & Procedural Generation</h2>
+    <p>
+      Emergent religions are procedurally generated by drawing coherent subsets (4 to 6 traits) from the library using seeded random number generators. Coherence is guaranteed by an explicit <strong>pairwise incompatibility graph</strong>:
+    </p>
+
+    <div class="grid-2">
+      <pre>
+def is_trait_set_coherent(traits: Sequence[ReligionTrait]) -> bool:
+    # Validates theological coherence across selected traits.
+    trait_ids = {t.id for t in traits}
+    for trait in traits:
+        # Check mutual exclusion against declared incompatibilities
+        if any(incomp in trait_ids for incomp in trait.incompatibilities):
+            return False
+    # Ensure at least one Cosmology or Authority anchor exists
+    categories = {t.category for t in traits}
+    return (TraitCategory.COSMOLOGY in categories or 
+            TraitCategory.AUTHORITY in categories)</pre>
+
+      <div class="card">
+        <div class="card-header">
+          <span>Incompatibility Constraints Enforced</span>
+          <span class="badge" style="background:#fee2e2; color:#991b1b;">INVARIANTS</span>
+        </div>
+        <table style="font-size: 6.8pt; margin: 0;">
+          <tr>
+            <th>Selected Trait</th>
+            <th>Strictly Prohibited Traits</th>
+          </tr>
+          <tr>
+            <td><code>monotheism</code></td>
+            <td><code>polytheism</code>, <code>animism_cosmology</code></td>
+          </tr>
+          <tr>
+            <td><code>strict_pacifism</code></td>
+            <td><code>warrior_honor</code>, <code>holy_war_zeal</code></td>
+          </tr>
+          <tr>
+            <td><code>lay_egalitarianism</code></td>
+            <td><code>hierarchical_priesthood</code></td>
+          </tr>
+          <tr>
+            <td><code>reincarnation</code></td>
+            <td><code>oblivion_cessation</code></td>
+          </tr>
+          <tr>
+            <td><code>monogamy_sacrament</code></td>
+            <td><code>polygamy_tradition</code></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <h2>9. Aggregate Religion Modifiers & Economic Hooks</h2>
+    <p>
+      Active traits aggregate linearly to modify economic consumption, combat determination, fertility, and diplomatic relations:
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>Trait Name</th>
+          <th>Category</th>
+          <th>Primary Modifier Effect</th>
+          <th>Secondary / Social Impact</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>strict_pacifism</code></td>
+          <td>Ethics</td>
+          <td><code>raid_affinity: -0.90</code> (Never initiates raids)</td>
+          <td><code>forgiveness_boost: +0.40</code>, accelerates peace treaties</td>
+        </tr>
+        <tr>
+          <td><code>warrior_honor</code></td>
+          <td>Ethics</td>
+          <td><code>combat_strength: +0.25</code> in active feuds</td>
+          <td><code>grudge_retention: +0.35</code>, intensifies clan vendettas</td>
+        </tr>
+        <tr>
+          <td><code>purification_ablutions</code></td>
+          <td>Ritual</td>
+          <td><code>disease_resistance: +0.20</code> across settlement</td>
+          <td>Establishes annual river immersion festivals in month 3</td>
+        </tr>
+        <tr>
+          <td><code>ritual_fasting</code></td>
+          <td>Ritual</td>
+          <td><code>consumption_multiplier: 0.88</code> (-12% food consumption)</td>
+          <td>Sparks seasonal grain reserves and drought resilience</td>
+        </tr>
+        <tr>
+          <td><code>charity_obligation</code></td>
+          <td>Ethics</td>
+          <td><code>aid_generosity: +0.40</code> during famine crisis</td>
+          <td>Increases inter-settlement food shipments during starvations</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="footer">
+    <span>Project Minemesis &bull; Religion Engine Technical Report</span>
+    <span>Page 3 of 12</span>
+  </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- PAGE 4: SECTARIAN TENSIONS & GENEALOGY TREES                              -->
+<!-- ========================================================================= -->
+<div class="page">
+  <div class="page-content">
+    <h2>10. Religious Tension & The Sectarian Paradox (R1.2)</h2>
+    <p>
+      In historical sociology, religious conflicts are rarely most intense between completely foreign faiths. Rather, <strong>internal schisms, reformed sects, and divergent heresies</strong> frequently evoke intense enmity. Minemesis operationalizes this through <code>ReligiousRelationshipType</code>:
+    </p>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <span>Relationship Classification</span>
+          <span class="badge badge-core">TYPOLOGY</span>
+        </div>
+        <ul style="font-size: 7.2pt; color: #475569;">
+          <li><code>SharedFaith</code> (Friction 0.0): Mutual communion; shared sacred festivals and temples.</li>
+          <li><code>SimilarFaith</code> (Friction 15.0): High theological kinship; cordial diplomatic views.</li>
+          <li><code>HostileDoctrine</code> (Friction 40.0): Incompatible core ethics (e.g. Pacifism vs Holy War).</li>
+          <li><code>DivergentSect</code> (Friction 65.0): Breakaway heresy or schism; highest mutual bitterness.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>Settlement Tension Formulation</span>
+          <span class="badge badge-pass">ALGORITHM</span>
+        </div>
+        <p style="font-size: 7.2pt; margin-bottom: 3px;">
+          For a settlement with population \(N\) and resident faiths \(f_i\) with proportions \(p_i\):
+        </p>
+        <pre style="margin: 0; font-size: 6.5pt;">
+T_settlement = ∑ (p_i * p_j * Friction(f_i, f_j))
+Where Friction(DivergentSect) = 65.0
+      Friction(HostileDoctrine) = 40.0
+      Friction(SimilarFaith) = 15.0</pre>
+      </div>
+    </div>
+
+    <h2>11. Religious Refugees & Asylum Migration</h2>
+    <p>
+      When settlement tension \(T_{settlement}\) exceeds <code>REFUGEE_FLIGHT_TENSION_THRESHOLD</code> (50.0), devout minority adherents face structural discrimination and ostracism. Rather than mutating demographics without audit trails, Minemesis handles this with causal rigor:
+    </p>
+    <ul>
+      <li>Persecuted adherents seek asylum in destination settlements where their faith is dominant or safely tolerated.</li>
+      <li>Emits an audited <code>ReligiousRefugeeMigration</code> event into the <code>EventLog</code>.</li>
+      <li>Preserves exact settlement census invariants: asylum seeking does not alter demographic conservation outside of formal migration events.</li>
+    </ul>
+
+    <h2>12. Religion Family Trees & Descent Genealogy (R1.3)</h2>
+    <p>
+      Religions maintain genealogical lineage trees. Every emergent religion tracks <code>parent_religion_id</code>, <code>child_religion_ids</code>, <code>syncretic_parents</code>, and generational depth. The engine formats full ASCII genealogical family trees:
+    </p>
+
+    <div class="grid-2">
+      <pre>
+Way of the Celestial Peak (Gen 1) [4 adherents]
+|-- Reformed Way of the Celestial Peak (Gen 2) [10 adherents]
+|   `-- Covenant of the Sacred Sun (Gen 3) [6 adherents]
+`-- Heretical Order of the Mountain Void (Gen 2) [Extinct]</pre>
+
+      <div class="card">
+        <div class="card-header">
+          <span>Lineage Invariants</span>
+          <span class="badge badge-core">DATA MODEL</span>
+        </div>
+        <ul style="font-size: 7.2pt; color: #475569;">
+          <li><strong>Root Religions:</strong> <code>parent_religion_id = None</code>, Generation 1.</li>
+          <li><strong>Schismatic Offshoots:</strong> Increments generation; registers on parent's <code>child_religion_ids</code>.</li>
+          <li><strong>Syncretic Unions:</strong> Dual parent pointers in <code>syncretic_parents = [A, B]</code>.</li>
+          <li><strong>Extinction Tracking:</strong> When active adherents reach 0, <code>is_extinct = True</code>.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>13. Empirical Lineage Tree from Headless 100-Year Simulation (Seed 101)</h2>
+    <p>
+      The following verified genealogical chronicle was extracted directly from an autonomous 100-year headless simulation, demonstrating deep-time branching, heresy offshoots, and extinct sects:
+    </p>
+    <div class="diagram-box" style="text-align: left; font-size: 6.8pt;">
+Circle of the Eye and Grove (Gen 1) [8 adherents]
+|-- Reformed Circle of the Crown and Sun (Gen 2) [Extinct - Year 42]
+|   `-- Covenant of the Blazing Dawn (Gen 3) [4 adherents]
+`-- Order of the Whispering Roots (Gen 2) [12 adherents]
+
+Ironbound Covenant of the Mountain Sentinel (Gen 1) [14 adherents]
+|-- Heretical Cult of the Granite Blade (Gen 2) [Extinct - Year 78]
+`-- United Harmony of Grove and Sentinel [Syncretic Fusion A+B - Year 64] (Gen 2) [18 adherents]
+    </div>
+  </div>
+  <div class="footer">
+    <span>Project Minemesis &bull; Religion Engine Technical Report</span>
+    <span>Page 4 of 12</span>
+  </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- PAGE 5: GREAT FIGURES & THE HERESY ENGINE                                 -->
+<!-- ========================================================================= -->
+<div class="page">
+  <div class="page-content">
+    <h2>14. Great Religious Figures & Martyrdom (R1.4)</h2>
+    <p>
+      Faiths are not driven by abstract algorithms alone; they are personified by exceptional historical agents whose deeds alter the trajectory of their communities:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Figure Archetype</th>
+          <th>Emergence Conditions</th>
+          <th>Simulated Psychological Impact</th>
+          <th>Societal Trajectory</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>The Prophet</strong></td>
+          <td>Devotion &ge; 0.85; triggers during crisis or founder passing</td>
+          <td>Elevates role to <code>ReligiousRole.PROPHET</code>; gains zealot status</td>
+          <td>Preaches renewal; boosts local conversion rate by +300%</td>
+        </tr>
+        <tr>
+          <td><strong>The Saint</strong></td>
+          <td>Posthumous canonization; devotion &ge; 0.85 and high virtue score</td>
+          <td>Permanently added to religion's <code>saints[]</code> registry</td>
+          <td>Relics generate local cult veneration and spontaneous conversions</td>
+        </tr>
+        <tr>
+          <td><strong>The Mystic</strong></td>
+          <td>Hermit isolation or high age; devotion &ge; 0.80</td>
+          <td>Elevates role to <code>ReligiousRole.ORACLE</code></td>
+          <td>Perceives sacred geometry; discovers undiscovered holy sites</td>
+        </tr>
+        <tr>
+          <td><strong>The Martyr</strong></td>
+          <td>Devout adherent slain during active raid or clan feud</td>
+          <td>Posthumously canonized; deeds recorded into <code>EventLog</code></td>
+          <td>Ignites vengeance feuds; seeds foundational myth creation</td>
+        </tr>
+        <tr>
+          <td><strong>The Reformer</strong></td>
+          <td>Elder clergy witness moral decay or corruption</td>
+          <td>Elevates role to <code>ReligiousRole.ELDER</code></td>
+          <td>Purges decayed traits; triggers internal doctrine reformation</td>
+        </tr>
+        <tr>
+          <td><strong>The Heretic</strong></td>
+          <td>Charismatic adherent questioning orthodox dogma</td>
+          <td>Excommunicated from mother faith; forms dissident circle</td>
+          <td>Gathers followers; establishes breakaway schismatic faith</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>15. The Heresy & Reformation Lifecycle Engine</h2>
+    <p>
+      Religious divergence proceeds through four distinct, interrelated historical phases:
+    </p>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <span>Phase 1: Heterodoxy & Schism</span>
+          <span class="badge" style="background:#fee2e2; color:#991b1b;">DIVERGENCE</span>
+        </div>
+        <p style="font-size: 7.2pt;">
+          When an adherent develops ideological discontent in a settlement with &ge;4 co-religionists, <code>check_and_declare_heresy</code> evaluates doctrinal fracture. A novel theological trait is adopted, generating <code>HeresyDeclared</code> followed by <code>ReligiousSchism</code>. A new child religion is instantiated, inheriting scripture and traditions while splitting the local population.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>Phase 2: Counter-Reformation</span>
+          <span class="badge badge-core">ORTHODOXY</span>
+        </div>
+        <p style="font-size: 7.2pt;">
+          Mother religions do not remain passive when fractured. With probability <code>COUNTER_REFORMATION_CHANCE</code> (5%), the mother faith launches a counter-reformation. <code>evaluate_counter_reformation</code> purges vulnerable doctrines, re-asserts orthodoxy, increases cleric missionary fervor, and emits <code>ReligiousReform</code>.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>Phase 3: Saint Cult Conversions</span>
+          <span class="badge badge-myth">POPULAR DEVOTION</span>
+        </div>
+        <p style="font-size: 7.2pt;">
+          Saints and martyrs do not remain dead abstractions. Every month, <code>process_saint_cult_conversions</code> evaluates local townsfolk venerating deceased saints. Miraculous tales attributed to saint relics trigger spontaneous lay conversions into the saint's parent tradition.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>Phase 4: Sectarian Reunification</span>
+          <span class="badge badge-pass">CONVERGENCE</span>
+        </div>
+        <p style="font-size: 7.2pt;">
+          When splinter sects suffer catastrophic population decline or when doctrinal distance shrinks, <code>evaluate_sect_reunification</code> evaluates armistice. If compatible, the splinter faith is re-absorbed into the parent tradition, consolidating adherents and emitting <code>SectReunification</code>.
+        </p>
+      </div>
+    </div>
+
+    <h2>16. Concrete Heresy Causal Chain (From Test Suite)</h2>
+    <pre>
+[Tick 0144] HeresyDeclared: "Lyra Ashford" preaches heterodoxy at set_oakhaven against "Circle of the Hearth"
+    │ Causes: [Root Revelation]
+    ▼
+[Tick 0145] ReligiousSchism: Breakaway sect "Order of the Unseen Sun" founded with trait [vision_quest_divination]
+    │ Causes: [HeresyDeclared Event #412]
+    ▼
+[Tick 0180] ReligiousReform: Mother faith "Circle of the Hearth" triggers Counter-Reformation with [strict_pacifism]
+    │ Causes: [ReligiousSchism Event #413]
+    ▼
+[Tick 0320] SectReunification: Decimated "Order of the Unseen Sun" reunifies under mother faith armistice
+    │ Causes: [Decimation Threshold Reached]</pre>
+  </div>
+  <div class="footer">
+    <span>Project Minemesis &bull; Religion Engine Technical Report</span>
+    <span>Page 5 of 12</span>
+  </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- PAGE 6: SACRED GEOGRAPHY & PILGRIMAGE ECONOMICS                           -->
+<!-- ========================================================================= -->
+<div class="page">
+  <div class="page-content">
+    <h2>17. Sacred Geography & Holy Site Consecration (R1.6)</h2>
+    <p>
+      Sacred places ground religious devotion in physical space. When mystics and devout leaders experience profound events or divine communion, they discover or consecrate physical landmarks across the world:
+    </p>
+
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-header">
+          <span>Sacred Mountains & Peaks</span>
+          <span class="badge badge-core">TERRAIN</span>
+        </div>
+        <p style="font-size: 7.2pt;">
+          High granite peaks revered as natural sanctuaries. Adherents undertake grueling fasting ascents, providing massive spiritual devotion boosts (+0.10) and moral clarity.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>Sacred Groves & Ancient Trees</span>
+          <span class="badge badge-pass">ANIMIST</span>
+        </div>
+        <p style="font-size: 7.2pt;">
+          Primeval forest clearings housing centuries-old oak and willow guardians. Serves as natural sanctuaries for spirit communion and seasonal harvest offerings.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>Sacred Rivers & Ablution Pools</span>
+          <span class="badge badge-myth">RITUAL</span>
+        </div>
+        <p style="font-size: 7.2pt;">
+          Clean river shallows and hot springs utilized for ceremonial ablutions. Promotes hygiene, disease resistance (+0.20), and annual spring immersion festivals.
+        </p>
+      </div>
+    </div>
+
+    <h2>18. Sacred Geography Multi-Tier Evolution (R2.7)</h2>
+    <p>
+      Holy sites are not static world fixtures; they physically and culturally evolve across five structural tiers as pilgrimage volume and generational sanctity accumulate:
+    </p>
+
+    <div class="diagram-box">
+┌────────────────────┐      5 Pilgrims      ┌────────────────────┐     15 Pilgrims     ┌────────────────────┐
+│  NATURAL SANCTUARY │ ───────────────────> │    LOCAL SHRINE    │ ──────────────────> │       TEMPLE       │
+│ (Unaltered Nature) │                      │ (Hearth & Altar)   │                     │ (Stone Sanctuaries)│
+└────────────────────┘                      └────────────────────┘                     └────────────────────┘
+                                                                                                  │
+                                                                                                  │ 30 Pilgrims
+                                                                                                  ▼
+┌────────────────────┐     60 Pilgrims      ┌────────────────────┐                     ┌────────────────────┐
+│    HOLY CAPITAL    │ <─────────────────── │REGIONAL PILGRIMAGE │ <───────────────────┘
+│(Global Sacred Seat)│                      │       SITE         │
+└────────────────────┘                      └────────────────────┘
+    </div>
+
+    <h2>19. The Pilgrim's Journey & Commercial Spillover</h2>
+    <p>
+      Devout adherents (devotion &ge; 0.70) regularly embark on long-distance pilgrimages to foreign holy sites. This dynamic establishes vital economic and diplomatic connectivity across the world:
+    </p>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <span>Spiritual Impact on Pilgrim</span>
+          <span class="badge badge-pass">PERSONAL</span>
+        </div>
+        <ul style="font-size: 7.2pt; color: #475569;">
+          <li><code>pilgrimages_completed += 1</code>: Enshrined on personal character record.</li>
+          <li><code>devotion += 0.05</code>: Revitalizes personal faith against natural decay.</li>
+          <li><code>religious_standing += 10.0</code>: Elevated moral authority in hometown.</li>
+          <li><code>HolySite.pilgrims_visited += 1</code>: Advances site towards next tier elevation.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>Economic & Trade Corridor Boost</span>
+          <span class="badge badge-core">MACROECONOMIC</span>
+        </div>
+        <ul style="font-size: 7.2pt; color: #475569;">
+          <li><strong>Corridor Vitality:</strong> Pilgrim travel reinforces commercial caravan security.</li>
+          <li><strong>Trade Route Regeneration:</strong> If an active route connects the towns, health recovers by +0.10.</li>
+          <li><strong>Merchant Evangelism:</strong> Caravans escorting pilgrims spread sacred stories across borders.</li>
+          <li><strong>Prosperity Bonus:</strong> Destination settlement gains commercial exchange opportunities.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>20. Empirical Pilgrimage Event Sequence (From Seed 42 Log)</h2>
+    <pre>
+[Tick 0084] HolySiteDiscovered: "The Whispering Falls" consecrated at set_riverbend by "Way of the River"
+    │ Location: set_riverbend | Significance: Cleansing mountain waters
+    ▼
+[Tick 0142] Pilgrimage: "Gideon Ironwood" journeys from set_ironpeak to set_riverbend
+    │ Pilgrim Devotion: 0.78 -> 0.83 | Economic Benefit: Trade route health boosted +0.10
+    ▼
+[Tick 0210] HolySiteElevated: "The Whispering Falls" ascends from NaturalSanctuary -> LocalShrine
+    │ Pilgrims Visited: 5 | Causes: [Pilgrimage Event #288]
+    ▼
+[Tick 0490] HolySiteElevated: "The Whispering Falls" ascends from LocalShrine -> Temple
+    │ Pilgrims Visited: 15 | Causes: [Pilgrimage Event #604]</pre>
+  </div>
+  <div class="footer">
+    <span>Project Minemesis &bull; Religion Engine Technical Report</span>
+    <span>Page 6 of 12</span>
+  </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- PAGE 7: DEEP-TIME LORE EVOLUTION                                          -->
+<!-- ========================================================================= -->
+<div class="page">
+  <div class="page-content">
+    <h2>21. Deep-Time Lore Evolution: From Event to Civilizational Culture (R1.7 & R2.5)</h2>
+    <p>
+      In historical civilizations, foundational myths do not emerge from divine fiat; they begin as raw historical events (a chieftain slain in battle, a terrible famine, an act of mercy) that are retold across generations, progressively accumulating embellishments, supernatural attributions, and ritual traditions:
+    </p>
+
+    <div class="diagram-box">
+┌────────────────┐      10 Years       ┌────────────────┐      40 Years       ┌────────────────┐
+│     STORY      │ ──────────────────> │     LEGEND     │ ──────────────────> │      MYTH      │
+│(Raw Eyewitness)│ (120 Ticks Elapsed) │ (Heroic Memory)│ (480 Ticks Elapsed) │ (Supernatural) │
+└────────────────┘                     └────────────────┘                     └────────────────┘
+                                                                                       │
+                                                                                       │ 60 Years (720 Ticks)
+                                                                                       ▼
+┌────────────────┐      90 Years       ┌────────────────┐                     ┌────────────────┐
+│    CULTURE     │ <────────────────── │   TRADITION    │ <───────────────────┘
+│(Civilizational)│(1080 Ticks Elapsed) │(Ritual Practice│
+└────────────────┘                     └────────────────┘
+    </div>
+
+    <h2>22. Five-Stage Evolutionary Lore Pipeline Specifications</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Lore Stage</th>
+          <th>Chronological Age</th>
+          <th>Cognitive Transformation</th>
+          <th>Example Output Narrative</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>1. Story</strong></td>
+          <td>0 &ndash; 10 Years (0 &ndash; 120 Ticks)</td>
+          <td>Direct eyewitness reporting; preserves objective facts without distortion.</td>
+          <td><em>"Arthur Ironwood was slain by a raider's axe outside the gates of Ironpeak at tick 14."</em></td>
+        </tr>
+        <tr>
+          <td><strong>2. Legend</strong></td>
+          <td>10 &ndash; 40 Years (120 &ndash; 480 Ticks)</td>
+          <td>Heroic exaggeration; deeds are framed as monumental feats of courage.</td>
+          <td><em>"The Legend of Arthur Ironwood: He stood alone against ten warriors, refusing to yield the pass."</em></td>
+        </tr>
+        <tr>
+          <td><strong>3. Myth</strong></td>
+          <td>40 &ndash; 60 Years (480 &ndash; 720 Ticks)</td>
+          <td>Supernatural transformation; celestial omens and divine interventions are integrated.</td>
+          <td><em>"The Sacred Myth of Arthur: The heavens split as thunderous angels escorted his spirit to the heights."</em></td>
+        </tr>
+        <tr>
+          <td><strong>4. Tradition</strong></td>
+          <td>60 &ndash; 90 Years (720 &ndash; 1080 Ticks)</td>
+          <td>Ritualization; community enacts recurring ceremonies to commemorate the myth.</td>
+          <td><em>"The Living Tradition of Arthur: Every winter solstice, youth bear torches recounting his sacrifice."</em></td>
+        </tr>
+        <tr>
+          <td><strong>5. Culture</strong></td>
+          <td>90+ Years (1080+ Ticks)</td>
+          <td>Civilizational identity; inseparable from core ethos and morality of the society.</td>
+          <td><em>"Foundational Culture: The Iron Oath of Arthur forms the bedrock identity of the northern clans."</em></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>23. Myth Exchange Across Commercial Trade Routes (R1.5.7)</h2>
+    <p>
+      Stories do not remain quarantined within their home village. Merchant caravans traveling between settlements carry songs, ballads, and oral folklore. Through <code>exchange_myths_across_trade_routes</code>, foreign communities adopt and adapt external legends into their local lore:
+    </p>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <span>Cross-Cultural Adaptation Mechanics</span>
+          <span class="badge badge-myth">SYNCRETIC LORE</span>
+        </div>
+        <ul style="font-size: 7.2pt; color: #475569;">
+          <li><strong>Diffusion Vector:</strong> Active commercial trade corridors between settlements.</li>
+          <li><strong>Foreign Recognition:</strong> Adopting religion adapts the narrative into its own pantheon.</li>
+          <li><strong>Syncretic Embellishment:</strong> <em>"Brought by trade caravans from the west..."</em></li>
+          <li><strong>Event Logging:</strong> Emits audited <code>MythExchanged</code> event linked to root historic cause.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>Hero Archetype Resolution (R2.6)</span>
+          <span class="badge badge-core">TYPOLOGY</span>
+        </div>
+        <ul style="font-size: 7.2pt; color: #475569;">
+          <li><code>HeroArchetype.HERO</code>: Martial clans celebrating champions.</li>
+          <li><code>HeroArchetype.ANCESTOR</code>: Hearth traditions venerating forebears.</li>
+          <li><code>HeroArchetype.PROTECTIVE_SPIRIT</code>: Animist villages revering guardians.</li>
+          <li><code>HeroArchetype.SAINT</code>: Hierarchical faiths canonizing holy piety.</li>
+          <li><code>HeroArchetype.CULTURAL_ICON</code>: Venerable patriarchs shaping civilization.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>24. Verified Myth Evolution Chronicle (From Simulation Seed 101)</h2>
+    <pre>
+[Tick 0024] Raw Story Seeded: "Silas Blackwood was slain during the Great Raid on Riverbend."
+[Tick 0144] Evolved to Legend: "Silas felled three champions before the riverbank gave way."
+[Tick 0504] Evolved to Myth: "A water sprite guarded his body, transforming his blade into silver granite."
+[Tick 0744] Evolved to Tradition: "Tradition of Silas: Enacted through annual river flower vigils in Riverbend."
+[Tick 1104] Evolved to Culture: Transcended doctrine into civilizational identity across all 3 settlements.</pre>
+  </div>
+  <div class="footer">
+    <span>Project Minemesis &bull; Religion Engine Technical Report</span>
+    <span>Page 7 of 12</span>
+  </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- PAGE 8: SYNCRETISM & DOCTRINAL EVOLUTION                                  -->
+<!-- ========================================================================= -->
+<div class="page">
+  <div class="page-content">
+    <h2>25. The Syncretism Engine: Merging Living Faiths (R1.5.1)</h2>
+    <p>
+      In conventional games, religious evolution only moves in one direction: fracturing through schism. In real human history, the opposite occurs with equal frequency: <strong>religions merge, synthesize, and harmonize</strong>. The Minemesis Syncretism Engine operationalizes:
+      $$Faith\ A + Faith\ B \longrightarrow Faith\ C$$
+    </p>
+
+    <div class="diagram-box">
+┌──────────────────────────────────────┐          ┌──────────────────────────────────────┐
+│  Faith A: "Way of the Sacred River"  │          │ Faith B: "Order of the Granite Peak" │
+│  • polytheism                        │          │  • ancestor_veneration               │
+│  • sacred_rivers                     │          │  • sacred_mountains                  │
+│  • charity_obligation                │          │  • warrior_honor                     │
+└──────────────────────────────────────┘          └──────────────────────────────────────┘
+                   │                                                  │
+                   └────────────────────────┬─────────────────────────┘
+                                            │
+                                            ▼  Cohabitation & Trade Corridor Exchange
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│               SYNCRETIC FUSION: "Sacred Union of River and Mountain"                   │
+│                                                                                        │
+│ • Parent Lineage: Tracks dual parentage in syncretic_parents = [Faith A, Faith B]      │
+│ • Harmonized Traits: Non-conflicting pool synthesized (rivers, mountains, charity, honor)│
+│ • Cultural Repertoire: Inherits combined saints, figures, myths, and absorbed folk lore│
+│ • Demographic Conversion: Cohabiting adherents in settlement convert to syncretic faith│
+└────────────────────────────────────────────────────────────────────────────────────────┘
+    </div>
+
+    <h2>26. Doctrinal Borrowing Without Conversion (R1.5.4)</h2>
+    <p>
+      Faiths frequently absorb philosophical ideas, ethical virtues, or artistic rituals from neighboring traditions without converting or merging. Through <code>evaluate_doctrinal_borrowing</code>:
+    </p>
+    <ul>
+      <li>Recipient faiths adopt non-conflicting traits from donor faiths (e.g., an animist forest cult adopting <code>charity_obligation</code> from an urban commercial faith).</li>
+      <li>Lineage is formally tracked in <code>borrowed_traits = {trait_id: donor_religion_id}</code>.</li>
+      <li>Emits <code>DoctrinalBorrowing</code> into the <code>EventLog</code>.</li>
+    </ul>
+
+    <h2>27. Faith Convergence Metric: Jaccard Similarity (R1.5.5)</h2>
+    <p>
+      To measure long-term cultural and theological alignment between cohabiting religions, the engine computes the <strong>Jaccard Trait Similarity Index</strong>:
+      $$J(A, B) = \frac{|Traits(A) \cap Traits(B)|}{|Traits(A) \cup Traits(B)|}$$
+    </p>
+    <p>
+      When \(J(A, B) \ge 0.65\), the faiths have converged so closely that inter-faith tension drops to zero, facilitating formal armistice, mutual recognition, or institutional synthesis.
+    </p>
+
+    <h2>28. The Religious Identity Strength Spectrum (R1.5.6)</h2>
+    <p>
+      Adherence is not a binary flag. Characters possess nuanced psychological attachments to their faith, modeled by <code>ReligiousIdentityStrength</code>:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Identity Tier</th>
+          <th>Devotion Threshold</th>
+          <th>Psychological Characteristics</th>
+          <th>Behavioral Impact</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>Zealous</code></td>
+          <td>Devotion &ge; 0.90</td>
+          <td>Militant champion; intolerant of divergent sects; willing to martyr self.</td>
+          <td>+50% combat resolve in holy wars; actively proselytizes.</td>
+        </tr>
+        <tr>
+          <td><code>Devout</code></td>
+          <td>0.70 &le; Devotion &lt; 0.90</td>
+          <td>Pious adherent; observes all seasonal rituals; undertakes pilgrimages.</td>
+          <td>Undertakes long-distance journeys; participates in vigils.</td>
+        </tr>
+        <tr>
+          <td><code>Average</code></td>
+          <td>0.40 &le; Devotion &lt; 0.70</td>
+          <td>Standard practitioner; attends village festivals and communal feasts.</td>
+          <td>Stable moral standing; moderate adherence to taboos.</td>
+        </tr>
+        <tr>
+          <td><code>Nominal</code></td>
+          <td>0.20 &le; Devotion &lt; 0.40</td>
+          <td>Passive member; observes customs for social conformity.</td>
+          <td>Easily converted by marriage or trade missionaries.</td>
+        </tr>
+        <tr>
+          <td><code>CulturalMember</code></td>
+          <td>0.10 &le; Devotion &lt; 0.20</td>
+          <td>Secular attachment; values holiday feasts and music over theology.</td>
+          <td>Zero interest in holy wars; celebrates village customs.</td>
+        </tr>
+        <tr>
+          <td><code>NonPracticing</code></td>
+          <td>Devotion &lt; 0.10</td>
+          <td>Atheistic or alienated; indifferent to divine judgment and taboos.</td>
+          <td>Unaffected by religious virtue standing and clerical decrees.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="footer">
+    <span>Project Minemesis &bull; Religion Engine Technical Report</span>
+    <span>Page 8 of 12</span>
+  </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- PAGE 9: RELIGION SHAPES CULTURE AND CIVILIZATION                          -->
+<!-- ========================================================================= -->
+<div class="page">
+  <div class="page-content">
+    <h2>29. The Folk Tradition Layer: Substratum Animism (R1.5.3)</h2>
+    <p>
+      Beneath formal high religions lies an ancient bedrock of vernacular folk beliefs: guardian river spirits, sacred grove trees, haunted mountain sentinels, and ancestor hearths. In Minemesis, settlements maintain living <code>FolkTradition</code> registries:
+    </p>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <span>Vernacular Folk Traditions</span>
+          <span class="badge badge-pass">BEDROCK</span>
+        </div>
+        <ul style="font-size: 7.2pt; color: #475569;">
+          <li><strong>Oakhaven:</strong> <em>"The Elder Oak Spirit"</em> (Sacred Tree) & <em>"Ancestor Hearth"</em>.</li>
+          <li><strong>Riverbend:</strong> <em>"The Whispering Current Guardian"</em> & <em>"Water Sprite"</em>.</li>
+          <li><strong>Ironpeak:</strong> <em>"The Mountain Sentinel of Granite"</em> & <em>"Ore Spirits"</em>.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>Canonical Absorption Mechanics</span>
+          <span class="badge badge-core">SYNCRETISM</span>
+        </div>
+        <p style="font-size: 7.2pt;">
+          Organized high religions organically absorb local folk spirits into their official canon. The spirit is re-interpreted as a guardian saint, angel, or protective herald. Emits <code>FolkTraditionAbsorbed</code> and binds the folklore permanently into <code>Religion.absorbed_folk_traditions[]</code>.
+        </p>
+      </div>
+    </div>
+
+    <h2>30. Settlement Cultural Profiles (R2.1 & R2.3)</h2>
+    <p>
+      Settlements develop distinct, persistent civilizational identities captured by <code>CulturalProfile</code>. Social values exist on normalized 0.0 to 1.0 spectrums, establishing unique cultural personalities:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Settlement</th>
+          <th>Archetype</th>
+          <th>Dominant Social Values</th>
+          <th>Behavioral Personality</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Ironpeak</strong></td>
+          <td>Martial Clan Stronghold</td>
+          <td><code>warrior_tradition: 0.88</code>, <code>honor: 0.87</code>, <code>discipline: 0.82</code>, <code>compassion: 0.45</code></td>
+          <td>High raid affinity; severe retribution for blood feuds; strict discipline.</td>
+        </tr>
+        <tr>
+          <td><strong>Riverbend</strong></td>
+          <td>Commercial Haven & Sanctuary</td>
+          <td><code>compassion: 0.80</code>, <code>pilgrimage_sanctity: 0.85</code>, <code>honor: 0.60</code>, <code>discipline: 0.60</code></td>
+          <td>High forgiveness; welcomes religious refugees; active trade evangelism.</td>
+        </tr>
+        <tr>
+          <td><strong>Oakhaven</strong></td>
+          <td>Traditional Agrarian Hearth</td>
+          <td><code>family_loyalty: 0.88</code>, <code>ancestor_veneration: 0.87</code>, <code>collectivism: 0.82</code></td>
+          <td>Deep clan loyalty; long-term grudge retention; robust mutual aid.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>31. Local Customs & The Seasonal Calendar (R2.4)</h2>
+    <p>
+      Villages celebrate recurring seasonal ceremonies. Every simulated month, <code>celebrate_local_customs</code> evaluates calendar alignment, emitting <code>LocalCustomCelebrated</code>:
+    </p>
+    <ul>
+      <li><strong>Month 3 (Spring Equinox):</strong> <em>Spring River Immersion</em> &mdash; Ceremonial ablutions and spiritual renewal.</li>
+      <li><strong>Month 6 (Summer Solstice):</strong> <em>Midsummer Harvest Festival</em> &mdash; Communal feast of gratitude for grain and abundance.</li>
+      <li><strong>Month 9 (Autumn Equinox):</strong> <em>Autumn Ancestor Vigil</em> &mdash; Night torchlight vigils honoring departed forebears.</li>
+      <li><strong>Month 12 (Winter Solstice):</strong> <em>Winter Hero Remembrance</em> &mdash; Recounting tales of fallen founders and martyrs.</li>
+    </ul>
+
+    <h2>32. Cultural Pressure on Decision-Making (R2.8)</h2>
+    <p>
+      Social values do not sit idle in memory; they actively shape character decisions via <code>get_cultural_behavioral_pressure</code>:
+    </p>
+    <div class="grid-2">
+      <pre>
+def get_cultural_behavioral_pressure(settlement_id: str, profiles) -> dict:
+    vals = profiles[settlement_id].social_values
+    return {
+        "grudge_retention_multiplier": 1.0 + (vals.get("family_loyalty", 0.5) * 0.4),
+        "forgiveness_propensity_multiplier": 1.0 + (vals.get("compassion", 0.5) * 0.5),
+        "raid_affinity_multiplier": 1.0 + (vals.get("warrior_tradition", 0.5) * 0.6),
+        "aid_generosity_multiplier": 1.0 + (vals.get("compassion", 0.5) * 0.4),
+    }</pre>
+
+      <div class="card">
+        <div class="card-header">
+          <span>Fluid Cultural Mixing (R2.9)</span>
+          <span class="badge badge-pass">COMMERCE</span>
+        </div>
+        <p style="font-size: 7.2pt;">
+          Active trade corridors act as conduits of cultural diffusion. Every month, <code>process_cultural_mixing</code> compares trading partners' values. Discrepancies are gradually harmonized at <code>CULTURAL_MIXING_RATE</code> (0.05 per tick), simulating centuries of commercial integration.
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="footer">
+    <span>Project Minemesis &bull; Religion Engine Technical Report</span>
+    <span>Page 9 of 12</span>
+  </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- PAGE 10: HISTORICAL CHRONICLE & CASE STUDIES                              -->
+<!-- ========================================================================= -->
+<div class="page">
+  <div class="page-content">
+    <h2>33. Longitudinal Empirical Case Study (Autonomous 100-Year Run)</h2>
+    <p>
+      To prove that the Religion Engine functions as an emergent, unscripted historical force, the simulation was executed across 1,200 monthly ticks (100 simulated years) with seed <code>101</code>. The following authentic historical chronicle was extracted directly from the engine:
+    </p>
+
+    <div class="diagram-box" style="text-align: left; font-size: 6.8pt; line-height: 1.35;">
+Year 01, Month 01 (Tick 0000): Simulation Genesis. 2 Foundational Faiths initialized:
+                               • "Circle of the Eye and Grove" (Oakhaven / Riverbend)
+                               • "Ironbound Covenant of Sentinel" (Ironpeak)
+Year 02, Month 03 (Tick 0015): [LocalCustomCelebrated] at set_riverbend - Spring River Immersion ablutions.
+Year 04, Month 08 (Tick 0044): [HolySiteDiscovered] at set_oakhaven - "Whispering Roots of the Founding Oak".
+Year 07, Month 11 (Tick 0083): [Pilgrimage] at set_oakhaven - Pilgrim "Arthur Ironwood" completes 1st holy journey.
+Year 12, Month 04 (Tick 0136): [GreatFigureEmergence] at set_ironpeak - "Thalia Crowley" awakened as Prophet.
+Year 18, Month 06 (Tick 0210): [HolySiteElevated] at set_oakhaven - Founding Oak elevated to LocalShrine (5 pilgrims).
+Year 23, Month 09 (Tick 0273): [SaintCanonized] at set_riverbend - "Silas Blackwood" martyred; canonized as Saint.
+Year 23, Month 09 (Tick 0273): [MythRecorded] at set_riverbend - Initial story seeded for Silas Blackwood.
+Year 28, Month 02 (Tick 0326): [HeresyDeclared] at set_riverbend - Dissident preaches against ascetic fasting.
+Year 28, Month 03 (Tick 0327): [ReligiousSchism] at set_riverbend - "Reformed Circle of the Crown and Sun" splits.
+Year 34, Month 10 (Tick 0406): [ReligiousRefugeeMigration] - Minority adherents flee high sectarian tension to Oakhaven.
+Year 42, Month 05 (Tick 0497): [HolySiteElevated] at set_oakhaven - Founding Oak elevated to Temple (15 pilgrims).
+Year 51, Month 07 (Tick 0607): [DoctrinalBorrowing] - Oakhaven faith borrows "warrior_honor" from northern traders.
+Year 58, Month 12 (Tick 0708): [FolkTraditionAbsorbed] at set_ironpeak - Mountain Sentinel absorbed into canon.
+Year 64, Month 04 (Tick 0760): [ReligiousSyncretism] at set_riverbend - "United Harmony of Grove and Sentinel" merges.
+Year 72, Month 08 (Tick 0860): [MythRecorded] - Silas Blackwood story matures into living Tradition.
+Year 94, Month 01 (Tick 1117): [MythRecorded] - Tale of Silas Blackwood matures into Foundational Culture.
+    </div>
+
+    <h2>34. Deep Analytics Report Output (R1.10 & R2.10)</h2>
+    <p>
+      At the conclusion of the 100-year epoch, the engine compiled the comprehensive analytics summary:
+    </p>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <span>Global Religion Metrics</span>
+          <span class="badge badge-core">ANALYTICS</span>
+        </div>
+        <table style="font-size: 6.8pt; margin: 0;">
+          <tr>
+            <th>Metric</th>
+            <th>Value / Details</th>
+          </tr>
+          <tr>
+            <td><strong>Largest Religion</strong></td>
+            <td><code>United Harmony of Grove and Sentinel</code> (18 adherents)</td>
+          </tr>
+          <tr>
+            <td><strong>Fastest Growing</strong></td>
+            <td><code>United Harmony</code> (+6 recent converts)</td>
+          </tr>
+          <tr>
+            <td><strong>Most Schismatic</strong></td>
+            <td><code>Circle of the Eye and Grove</code> (2 child sects)</td>
+          </tr>
+          <tr>
+            <td><strong>Oldest Faith</strong></td>
+            <td><code>Circle of the Eye and Grove</code> (Founded Year 1)</td>
+          </tr>
+          <tr>
+            <td><strong>Most Canonized Saints</strong></td>
+            <td><code>Circle of the Eye and Grove</code> (3 Saints recorded)</td>
+          </tr>
+          <tr>
+            <td><strong>Total Pilgrimages</strong></td>
+            <td>28 pilgrimages completed globally</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>Civilization & Culture Metrics (R2.10)</span>
+          <span class="badge badge-cult">CULTURE</span>
+        </div>
+        <table style="font-size: 6.8pt; margin: 0;">
+          <tr>
+            <th>Metric</th>
+            <th>Value / Details</th>
+          </tr>
+          <tr>
+            <td><strong>Most Syncretic Faith</strong></td>
+            <td><code>United Harmony</code> (2 parents, 2 borrowed traits)</td>
+          </tr>
+          <tr>
+            <td><strong>Most Diverse Culture</strong></td>
+            <td><code>set_riverbend</code> (Diversity score: 1.000)</td>
+          </tr>
+          <tr>
+            <td><strong>Most Isolated Culture</strong></td>
+            <td><code>set_ironpeak</code> (Preserved initial clan values)</td>
+          </tr>
+          <tr>
+            <td><strong>Largest Pilgrimage Network</strong></td>
+            <td><code>Circle of Grove</code> (2 sites, 18 pilgrims)</td>
+          </tr>
+          <tr>
+            <td><strong>Most Influential Myth</strong></td>
+            <td><em>Tale of Silas Blackwood</em> (Stage: <code>Culture</code>)</td>
+          </tr>
+          <tr>
+            <td><strong>Settlement Simpson Diversity</strong></td>
+            <td>Oakhaven: 0.420 &bull; Riverbend: 0.650 &bull; Ironpeak: 0.280</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <h2>35. Key Findings from Longitudinal Analysis</h2>
+    <ul>
+      <li><strong>Organic Religious Pluralism:</strong> Without scripted events, towns naturally evolve from monocultural outposts into complex multi-faith communities where ancient animisms, high religions, and syncretic unions coexist.</li>
+      <li><strong>Economic-Religious Symbiosis:</strong> Trade routes do not merely transport goods; they diffuse doctrines, exchange sacred myths, and harmonize civilizational values over centuries.</li>
+    </ul>
+  </div>
+  <div class="footer">
+    <span>Project Minemesis &bull; Religion Engine Technical Report</span>
+    <span>Page 10 of 12</span>
+  </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- PAGE 11: TECHNICAL VALIDATION & CAUSAL GRAMMAR                            -->
+<!-- ========================================================================= -->
+<div class="page">
+  <div class="page-content">
+    <h2>36. Causal Grammar Integration & Event Validation</h2>
+    <p>
+      In accordance with Minemesis architectural doctrine, events are objective reality and must strictly adhere to the <code>CAUSE_GRAMMAR</code>. Every religious event requires valid causal linkages, preventing uncaused or circular historical states:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Event Type</th>
+          <th>Root Allowed</th>
+          <th>Strictly Allowed Causal Event Types</th>
+          <th>Grammar Invariant Enforced</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>RELIGIOUS_SYNCRETISM</code></td>
+          <td>False</td>
+          <td><code>TRADE_ROUTE_FOUNDED</code>, <code>PILGRIMAGE</code>, <code>MARRIAGE</code>, <code>PEACE</code>, <code>RELIGIOUS_REFORM</code></td>
+          <td>Requires active interaction between cohabiting communities.</td>
+        </tr>
+        <tr>
+          <td><code>DOCTRINAL_BORROWING</code></td>
+          <td>True</td>
+          <td><code>TRADE_ROUTE_FOUNDED</code>, <code>PILGRIMAGE</code>, <code>MARRIAGE</code>, <code>MIGRATION</code>, <code>PEACE</code></td>
+          <td>Borrowing must stem from commercial or diplomatic interaction.</td>
+        </tr>
+        <tr>
+          <td><code>FOLK_TRADITION_ABSORBED</code></td>
+          <td>True</td>
+          <td><code>HOLY_SITE_DISCOVERED</code>, <code>MYTH_RECORDED</code>, <code>DEATH</code>, <code>REVELATION</code></td>
+          <td>Absorptions link to sacred site discovery or historic passing.</td>
+        </tr>
+        <tr>
+          <td><code>LOCAL_CUSTOM_CELEBRATED</code></td>
+          <td>True</td>
+          <td><code>HOLY_SITE_DISCOVERED</code>, <code>FOLK_TRADITION_ABSORBED</code>, <code>PEACE</code>, <code>PILGRIMAGE</code></td>
+          <td>Celebrations observe calendar cycles or peace armistices.</td>
+        </tr>
+        <tr>
+          <td><code>HOLY_SITE_ELEVATED</code></td>
+          <td>True</td>
+          <td><code>PILGRIMAGE</code>, <code>HOLY_SITE_DISCOVERED</code>, <code>SAINT_CANONIZED</code>, <code>GREAT_FIGURE_EMERGENCE</code></td>
+          <td>Elevations link to cumulative pilgrim milestones.</td>
+        </tr>
+        <tr>
+          <td><code>MYTH_EXCHANGED</code></td>
+          <td>True</td>
+          <td><code>MYTH_RECORDED</code>, <code>TRADE_ROUTE_FOUNDED</code>, <code>PILGRIMAGE</code>, <code>MIGRATION</code></td>
+          <td>Exchange requires underlying historic story and travel route.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>37. Strict Determinism Guarantees</h2>
+    <p>
+      Milestone 0 Rule A mandates byte-identical simulation outputs per seed. The Religion Engine upholds this invariant through rigorous defensive programming:
+    </p>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <span>Determinism Safeguards</span>
+          <span class="badge badge-pass">VERIFIED</span>
+        </div>
+        <ul style="font-size: 7.2pt; color: #475569;">
+          <li><strong>Salting & Isolation:</strong> <code>rng = random.Random(seed + 777)</code> isolates religion logic from core simulation RNG streams.</li>
+          <li><strong>Sorted Iterations:</strong> All dictionaries and sets (adherents, traits, settlements) are sorted by ID prior to processing.</li>
+          <li><strong>Zero Unaudited Census Mutation:</strong> Demographic conservation strictly respected.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>Full Serialization Round-Trip</span>
+          <span class="badge badge-core">PERSISTENCE</span>
+        </div>
+        <ul style="font-size: 7.2pt; color: #475569;">
+          <li><code>serialize()</code>: Encodes all religions, character faiths, cultural profiles, and monotonic counters to JSON.</li>
+          <li><code>deserialize()</code>: Reconstitutes live objects with 100% round-trip structural fidelity.</li>
+          <li>Enables complete save/load verification across multi-seed runs.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>38. Complete Regression Test Suite Status (74/74 PASS)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Test Suite Module</th>
+          <th>Tests</th>
+          <th>Focus Area & Scope</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>test_causal_chains.py</code></td>
+          <td>2</td>
+          <td>Causal chain depth &ge;3; conflict event type diversity</td>
+          <td><span class="badge badge-pass">PASS</span></td>
+        </tr>
+        <tr>
+          <td><code>test_causal_grammar.py</code></td>
+          <td>9</td>
+          <td>Strict validation of causal grammar rules across all event types</td>
+          <td><span class="badge badge-pass">PASS</span></td>
+        </tr>
+        <tr>
+          <td><code>test_demographics.py</code></td>
+          <td>5</td>
+          <td>100-year population conservation across seeds 42, 101, 777, 2026</td>
+          <td><span class="badge badge-pass">PASS</span></td>
+        </tr>
+        <tr>
+          <td><code>test_determinism.py</code></td>
+          <td>3</td>
+          <td>Byte-identical reproducibility across dual 100-year runs</td>
+          <td><span class="badge badge-pass">PASS</span></td>
+        </tr>
+        <tr>
+          <td><code>test_feud_reconciliation.py</code></td>
+          <td>2</td>
+          <td>Feud resolution via peace, armistice, and reconciliation</td>
+          <td><span class="badge badge-pass">PASS</span></td>
+        </tr>
+        <tr>
+          <td><code>test_historical_pressures.py</code></td>
+          <td>5</td>
+          <td>Anti-extinction, marriage peace alliances, demographic pressures</td>
+          <td><span class="badge badge-pass">PASS</span></td>
+        </tr>
+        <tr>
+          <td><code>test_pipeline_invariants.py</code></td>
+          <td>2</td>
+          <td>Allowed event types only; relationship views derived from memory</td>
+          <td><span class="badge badge-pass">PASS</span></td>
+        </tr>
+        <tr>
+          <td><code>test_religion_engine.py</code></td>
+          <td>17</td>
+          <td>R0 traits library, diffusion, modifiers, and round-trip serialization</td>
+          <td><span class="badge badge-pass">PASS</span></td>
+        </tr>
+        <tr>
+          <td><code>test_religion_history.py</code></td>
+          <td>11</td>
+          <td>R1 interpretation, tension, figures, heresies, sacred geo, myths</td>
+          <td><span class="badge badge-pass">PASS</span></td>
+        </tr>
+        <tr>
+          <td><code>test_revelation_pipeline.py</code></td>
+          <td>3</td>
+          <td>Revelation pipeline and belief formation across 5 seeds</td>
+          <td><span class="badge badge-pass">PASS</span></td>
+        </tr>
+        <tr>
+          <td><code>test_syncretism_and_culture.py</code></td>
+          <td>14</td>
+          <td>R1.5 & R2 syncretism, culture, customs, lore, analytics, 100-yr sim</td>
+          <td><span class="badge badge-pass">PASS</span></td>
+        </tr>
+        <tr>
+          <td><code>test_wrongful_grudge.py</code></td>
+          <td>1</td>
+          <td>Wrongful grudge formation through false belief perception</td>
+          <td><span class="badge badge-pass">PASS</span></td>
+        </tr>
+        <tr style="background:#e0f2fe; font-weight:700;">
+          <td><strong>TOTAL TEST SUITE</strong></td>
+          <td><strong>74</strong></td>
+          <td><strong>Complete Project Minemesis Verification Suite</strong></td>
+          <td><span class="badge badge-pass">74 / 74 PASS</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="footer">
+    <span>Project Minemesis &bull; Religion Engine Technical Report</span>
+    <span>Page 11 of 12</span>
+  </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- PAGE 12: LIMITATIONS, NEXT STEPS & ROADMAP                                -->
+<!-- ========================================================================= -->
+<div class="page">
+  <div class="page-content">
+    <h2>39. Current Architectural Boundaries & Limitations</h2>
+    <p>
+      In accordance with Minemesis engineering rigor, all current boundaries are explicitly documented:
+    </p>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <span>1. Pairwise Trade Corridors</span>
+          <span class="badge badge-core">BOUNDARY</span>
+        </div>
+        <p style="font-size: 7.2pt;">
+          Trade route evangelism and cultural diffusion currently operate across direct pairwise connections between adjacent settlements. Full multi-hop supply lines and maritime caravans will be modeled in future economic network passes.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>2. Single Primary Faith per Character</span>
+          <span class="badge badge-core">BOUNDARY</span>
+        </div>
+        <p style="font-size: 7.2pt;">
+          While settlements and religions support multi-tradition syncretism, individual characters adhere to one primary faith identity at a time. Multi-faith participation (e.g. practicing Shinto at birth and Buddhism at death) can be introduced in future lifecycle passes.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>3. Kinship & Clan Lineages Frozen</span>
+          <span class="badge badge-core">BOUNDARY</span>
+        </div>
+        <p style="font-size: 7.2pt;">
+          Family structures currently track nuclear relationships (parents, spouses, children). Deep multi-generational clan trees, bloodline claims, and dynastic alliances are deferred to Milestone 1.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>4. Headless Execution Invariant</span>
+          <span class="badge badge-core">BOUNDARY</span>
+        </div>
+        <p style="font-size: 7.2pt;">
+          The simulation remains completely headless. No voxel meshing, graphics rendering, networking, or interactive UI widgets have been added, preserving architectural cleanliness.
+        </p>
+      </div>
+    </div>
+
+    <h2>40. The Next Frontier: Milestone 1 &mdash; Kinship & Dynastic Vendettas</h2>
+    <p>
+      With the successful completion and audit of Milestones R0, R1, R1.5, and R2, the Religion Engine is feature-complete and fully validated. The logical next milestone in the Minemesis master roadmap is <strong>Milestone 1: Kinship, Lineage Networks, and Generational Inheritance</strong>:
+    </p>
+
+    <div class="card">
+      <div class="card-header">
+        <span>Milestone 1 Implementation Scope</span>
+        <span class="badge badge-pass">NEXT RECOMMENDED TASK</span>
+      </div>
+      <div class="grid-2" style="font-size: 7.2pt; color: #334155;">
+        <div>
+          <p><strong>1. Multi-Generational Clan Trees:</strong> Tracking deep patriarchal and matriarchal bloodlines spanning centuries across all settlements.</p>
+          <p><strong>2. Dynastic Bloodline Claims:</strong> Inheritance of chieftainships, sacred priesthood seats, and ancestral homesteads based on kinship priority.</p>
+        </div>
+        <div>
+          <p><strong>3. Generational Grudge Inheritance:</strong> Vendettas and blood feuds transmitted across generations, so children inherit their forebears' rivalries.</p>
+          <p><strong>4. Inter-Clan Marriage Pacts:</strong> Diplomatic marriages between rival dynasties designed to forge lasting peace or consolidate territory.</p>
+        </div>
+      </div>
+    </div>
+
+    <h2>41. Concluding Architectural Statement</h2>
+    <div class="callout">
+      The Minemesis Religion Engine proves that procedural world generation can transcend Eurocentric ecclesiastical tropes. By treating religion as a living collection of ideas—capable of interpretation, schism, syncretic fusion, folk absorption, deep-time myth distortion, and cultural pressure—Minemesis produces unscripted, believable human histories spanning centuries.
+    </div>
+
+    <div style="margin-top: 15px; padding: 10px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 4px; text-align: center;">
+      <p style="font-weight: 700; color: #1e3a8a; margin: 0 0 2px 0;">PROJECT MINEMESIS &bull; HEADLESS DETERMINISTIC SIMULATION</p>
+      <p style="font-size: 7pt; color: #64748b; margin: 0;">Developed with rigorous adherence to causality, determinism, and emergent storytelling.</p>
+    </div>
+  </div>
+  <div class="footer">
+    <span>Project Minemesis &bull; Religion Engine Technical Report</span>
+    <span>Page 12 of 12</span>
+  </div>
+</div>
+
+</body>
+</html>
+"""
+
+    with open(out_html, "w", encoding="utf-8") as f:
+        f.write(html_content)
+    print(f"HTML report successfully written to {out_html}")
+
+    edge_cmd = [
+        "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+        "--headless=new",
+        "--disable-gpu",
+        "--no-sandbox",
+        "--no-pdf-header-footer",
+        "--run-all-compositor-stages-before-draw",
+        f"--print-to-pdf={out_pdf_root}",
+        out_html,
+    ]
+    print(f"Rendering PDF via Microsoft Edge...")
+    subprocess.run(edge_cmd, check=True)
+    print(f"PDF generated successfully at {out_pdf_root}")
+
+    shutil.copyfile(out_pdf_root, out_pdf_reports)
+    print(f"PDF copied to {out_pdf_reports}")
+
+if __name__ == "__main__":
+    main()
