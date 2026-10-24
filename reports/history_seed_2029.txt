@@ -1,0 +1,299 @@
+================================================================================
+HOLD-OUT B CHRONOLOGICAL HISTORY: STRONGEST RUN (SEED 2029)
+================================================================================
+Total Events: 421 (Non-routine: 170)
+Total Feuds: 15
+Longest Conflict Path Depth: 12 (Distinct Types: 4)
+
+End-State Living Populations (Total: 70):
+  * Ironpeak    :  7 citizens | Food:    0 | Wealth: 4978
+  * Oakhaven    : 31 citizens | Food: 1364 | Wealth: 7344
+  * Riverbend   : 32 citizens | Food: 1365 | Wealth: 4369
+
+Longest Conflict Chain (Ending at Event #340):
+  #  61 (Y21 M9) Death @ set_riverbend: Kaelen Stone died accidentally in a forestry mishap with Lucan Stone
+  #  63 (Y21 M10) Feud @ set_riverbend: Wrongful feud declared by Eldrin Stone against Lucan Stone: accused of murder based on distorted belief, though death was accidental.
+  #  72 (Y24 M1) Death @ set_riverbend: Eldrin Stone exacted revenge and killed Lucan Stone for feud #63
+  # 157 (Y47 M9) Feud @ set_oakhaven: Blood feud declared by Isolde Stone against Eldrin Stone for aggression in event #72.
+  # 216 (Y62 M11) Raid @ set_riverbend: Raid launched by Oakhaven on Riverbend sparked by feud #157
+  # 217 (Y62 M11) Death @ set_riverbend: Lyra Stone was slain defending Riverbend during raid #216
+  # 221 (Y64 M2) Feud @ set_ironpeak: Blood feud declared by Kaelen Stone against Isolde Stone for aggression in event #217.
+  # 274 (Y77 M1) Raid @ set_oakhaven: Raid launched by Ironpeak on Oakhaven sparked by feud #221
+  # 275 (Y77 M1) Death @ set_oakhaven: Tobias Rivers was slain defending Oakhaven during raid #274
+  # 301 (Y84 M2) Feud @ set_riverbend: Blood feud declared by Thalia Rivers against Kaelen Stone for aggression in event #275.
+  # 329 (Y89 M11) Raid @ set_ironpeak: Raid launched by Riverbend on Ironpeak sparked by feud #301
+  # 339 (Y92 M4) Famine @ set_ironpeak: Severe famine struck Ironpeak as winter food stores collapsed.
+  # 340 (Y92 M4) Death @ set_ironpeak: Caleb Ironwood died of starvation during the famine in Ironpeak
+
+--- Full Chronological History ---
+[Year   1 Summary] Routine demographics: 1 births, 5 marriages, 1 natural deaths.
+  [Year   1 Month  6] #   4 TRADEROUTEFOUNDED @ set_oakhaven | Formal trade route established between Oakhaven and Riverbend | Root Event | Participants: (settlement_a=set_oakhaven, settlement_b=set_riverbend)
+[Year   2 Summary] Routine demographics: 2 births, 0 marriages, 0 natural deaths.
+  [Year   2 Month  6] #   9 TRADEROUTEFOUNDED @ set_ironpeak | Formal trade route established between Ironpeak and Oakhaven | Root Event | Participants: (settlement_a=set_ironpeak, settlement_b=set_oakhaven)
+[Year   3 Summary] Routine demographics: 4 births, 0 marriages, 0 natural deaths.
+  [Year   3 Month  1] #  11 TRADEROUTEFOUNDED @ set_ironpeak | Formal trade route established between Ironpeak and Riverbend | Root Event | Participants: (settlement_a=set_ironpeak, settlement_b=set_riverbend)
+[Year   4 Summary] Routine demographics: 1 births, 0 marriages, 1 natural deaths.
+  [Year   5 Month  6] #  18 MARRIAGE @ set_ironpeak | Marriage of Rowan Ironwood and Morwen Stone | Causes: [#11] | Participants: (spouse1=char_2, spouse2=char_23)
+[Year   6 Summary] Routine demographics: 4 births, 0 marriages, 0 natural deaths.
+[Year   7 Summary] Routine demographics: 1 births, 0 marriages, 0 natural deaths.
+  [Year   7 Month  2] #  23 MARRIAGE @ set_riverbend | Marriage of Corin Blackwood and Eleni Ironwood | Causes: [#11] | Participants: (spouse1=char_27, spouse2=char_3)
+[Year   8 Summary] Routine demographics: 2 births, 0 marriages, 1 natural deaths.
+[Year   9 Summary] Routine demographics: 1 births, 1 marriages, 0 natural deaths.
+[Year  10 Summary] Routine demographics: 1 births, 0 marriages, 0 natural deaths.
+[Year  11 Summary] Routine demographics: 2 births, 0 marriages, 1 natural deaths.
+[Year  12 Summary] Routine demographics: 1 births, 0 marriages, 1 natural deaths.
+  [Year  12 Month 11] #  36 FEUD @ set_riverbend | Wrongful feud declared by Silas Blackwood against Gareth Stone: accused of murder based on distorted belief, though death was accidental. | Causes: [#33] | Participants: (instigator=char_24, target=char_20)
+[Year  13 Summary] Routine demographics: 0 births, 0 marriages, 1 natural deaths.
+  [Year  13 Month 12] #  38 FEUD @ set_oakhaven | Wrongful feud declared by Cedric Crowley against Bram Rivers: accused of murder based on distorted belief, though death was accidental. | Causes: [#37] | Participants: (instigator=char_14, target=char_12)
+[Year  14 Summary] Routine demographics: 1 births, 0 marriages, 0 natural deaths.
+[Year  15 Summary] Routine demographics: 3 births, 0 marriages, 1 natural deaths.
+  [Year  15 Month 10] #  44 FEUD @ set_ironpeak | Wrongful feud declared by Rowan Ironwood against Morwen Crowley: accused of murder based on distorted belief, though death was accidental. | Causes: [#43] | Participants: (instigator=char_2, target=char_19)
+  [Year  15 Month 11] #  45 TRADEROUTEBROKEN @ set_ironpeak | Trade route between Ironpeak and Riverbend was severed by feud #44 | Causes: [#44] | Participants: (settlement_a=set_ironpeak, settlement_b=set_riverbend)
+[Year  16 Summary] Routine demographics: 1 births, 0 marriages, 1 natural deaths.
+  [Year  16 Month  2] #  47 RAID @ set_riverbend | Raid launched by Ironpeak on Riverbend sparked by feud #44 | Causes: [#44] | Participants: (initiator=set_ironpeak, instigator_char=char_2, target=set_riverbend)
+  [Year  16 Month  2] #  48 REVELATION @ set_riverbend | Truth revealed to Silas Blackwood by eyewitness Brenna Blackwood: The death in event #33 was an accident, not murder. | Causes: [#33, #36] | Participants: (recipient=char_24, witness=char_25)
+  [Year  16 Month  2] #  49 PEACE @ set_riverbend | Reconciliation and Peace between Silas Blackwood and char_20: Truth revealed in #48. Feud #36 resolved. | Causes: [#36, #48] | Participants: (initiator=set_riverbend, party1=char_24, party2=char_20, target=set_riverbend)
+  [Year  17 Month  8] #  51 FEUD @ set_oakhaven | Wrongful feud declared by Lyra Rivers against Gareth Stone: accused of murder based on distorted belief, though death was accidental. | Causes: [#0] | Participants: (instigator=char_40, target=char_20)
+  [Year  17 Month  9] #  52 TRADEROUTEBROKEN @ set_oakhaven | Trade route between Oakhaven and Riverbend was severed by feud #51 | Causes: [#51] | Participants: (settlement_a=set_oakhaven, settlement_b=set_riverbend)
+[Year  19 Summary] Routine demographics: 0 births, 0 marriages, 1 natural deaths.
+  [Year  19 Month  7] #  54 CHIEFCHANGED @ set_ironpeak | Caleb Ashford ascended as the new chief of Ironpeak | Causes: [#53] | Participants: (new_chief=char_4, settlement=set_ironpeak)
+[Year  20 Summary] Routine demographics: 0 births, 1 marriages, 0 natural deaths.
+  [Year  20 Month  2] #  55 RAID @ set_riverbend | Raid launched by Oakhaven on Riverbend sparked by feud #51 | Causes: [#51] | Participants: (initiator=set_oakhaven, instigator_char=char_40, target=set_riverbend)
+[Year  21 Summary] Routine demographics: 1 births, 0 marriages, 3 natural deaths.
+  [Year  21 Month  4] #  58 RAID @ set_riverbend | Raid launched by Oakhaven on Riverbend sparked by feud #51 | Causes: [#51] | Participants: (initiator=set_oakhaven, instigator_char=char_40, target=set_riverbend)
+  [Year  21 Month  4] #  59 DEATH @ set_riverbend | Aldous Stone was slain defending Riverbend during raid #58 | Causes: [#58] | Participants: (actor=char_40, target=char_28)
+  [Year  21 Month 10] #  63 FEUD @ set_riverbend | Wrongful feud declared by Eldrin Stone against Lucan Stone: accused of murder based on distorted belief, though death was accidental. | Causes: [#61] | Participants: (instigator=char_22, target=char_37)
+  [Year  21 Month 11] #  64 RAID @ set_riverbend | Raid launched by Ironpeak on Riverbend sparked by feud #44 | Causes: [#44] | Participants: (initiator=set_ironpeak, instigator_char=char_2, target=set_riverbend)
+[Year  22 Summary] Routine demographics: 0 births, 0 marriages, 1 natural deaths.
+  [Year  22 Month  3] #  65 REVELATION @ set_oakhaven | Truth revealed to Lyra Rivers by eyewitness Bram Rivers: The death in event #0 was an accident, not murder. | Causes: [#0, #51] | Participants: (recipient=char_40, witness=char_12)
+  [Year  22 Month  3] #  66 PEACE @ set_oakhaven | Reconciliation and Peace between Lyra Rivers and char_20: Truth revealed in #65. Feud #51 resolved. | Causes: [#51, #65] | Participants: (initiator=set_oakhaven, party1=char_40, party2=char_20, target=set_riverbend)
+  [Year  22 Month  4] #  67 MARRIAGE @ set_oakhaven | Marriage of Bram Rivers and Sylvia Stone (Alliance Marriage) | Causes: [#66] | Participants: (spouse1=char_31, spouse2=char_33)
+  [Year  22 Month  4] #  68 FEUD @ set_riverbend | Blood feud declared by Silas Blackwood against Lyra Rivers for aggression in event #55. | Causes: [#55] | Participants: (instigator=char_24, target=char_40)
+[Year  23 Summary] Routine demographics: 1 births, 1 marriages, 0 natural deaths.
+[Year  24 Summary] Routine demographics: 1 births, 1 marriages, 0 natural deaths.
+  [Year  24 Month  1] #  72 DEATH @ set_riverbend | Eldrin Stone exacted revenge and killed Lucan Stone for feud #63 | Causes: [#61, #63] | Participants: (actor=char_22, target=char_37)
+[Year  25 Summary] Routine demographics: 2 births, 0 marriages, 2 natural deaths.
+  [Year  25 Month  6] #  77 RAID @ set_oakhaven | Raid launched by Riverbend on Oakhaven sparked by feud #68 | Causes: [#68] | Participants: (initiator=set_riverbend, instigator_char=char_24, target=set_oakhaven)
+  [Year  25 Month  9] #  80 SUCCESSIONCRISIS @ set_oakhaven | Succession crisis erupted in Oakhaven between Bram Rivers and Cedric Crowley | Causes: [#79] | Participants: (rival_1=char_12, rival_2=char_14, settlement=set_oakhaven)
+  [Year  25 Month  9] #  81 CHIEFCHANGED @ set_oakhaven | Bram Rivers ascended as the new chief of Oakhaven | Causes: [#80] | Participants: (new_chief=char_12, settlement=set_oakhaven)
+[Year  26 Summary] Routine demographics: 0 births, 0 marriages, 3 natural deaths.
+  [Year  26 Month 12] #  85 CHIEFCHANGED @ set_ironpeak | Gideon Ashford ascended as the new chief of Ironpeak | Causes: [#84] | Participants: (new_chief=char_7, settlement=set_ironpeak)
+[Year  27 Summary] Routine demographics: 1 births, 0 marriages, 2 natural deaths.
+  [Year  27 Month  4] #  88 CHIEFCHANGED @ set_riverbend | Eldrin Stone ascended as the new chief of Riverbend | Causes: [#87] | Participants: (new_chief=char_22, settlement=set_riverbend)
+  [Year  27 Month 12] #  90 MARRIAGE @ set_ironpeak | Marriage of Theron Ironwood and Lyra Rivers | Causes: [#9] | Participants: (spouse1=char_45, spouse2=char_40)
+[Year  28 Summary] Routine demographics: 1 births, 1 marriages, 0 natural deaths.
+  [Year  28 Month  5] #  92 RAID @ set_riverbend | Raid launched by Ironpeak on Riverbend sparked by feud #44 | Causes: [#44] | Participants: (initiator=set_ironpeak, instigator_char=char_2, target=set_riverbend)
+  [Year  28 Month  7] #  93 RAID @ set_oakhaven | Raid launched by Riverbend on Oakhaven sparked by feud #68 | Causes: [#68] | Participants: (initiator=set_riverbend, instigator_char=char_24, target=set_oakhaven)
+[Year  29 Summary] Routine demographics: 1 births, 0 marriages, 1 natural deaths.
+  [Year  29 Month  6] #  95 PEACE @ set_oakhaven | Peace treaty signed between Oakhaven and Oakhaven, ending feud #38 through exhaustion. | Causes: [#38, #37] | Participants: (initiator=set_oakhaven, party1=char_12, party2=char_12, target=set_oakhaven)
+  [Year  29 Month 12] #  98 FEUD @ set_oakhaven | Wrongful feud declared by Aldous Crowley against Bram Rivers: accused of murder based on distorted belief, though death was accidental. | Causes: [#37] | Participants: (instigator=char_17, target=char_12)
+[Year  30 Summary] Routine demographics: 1 births, 2 marriages, 0 natural deaths.
+[Year  31 Summary] Routine demographics: 1 births, 0 marriages, 0 natural deaths.
+  [Year  31 Month 10] # 103 REVELATION @ set_riverbend | Truth revealed to Eldrin Stone by eyewitness Morwen Crowley: The death in event #61 was an accident, not murder. | Causes: [#61, #63] | Participants: (recipient=char_22, witness=char_19)
+  [Year  31 Month 10] # 104 PEACE @ set_riverbend | Reconciliation and Peace between Eldrin Stone and char_37: Truth revealed in #103. Feud #63 resolved. | Causes: [#63, #103] | Participants: (initiator=set_riverbend, party1=char_22, party2=char_37, target=set_riverbend)
+  [Year  31 Month 11] # 105 FEUD @ set_riverbend | Blood feud declared by Tobias Stone against Eldrin Stone for aggression in event #72. | Causes: [#72] | Participants: (instigator=char_43, target=char_22)
+[Year  32 Summary] Routine demographics: 1 births, 0 marriages, 0 natural deaths.
+  [Year  32 Month  1] # 106 RAID @ set_oakhaven | Raid launched by Riverbend on Oakhaven sparked by feud #68 | Causes: [#68] | Participants: (initiator=set_riverbend, instigator_char=char_24, target=set_oakhaven)
+  [Year  32 Month 10] # 108 RAID @ set_riverbend | Raid launched by Ironpeak on Riverbend sparked by feud #44 | Causes: [#44] | Participants: (initiator=set_ironpeak, instigator_char=char_2, target=set_riverbend)
+  [Year  32 Month 10] # 109 REVELATION @ set_oakhaven | Truth revealed to Aldous Crowley by eyewitness Briony Rivers: The death in event #37 was an accident, not murder. | Causes: [#37, #98] | Participants: (recipient=char_17, witness=char_13)
+  [Year  32 Month 10] # 110 PEACE @ set_oakhaven | Reconciliation and Peace between Aldous Crowley and char_12: Truth revealed in #109. Feud #98 resolved. | Causes: [#98, #109] | Participants: (initiator=set_oakhaven, party1=char_17, party2=char_12, target=set_oakhaven)
+[Year  33 Summary] Routine demographics: 1 births, 0 marriages, 0 natural deaths.
+[Year  34 Summary] Routine demographics: 3 births, 1 marriages, 0 natural deaths.
+  [Year  34 Month  9] # 114 FEUD @ set_ironpeak | Blood feud declared by Sari Stone against Lyra Rivers for aggression in event #59. | Causes: [#59] | Participants: (instigator=char_34, target=char_40)
+[Year  35 Summary] Routine demographics: 3 births, 1 marriages, 0 natural deaths.
+  [Year  35 Month  9] # 120 RAID @ set_riverbend | Raid launched by Ironpeak on Riverbend sparked by feud #44 | Causes: [#44] | Participants: (initiator=set_ironpeak, instigator_char=char_2, target=set_riverbend)
+  [Year  36 Month  2] # 122 RAID @ set_oakhaven | Raid launched by Riverbend on Oakhaven sparked by feud #68 | Causes: [#68] | Participants: (initiator=set_riverbend, instigator_char=char_24, target=set_oakhaven)
+  [Year  36 Month 12] # 123 RAID @ set_riverbend | Raid launched by Ironpeak on Riverbend sparked by feud #44 | Causes: [#44] | Participants: (initiator=set_ironpeak, instigator_char=char_2, target=set_riverbend)
+[Year  37 Summary] Routine demographics: 2 births, 0 marriages, 0 natural deaths.
+[Year  38 Summary] Routine demographics: 1 births, 0 marriages, 0 natural deaths.
+[Year  40 Summary] Routine demographics: 1 births, 0 marriages, 0 natural deaths.
+  [Year  40 Month  2] # 127 RAID @ set_riverbend | Raid launched by Ironpeak on Riverbend sparked by feud #44 | Causes: [#44] | Participants: (initiator=set_ironpeak, instigator_char=char_2, target=set_riverbend)
+[Year  41 Summary] Routine demographics: 3 births, 0 marriages, 1 natural deaths.
+  [Year  41 Month  2] # 131 RAID @ set_riverbend | Raid launched by Ironpeak on Riverbend sparked by feud #44 | Causes: [#44] | Participants: (initiator=set_ironpeak, instigator_char=char_2, target=set_riverbend)
+  [Year  41 Month  8] # 133 RAID @ set_oakhaven | Raid launched by Riverbend on Oakhaven sparked by feud #68 | Causes: [#68] | Participants: (initiator=set_riverbend, instigator_char=char_24, target=set_oakhaven)
+[Year  42 Summary] Routine demographics: 1 births, 1 marriages, 1 natural deaths.
+  [Year  42 Month  3] # 137 RAID @ set_riverbend | Raid launched by Ironpeak on Riverbend sparked by feud #44 | Causes: [#44] | Participants: (initiator=set_ironpeak, instigator_char=char_2, target=set_riverbend)
+  [Year  42 Month  8] # 138 RAID @ set_oakhaven | Raid launched by Riverbend on Oakhaven sparked by feud #68 | Causes: [#68] | Participants: (initiator=set_riverbend, instigator_char=char_24, target=set_oakhaven)
+  [Year  43 Month  2] # 140 MARRIAGE @ set_oakhaven | Marriage of Theron Rivers and Lyra Ironwood | Causes: [#9] | Participants: (spouse1=char_58, spouse2=char_52)
+  [Year  43 Month  3] # 141 RAID @ set_riverbend | Raid launched by Ironpeak on Riverbend sparked by feud #44 | Causes: [#44] | Participants: (initiator=set_ironpeak, instigator_char=char_2, target=set_riverbend)
+[Year  44 Summary] Routine demographics: 0 births, 0 marriages, 4 natural deaths.
+  [Year  44 Month  4] # 143 RAID @ set_oakhaven | Raid launched by Riverbend on Oakhaven sparked by feud #68 | Causes: [#68] | Participants: (initiator=set_riverbend, instigator_char=char_24, target=set_oakhaven)
+  [Year  44 Month  8] # 147 SUCCESSIONCRISIS @ set_ironpeak | Succession crisis erupted in Ironpeak between Isolde Ashford and Sylvia Crowley | Causes: [#146] | Participants: (rival_1=char_55, rival_2=char_16, settlement=set_ironpeak)
+  [Year  44 Month  8] # 148 CHIEFCHANGED @ set_ironpeak | Isolde Ashford ascended as the new chief of Ironpeak | Causes: [#147] | Participants: (new_chief=char_55, settlement=set_ironpeak)
+[Year  45 Summary] Routine demographics: 3 births, 0 marriages, 1 natural deaths.
+[Year  46 Summary] Routine demographics: 0 births, 0 marriages, 1 natural deaths.
+[Year  47 Summary] Routine demographics: 1 births, 0 marriages, 0 natural deaths.
+  [Year  47 Month  3] # 154 RAID @ set_riverbend | Raid launched by Ironpeak on Riverbend sparked by feud #44 | Causes: [#44] | Participants: (initiator=set_ironpeak, instigator_char=char_2, target=set_riverbend)
+  [Year  47 Month  4] # 155 PEACE @ set_riverbend | Peace treaty signed between Riverbend and Oakhaven, ending feud #68 through exhaustion. | Causes: [#68, #143] | Participants: (initiator=set_riverbend, party1=char_22, party2=char_40, target=set_oakhaven)
+  [Year  47 Month  9] # 157 FEUD @ set_oakhaven | Blood feud declared by Isolde Stone against Eldrin Stone for aggression in event #72. | Causes: [#72] | Participants: (instigator=char_39, target=char_22)
+[Year  48 Summary] Routine demographics: 0 births, 1 marriages, 0 natural deaths.
+  [Year  48 Month 12] # 159 RAID @ set_riverbend | Raid launched by Oakhaven on Riverbend sparked by feud #157 | Causes: [#157] | Participants: (initiator=set_oakhaven, instigator_char=char_39, target=set_riverbend)
+[Year  49 Summary] Routine demographics: 0 births, 1 marriages, 2 natural deaths.
+  [Year  49 Month  6] # 161 CHIEFCHANGED @ set_oakhaven | Bram Rivers ascended as the new chief of Oakhaven | Causes: [#160] | Participants: (new_chief=char_31, settlement=set_oakhaven)
+  [Year  49 Month 11] # 164 PEACE @ set_ironpeak | Peace treaty signed between Ironpeak and Ironpeak, ending feud #114 through exhaustion. | Causes: [#114, #59] | Participants: (initiator=set_ironpeak, party1=char_55, party2=char_40, target=set_ironpeak)
+[Year  50 Summary] Routine demographics: 2 births, 0 marriages, 0 natural deaths.
+  [Year  50 Month  7] # 166 RAID @ set_riverbend | Raid launched by Oakhaven on Riverbend sparked by feud #157 | Causes: [#157] | Participants: (initiator=set_oakhaven, instigator_char=char_39, target=set_riverbend)
+[Year  51 Summary] Routine demographics: 0 births, 0 marriages, 1 natural deaths.
+[Year  52 Summary] Routine demographics: 0 births, 1 marriages, 3 natural deaths.
+  [Year  53 Month  1] # 173 RAID @ set_riverbend | Raid launched by Ironpeak on Riverbend sparked by feud #44 | Causes: [#44] | Participants: (initiator=set_ironpeak, instigator_char=char_2, target=set_riverbend)
+  [Year  53 Month  1] # 174 RAID @ set_riverbend | Raid launched by Oakhaven on Riverbend sparked by feud #157 | Causes: [#157] | Participants: (initiator=set_oakhaven, instigator_char=char_39, target=set_riverbend)
+[Year  54 Summary] Routine demographics: 3 births, 0 marriages, 0 natural deaths.
+  [Year  54 Month  9] # 178 RAID @ set_riverbend | Raid launched by Ironpeak on Riverbend sparked by feud #44 | Causes: [#44] | Participants: (initiator=set_ironpeak, instigator_char=char_2, target=set_riverbend)
+[Year  55 Summary] Routine demographics: 1 births, 2 marriages, 2 natural deaths.
+  [Year  55 Month  3] # 182 CHIEFCHANGED @ set_riverbend | Tobias Stone ascended as the new chief of Riverbend | Causes: [#180] | Participants: (new_chief=char_43, settlement=set_riverbend)
+  [Year  55 Month 10] # 184 RAID @ set_riverbend | Raid launched by Oakhaven on Riverbend sparked by feud #157 | Causes: [#157] | Participants: (initiator=set_oakhaven, instigator_char=char_39, target=set_riverbend)
+[Year  56 Summary] Routine demographics: 1 births, 0 marriages, 1 natural deaths.
+  [Year  56 Month  3] # 187 RAID @ set_riverbend | Raid launched by Ironpeak on Riverbend sparked by feud #44 | Causes: [#44] | Participants: (initiator=set_ironpeak, instigator_char=char_2, target=set_riverbend)
+  [Year  56 Month  4] # 188 PEACE @ set_ironpeak | Peace treaty signed between Ironpeak and Riverbend, ending feud #44 through exhaustion. | Causes: [#44, #187] | Participants: (initiator=set_ironpeak, party1=char_55, party2=char_19, target=set_riverbend)
+  [Year  56 Month  9] # 190 MARRIAGE @ set_oakhaven | Marriage of Vance Rivers and Vesper Ironwood | Causes: [#9] | Participants: (spouse1=char_75, spouse2=char_71)
+[Year  57 Summary] Routine demographics: 2 births, 0 marriages, 0 natural deaths.
+  [Year  57 Month  6] # 192 RAID @ set_riverbend | Raid launched by Oakhaven on Riverbend sparked by feud #157 | Causes: [#157] | Participants: (initiator=set_oakhaven, instigator_char=char_39, target=set_riverbend)
+  [Year  57 Month  6] # 193 DEATH @ set_riverbend | Sari Crowley was slain defending Riverbend during raid #192 | Causes: [#192] | Participants: (actor=char_39, target=char_47)
+[Year  58 Summary] Routine demographics: 1 births, 0 marriages, 1 natural deaths.
+  [Year  58 Month  1] # 195 TRADEROUTEFOUNDED @ set_ironpeak | Formal trade route established between Ironpeak and Riverbend | Causes: [#188] | Participants: (settlement_a=set_ironpeak, settlement_b=set_riverbend)
+[Year  59 Summary] Routine demographics: 1 births, 0 marriages, 3 natural deaths.
+  [Year  59 Month  1] # 198 RAID @ set_riverbend | Raid launched by Oakhaven on Riverbend sparked by feud #157 | Causes: [#157] | Participants: (initiator=set_oakhaven, instigator_char=char_39, target=set_riverbend)
+  [Year  59 Month  6] # 202 SUCCESSIONCRISIS @ set_oakhaven | Succession crisis erupted in Oakhaven between Freya Rivers and Aldous Crowley | Causes: [#201] | Participants: (rival_1=char_77, rival_2=char_17, settlement=set_oakhaven)
+  [Year  59 Month  6] # 203 CHIEFCHANGED @ set_oakhaven | Freya Rivers ascended as the new chief of Oakhaven | Causes: [#202] | Participants: (new_chief=char_77, settlement=set_oakhaven)
+[Year  60 Summary] Routine demographics: 0 births, 1 marriages, 1 natural deaths.
+  [Year  60 Month  2] # 205 MARRIAGE @ set_ironpeak | Marriage of Theron Ashford and Sylvia Crowley | Causes: [#9] | Participants: (spouse1=char_78, spouse2=char_60)
+  [Year  60 Month  2] # 206 RAID @ set_riverbend | Raid launched by Oakhaven on Riverbend sparked by feud #157 | Causes: [#157] | Participants: (initiator=set_oakhaven, instigator_char=char_39, target=set_riverbend)
+  [Year  60 Month 10] # 209 SUCCESSIONCRISIS @ set_riverbend | Succession crisis erupted in Riverbend between Brenna Stone and Sari Ironwood | Causes: [#208] | Participants: (rival_1=char_63, rival_2=char_46, settlement=set_riverbend)
+  [Year  60 Month 10] # 210 CHIEFCHANGED @ set_riverbend | Brenna Stone ascended as the new chief of Riverbend | Causes: [#209] | Participants: (new_chief=char_63, settlement=set_riverbend)
+[Year  61 Summary] Routine demographics: 2 births, 0 marriages, 0 natural deaths.
+[Year  62 Summary] Routine demographics: 3 births, 0 marriages, 0 natural deaths.
+  [Year  62 Month 11] # 216 RAID @ set_riverbend | Raid launched by Oakhaven on Riverbend sparked by feud #157 | Causes: [#157] | Participants: (initiator=set_oakhaven, instigator_char=char_39, target=set_riverbend)
+  [Year  62 Month 11] # 217 DEATH @ set_riverbend | Lyra Stone was slain defending Riverbend during raid #216 | Causes: [#216] | Participants: (actor=char_39, target=char_70)
+[Year  63 Summary] Routine demographics: 0 births, 1 marriages, 0 natural deaths.
+  [Year  63 Month  2] # 218 MARRIAGE @ set_ironpeak | Marriage of Bram Ironwood and Kaelen Stone | Causes: [#195] | Participants: (spouse1=char_81, spouse2=char_68)
+[Year  64 Summary] Routine demographics: 2 births, 0 marriages, 0 natural deaths.
+  [Year  64 Month  2] # 221 FEUD @ set_ironpeak | Blood feud declared by Kaelen Stone against Isolde Stone for aggression in event #217. | Causes: [#217] | Participants: (instigator=char_68, target=char_39)
+  [Year  64 Month  3] # 223 TRADEROUTEBROKEN @ set_ironpeak | Trade route between Ironpeak and Oakhaven was severed by feud #221 | Causes: [#221] | Participants: (settlement_a=set_ironpeak, settlement_b=set_oakhaven)
+[Year  65 Summary] Routine demographics: 2 births, 0 marriages, 1 natural deaths.
+  [Year  65 Month  4] # 225 RAID @ set_oakhaven | Raid launched by Ironpeak on Oakhaven sparked by feud #221 | Causes: [#221] | Participants: (initiator=set_ironpeak, instigator_char=char_68, target=set_oakhaven)
+  [Year  66 Month 10] # 228 RAID @ set_oakhaven | Raid launched by Ironpeak on Oakhaven sparked by feud #221 | Causes: [#221] | Participants: (initiator=set_ironpeak, instigator_char=char_68, target=set_oakhaven)
+[Year  67 Summary] Routine demographics: 1 births, 1 marriages, 0 natural deaths.
+  [Year  67 Month  3] # 230 FEUD @ set_oakhaven | Blood feud declared by Brenna Stone against Isolde Stone for aggression in event #217. | Causes: [#217] | Participants: (instigator=char_63, target=char_39)
+  [Year  67 Month  7] # 232 RAID @ set_riverbend | Raid launched by Oakhaven on Riverbend sparked by feud #157 | Causes: [#157] | Participants: (initiator=set_oakhaven, instigator_char=char_39, target=set_riverbend)
+[Year  68 Summary] Routine demographics: 1 births, 0 marriages, 0 natural deaths.
+  [Year  68 Month 11] # 234 RAID @ set_oakhaven | Raid launched by Ironpeak on Oakhaven sparked by feud #221 | Causes: [#221] | Participants: (initiator=set_ironpeak, instigator_char=char_68, target=set_oakhaven)
+  [Year  68 Month 12] # 235 RAID @ set_riverbend | Raid launched by Oakhaven on Riverbend sparked by feud #157 | Causes: [#157] | Participants: (initiator=set_oakhaven, instigator_char=char_39, target=set_riverbend)
+[Year  69 Summary] Routine demographics: 1 births, 1 marriages, 3 natural deaths.
+[Year  70 Summary] Routine demographics: 4 births, 0 marriages, 0 natural deaths.
+  [Year  70 Month  4] # 241 RAID @ set_riverbend | Raid launched by Oakhaven on Riverbend sparked by feud #157 | Causes: [#157] | Participants: (initiator=set_oakhaven, instigator_char=char_39, target=set_riverbend)
+[Year  71 Summary] Routine demographics: 2 births, 0 marriages, 1 natural deaths.
+  [Year  71 Month  4] # 246 RAID @ set_riverbend | Raid launched by Oakhaven on Riverbend sparked by feud #157 | Causes: [#157] | Participants: (initiator=set_oakhaven, instigator_char=char_39, target=set_riverbend)
+  [Year  71 Month  4] # 247 RAID @ set_oakhaven | Raid launched by Ironpeak on Oakhaven sparked by feud #221 | Causes: [#221] | Participants: (initiator=set_ironpeak, instigator_char=char_68, target=set_oakhaven)
+  [Year  71 Month  4] # 248 PEACE @ set_riverbend | Peace treaty signed between Riverbend and Riverbend, ending feud #105 through exhaustion. | Causes: [#105, #72] | Participants: (initiator=set_riverbend, party1=char_63, party2=char_22, target=set_riverbend)
+[Year  72 Summary] Routine demographics: 0 births, 2 marriages, 0 natural deaths.
+  [Year  72 Month  4] # 252 RAID @ set_oakhaven | Raid launched by Ironpeak on Oakhaven sparked by feud #221 | Causes: [#221] | Participants: (initiator=set_ironpeak, instigator_char=char_68, target=set_oakhaven)
+[Year  73 Summary] Routine demographics: 1 births, 0 marriages, 0 natural deaths.
+  [Year  73 Month  8] # 255 RAID @ set_oakhaven | Raid launched by Ironpeak on Oakhaven sparked by feud #221 | Causes: [#221] | Participants: (initiator=set_ironpeak, instigator_char=char_68, target=set_oakhaven)
+[Year  74 Summary] Routine demographics: 4 births, 1 marriages, 0 natural deaths.
+  [Year  74 Month  4] # 259 PEACE @ set_oakhaven | Peace treaty signed between Oakhaven and Riverbend, ending feud #157 through exhaustion. | Causes: [#157, #246] | Participants: (initiator=set_oakhaven, party1=char_77, party2=char_22, target=set_riverbend)
+[Year  75 Summary] Routine demographics: 2 births, 1 marriages, 3 natural deaths.
+  [Year  75 Month  8] # 269 CHIEFCHANGED @ set_riverbend | Sari Ironwood ascended as the new chief of Riverbend | Causes: [#268] | Participants: (new_chief=char_46, settlement=set_riverbend)
+[Year  76 Summary] Routine demographics: 3 births, 0 marriages, 0 natural deaths.
+  [Year  76 Month  8] # 272 TRADEROUTEFOUNDED @ set_oakhaven | Formal trade route established between Oakhaven and Riverbend | Causes: [#259] | Participants: (settlement_a=set_oakhaven, settlement_b=set_riverbend)
+[Year  77 Summary] Routine demographics: 0 births, 1 marriages, 3 natural deaths.
+  [Year  77 Month  1] # 274 RAID @ set_oakhaven | Raid launched by Ironpeak on Oakhaven sparked by feud #221 | Causes: [#221] | Participants: (initiator=set_ironpeak, instigator_char=char_68, target=set_oakhaven)
+  [Year  77 Month  1] # 275 DEATH @ set_oakhaven | Tobias Rivers was slain defending Oakhaven during raid #274 | Causes: [#274] | Participants: (actor=char_68, target=char_84)
+  [Year  77 Month  7] # 279 CHIEFCHANGED @ set_riverbend | Orson Stone ascended as the new chief of Riverbend | Causes: [#278] | Participants: (new_chief=char_80, settlement=set_riverbend)
+[Year  78 Summary] Routine demographics: 4 births, 0 marriages, 1 natural deaths.
+  [Year  78 Month  2] # 282 MARRIAGE @ set_ironpeak | Marriage of Cedric Ashford and Maeve Stone | Causes: [#195] | Participants: (spouse1=char_95, spouse2=char_69)
+[Year  79 Summary] Routine demographics: 0 births, 0 marriages, 2 natural deaths.
+[Year  80 Summary] Routine demographics: 1 births, 1 marriages, 0 natural deaths.
+[Year  81 Summary] Routine demographics: 1 births, 0 marriages, 2 natural deaths.
+  [Year  81 Month  4] # 292 CHIEFCHANGED @ set_ironpeak | Sylvia Stone ascended as the new chief of Ironpeak | Causes: [#291] | Participants: (new_chief=char_51, settlement=set_ironpeak)
+[Year  82 Summary] Routine demographics: 1 births, 1 marriages, 0 natural deaths.
+  [Year  82 Month  1] # 295 RAID @ set_oakhaven | Raid launched by Ironpeak on Oakhaven sparked by feud #221 | Causes: [#221] | Participants: (initiator=set_ironpeak, instigator_char=char_68, target=set_oakhaven)
+[Year  83 Summary] Routine demographics: 0 births, 1 marriages, 0 natural deaths.
+  [Year  83 Month  9] # 299 RAID @ set_oakhaven | Raid launched by Ironpeak on Oakhaven sparked by feud #221 | Causes: [#221] | Participants: (initiator=set_ironpeak, instigator_char=char_68, target=set_oakhaven)
+[Year  84 Summary] Routine demographics: 1 births, 0 marriages, 0 natural deaths.
+  [Year  84 Month  1] # 300 MARRIAGE @ set_riverbend | Marriage of Cedric Stone and Thalia Rivers | Causes: [#272] | Participants: (spouse1=char_96, spouse2=char_101)
+  [Year  84 Month  2] # 301 FEUD @ set_riverbend | Blood feud declared by Thalia Rivers against Kaelen Stone for aggression in event #275. | Causes: [#275] | Participants: (instigator=char_101, target=char_68)
+  [Year  84 Month  3] # 302 MARRIAGE @ set_riverbend | Marriage of Gideon Stone and Briony Ironwood | Causes: [#195] | Participants: (spouse1=char_104, spouse2=char_102)
+  [Year  84 Month  3] # 303 TRADEROUTEBROKEN @ set_ironpeak | Trade route between Ironpeak and Riverbend was severed by feud #301 | Causes: [#301] | Participants: (settlement_a=set_ironpeak, settlement_b=set_riverbend)
+  [Year  84 Month  9] # 304 FEUD @ set_ironpeak | Blood feud declared by Eleni Rivers against Kaelen Stone for aggression in event #275. | Causes: [#275] | Participants: (instigator=char_83, target=char_68)
+[Year  85 Summary] Routine demographics: 2 births, 0 marriages, 1 natural deaths.
+  [Year  85 Month  2] # 308 RAID @ set_ironpeak | Raid launched by Riverbend on Ironpeak sparked by feud #301 | Causes: [#301] | Participants: (initiator=set_riverbend, instigator_char=char_101, target=set_ironpeak)
+[Year  86 Summary] Routine demographics: 2 births, 1 marriages, 0 natural deaths.
+  [Year  86 Month  4] # 312 RAID @ set_ironpeak | Raid launched by Riverbend on Ironpeak sparked by feud #301 | Causes: [#301] | Participants: (initiator=set_riverbend, instigator_char=char_101, target=set_ironpeak)
+[Year  87 Summary] Routine demographics: 3 births, 0 marriages, 2 natural deaths.
+  [Year  87 Month 11] # 318 MARRIAGE @ set_riverbend | Marriage of Orson Stone and Elora Rivers | Causes: [#272] | Participants: (spouse1=char_106, spouse2=char_107)
+[Year  88 Summary] Routine demographics: 1 births, 0 marriages, 3 natural deaths.
+  [Year  88 Month  1] # 321 CHIEFCHANGED @ set_ironpeak | Theron Ashford ascended as the new chief of Ironpeak | Causes: [#320] | Participants: (new_chief=char_91, settlement=set_ironpeak)
+[Year  89 Summary] Routine demographics: 0 births, 1 marriages, 2 natural deaths.
+  [Year  89 Month 10] # 328 RAID @ set_oakhaven | Raid launched by Ironpeak on Oakhaven sparked by feud #221 | Causes: [#221] | Participants: (initiator=set_ironpeak, instigator_char=char_68, target=set_oakhaven)
+  [Year  89 Month 11] # 329 RAID @ set_ironpeak | Raid launched by Riverbend on Ironpeak sparked by feud #301 | Causes: [#301] | Participants: (initiator=set_riverbend, instigator_char=char_101, target=set_ironpeak)
+[Year  90 Summary] Routine demographics: 2 births, 0 marriages, 0 natural deaths.
+[Year  91 Summary] Routine demographics: 3 births, 0 marriages, 0 natural deaths.
+[Year  92 Summary] Routine demographics: 4 births, 1 marriages, 1 natural deaths.
+  [Year  92 Month  4] # 339 FAMINE @ set_ironpeak | Severe famine struck Ironpeak as winter food stores collapsed. | Causes: [#329] | Participants: (settlement=set_ironpeak)
+  [Year  92 Month  4] # 340 DEATH @ set_ironpeak | Caleb Ironwood died of starvation during the famine in Ironpeak | Causes: [#339] | Participants: (target=char_143)
+  [Year  92 Month  4] # 341 RAID @ set_oakhaven | Raid launched by Ironpeak on Oakhaven sparked by feud #221 | Causes: [#221] | Participants: (initiator=set_ironpeak, instigator_char=char_68, target=set_oakhaven)
+  [Year  92 Month 12] # 344 FAMINE @ set_ironpeak | Severe famine struck Ironpeak as winter food stores collapsed. | Causes: [#329] | Participants: (settlement=set_ironpeak)
+  [Year  92 Month 12] # 345 DEATH @ set_ironpeak | Kaelen Ashford died of starvation during the famine in Ironpeak | Causes: [#344] | Participants: (target=char_128)
+  [Year  92 Month 12] # 346 RAID @ set_riverbend | Desperate food raid launched by starving Ironpeak on Riverbend | Causes: [#344] | Participants: (initiator=set_ironpeak, target=set_riverbend)
+[Year  93 Summary] Routine demographics: 2 births, 1 marriages, 1 natural deaths.
+  [Year  93 Month  6] # 349 FAMINE @ set_ironpeak | Severe famine struck Ironpeak as winter food stores collapsed. | Causes: [#329] | Participants: (settlement=set_ironpeak)
+  [Year  93 Month  6] # 350 DEATH @ set_ironpeak | Aldous Ashford died of starvation during the famine in Ironpeak | Causes: [#349] | Participants: (target=char_135)
+[Year  94 Summary] Routine demographics: 2 births, 0 marriages, 1 natural deaths.
+  [Year  94 Month  1] # 353 FAMINE @ set_ironpeak | Severe famine struck Ironpeak as winter food stores collapsed. | Causes: [#329] | Participants: (settlement=set_ironpeak)
+  [Year  94 Month  1] # 354 DEATH @ set_ironpeak | Kaelen Ashford died of starvation during the famine in Ironpeak | Causes: [#353] | Participants: (target=char_139)
+  [Year  94 Month  2] # 356 RAID @ set_oakhaven | Raid launched by Ironpeak on Oakhaven sparked by feud #221 | Causes: [#221] | Participants: (initiator=set_ironpeak, instigator_char=char_68, target=set_oakhaven)
+  [Year  94 Month  3] # 357 PEACE @ set_ironpeak | Peace treaty signed between Ironpeak and Oakhaven, ending feud #221 through exhaustion. | Causes: [#221, #356] | Participants: (initiator=set_ironpeak, party1=char_68, party2=char_39, target=set_oakhaven)
+  [Year  94 Month  4] # 358 FEUD @ set_oakhaven | Blood feud declared by Thalia Rivers against Kaelen Stone for aggression in event #234. | Causes: [#234] | Participants: (instigator=char_112, target=char_68)
+  [Year  94 Month  8] # 359 MARRIAGE @ set_oakhaven | Marriage of Caleb Rivers and Eleni Ironwood (Alliance Marriage) | Causes: [#357] | Participants: (spouse1=char_121, spouse2=char_119)
+  [Year  94 Month  8] # 360 FAMINE @ set_ironpeak | Severe famine struck Ironpeak as winter food stores collapsed. | Root Event | Participants: (settlement=set_ironpeak)
+  [Year  94 Month  8] # 361 DEATH @ set_ironpeak | Daphne Stone died of starvation during the famine in Ironpeak | Causes: [#360] | Participants: (target=char_66)
+  [Year  94 Month 12] # 364 MARRIAGE @ set_oakhaven | Marriage of Caleb Rivers and Daphne Stone | Causes: [#272] | Participants: (spouse1=char_114, spouse2=char_117)
+[Year  95 Summary] Routine demographics: 4 births, 0 marriages, 0 natural deaths.
+  [Year  95 Month  1] # 366 FAMINE @ set_ironpeak | Severe famine struck Ironpeak as winter food stores collapsed. | Root Event | Participants: (settlement=set_ironpeak)
+  [Year  95 Month  1] # 367 DEATH @ set_ironpeak | Cedric Ashford died of starvation during the famine in Ironpeak | Causes: [#366] | Participants: (target=char_153)
+  [Year  95 Month  3] # 368 MARRIAGE @ set_riverbend | Marriage of Rowan Stone and Lyra Rivers | Causes: [#272] | Participants: (spouse1=char_122, spouse2=char_120)
+  [Year  95 Month  3] # 369 MARRIAGE @ set_ironpeak | Marriage of Lucan Ashford and Thalia Rivers (Alliance Marriage) | Causes: [#357] | Participants: (spouse1=char_123, spouse2=char_112)
+  [Year  95 Month  3] # 370 FAMINE @ set_ironpeak | Severe famine struck Ironpeak as winter food stores collapsed. | Root Event | Participants: (settlement=set_ironpeak)
+  [Year  95 Month  3] # 371 DEATH @ set_ironpeak | Vance Ashford died of starvation during the famine in Ironpeak | Causes: [#370] | Participants: (target=char_148)
+  [Year  95 Month  3] # 372 RAID @ set_riverbend | Desperate food raid launched by starving Ironpeak on Riverbend | Causes: [#370] | Participants: (initiator=set_ironpeak, target=set_riverbend)
+  [Year  95 Month  7] # 374 FAMINE @ set_ironpeak | Severe famine struck Ironpeak as winter food stores collapsed. | Root Event | Participants: (settlement=set_ironpeak)
+  [Year  95 Month  7] # 375 DEATH @ set_ironpeak | Vance Ashford died of starvation during the famine in Ironpeak | Causes: [#374] | Participants: (target=char_62)
+  [Year  95 Month 10] # 378 FAMINE @ set_ironpeak | Severe famine struck Ironpeak as winter food stores collapsed. | Root Event | Participants: (settlement=set_ironpeak)
+  [Year  95 Month 10] # 379 DEATH @ set_ironpeak | Corin Ashford died of starvation during the famine in Ironpeak | Causes: [#378] | Participants: (target=char_132)
+  [Year  95 Month 10] # 380 RAID @ set_riverbend | Desperate food raid launched by starving Ironpeak on Riverbend | Causes: [#378] | Participants: (initiator=set_ironpeak, target=set_riverbend)
+[Year  96 Summary] Routine demographics: 0 births, 0 marriages, 1 natural deaths.
+  [Year  96 Month  4] # 381 FAMINE @ set_ironpeak | Severe famine struck Ironpeak as winter food stores collapsed. | Root Event | Participants: (settlement=set_ironpeak)
+  [Year  96 Month  4] # 382 DEATH @ set_ironpeak | Briony Ironwood died of starvation during the famine in Ironpeak | Causes: [#381] | Participants: (target=char_72)
+  [Year  96 Month  6] # 383 FAMINE @ set_ironpeak | Severe famine struck Ironpeak as winter food stores collapsed. | Root Event | Participants: (settlement=set_ironpeak)
+  [Year  96 Month  6] # 384 DEATH @ set_ironpeak | Kaelen Stone died of starvation during the famine in Ironpeak | Causes: [#383] | Participants: (target=char_68)
+  [Year  96 Month  6] # 385 RAID @ set_riverbend | Desperate food raid launched by starving Ironpeak on Riverbend | Causes: [#383] | Participants: (initiator=set_ironpeak, target=set_riverbend)
+[Year  97 Summary] Routine demographics: 4 births, 0 marriages, 0 natural deaths.
+  [Year  97 Month  4] # 389 FAMINE @ set_ironpeak | Severe famine struck Ironpeak as winter food stores collapsed. | Root Event | Participants: (settlement=set_ironpeak)
+  [Year  97 Month  4] # 390 DEATH @ set_ironpeak | Theron Ashford died of starvation during the famine in Ironpeak | Causes: [#389] | Participants: (target=char_91)
+  [Year  97 Month  4] # 391 RAID @ set_oakhaven | Desperate food raid launched by starving Ironpeak on Oakhaven | Causes: [#389] | Participants: (initiator=set_ironpeak, target=set_oakhaven)
+  [Year  97 Month  4] # 392 SUCCESSIONCRISIS @ set_ironpeak | Succession crisis erupted in Ironpeak between Lucan Ashford and Bram Ironwood | Causes: [#390] | Participants: (rival_1=char_123, rival_2=char_81, settlement=set_ironpeak)
+  [Year  97 Month  4] # 393 CHIEFCHANGED @ set_ironpeak | Lucan Ashford ascended as the new chief of Ironpeak | Causes: [#392] | Participants: (new_chief=char_123, settlement=set_ironpeak)
+  [Year  97 Month 11] # 396 FAMINE @ set_ironpeak | Severe famine struck Ironpeak as winter food stores collapsed. | Root Event | Participants: (settlement=set_ironpeak)
+  [Year  97 Month 11] # 397 DEATH @ set_ironpeak | Thalia Rivers died of starvation during the famine in Ironpeak | Causes: [#396] | Participants: (target=char_112)
+  [Year  97 Month 11] # 398 RAID @ set_oakhaven | Desperate food raid launched by starving Ironpeak on Oakhaven | Causes: [#396] | Participants: (initiator=set_ironpeak, target=set_oakhaven)
+[Year  98 Summary] Routine demographics: 1 births, 0 marriages, 0 natural deaths.
+  [Year  98 Month  5] # 399 MARRIAGE @ set_oakhaven | Marriage of Eldrin Rivers and Briony Stone | Causes: [#272] | Participants: (spouse1=char_118, spouse2=char_127)
+  [Year  98 Month  6] # 400 FAMINE @ set_ironpeak | Severe famine struck Ironpeak as winter food stores collapsed. | Root Event | Participants: (settlement=set_ironpeak)
+  [Year  98 Month  6] # 401 DEATH @ set_ironpeak | Lucan Ashford died of starvation during the famine in Ironpeak | Causes: [#400] | Participants: (target=char_123)
+  [Year  98 Month  6] # 402 RAID @ set_riverbend | Desperate food raid launched by starving Ironpeak on Riverbend | Causes: [#400] | Participants: (initiator=set_ironpeak, target=set_riverbend)
+  [Year  98 Month  6] # 403 CHIEFCHANGED @ set_ironpeak | Theron Ashford ascended as the new chief of Ironpeak | Causes: [#401] | Participants: (new_chief=char_78, settlement=set_ironpeak)
+[Year  99 Summary] Routine demographics: 1 births, 1 marriages, 0 natural deaths.
+  [Year  99 Month  3] # 405 FAMINE @ set_ironpeak | Severe famine struck Ironpeak as winter food stores collapsed. | Root Event | Participants: (settlement=set_ironpeak)
+  [Year  99 Month  3] # 406 DEATH @ set_ironpeak | Bram Ironwood died of starvation during the famine in Ironpeak | Causes: [#405] | Participants: (target=char_81)
+  [Year  99 Month  3] # 407 RAID @ set_oakhaven | Desperate food raid launched by starving Ironpeak on Oakhaven | Causes: [#405] | Participants: (initiator=set_ironpeak, target=set_oakhaven)
+  [Year  99 Month  9] # 409 PEACE @ set_ironpeak | Peace treaty signed between Ironpeak and Ironpeak, ending feud #304 through exhaustion. | Causes: [#304, #275] | Participants: (initiator=set_ironpeak, party1=char_78, party2=char_68, target=set_ironpeak)
+  [Year  99 Month 10] # 411 FAMINE @ set_ironpeak | Severe famine struck Ironpeak as winter food stores collapsed. | Root Event | Participants: (settlement=set_ironpeak)
+  [Year  99 Month 10] # 412 DEATH @ set_ironpeak | Theron Ashford died of starvation during the famine in Ironpeak | Causes: [#411] | Participants: (target=char_78)
+  [Year  99 Month 10] # 413 RAID @ set_riverbend | Desperate food raid launched by starving Ironpeak on Riverbend | Causes: [#411] | Participants: (initiator=set_ironpeak, target=set_riverbend)
+  [Year  99 Month 10] # 414 SUCCESSIONCRISIS @ set_ironpeak | Succession crisis erupted in Ironpeak between Caleb Ashford and Eleni Rivers | Causes: [#412] | Participants: (rival_1=char_100, rival_2=char_93, settlement=set_ironpeak)
+  [Year  99 Month 10] # 415 CHIEFCHANGED @ set_ironpeak | Caleb Ashford ascended as the new chief of Ironpeak | Causes: [#414] | Participants: (new_chief=char_100, settlement=set_ironpeak)
+[Year 100 Summary] Routine demographics: 1 births, 0 marriages, 0 natural deaths.
+  [Year 100 Month  3] # 416 FAMINE @ set_ironpeak | Severe famine struck Ironpeak as winter food stores collapsed. | Root Event | Participants: (settlement=set_ironpeak)
+  [Year 100 Month  3] # 417 DEATH @ set_ironpeak | Brenna Crowley died of starvation during the famine in Ironpeak | Causes: [#416] | Participants: (target=char_99)
+  [Year 100 Month 11] # 419 FAMINE @ set_ironpeak | Severe famine struck Ironpeak as winter food stores collapsed. | Root Event | Participants: (settlement=set_ironpeak)
+  [Year 100 Month 11] # 420 DEATH @ set_ironpeak | Isolde Ironwood died of starvation during the famine in Ironpeak | Causes: [#419] | Participants: (target=char_163)
