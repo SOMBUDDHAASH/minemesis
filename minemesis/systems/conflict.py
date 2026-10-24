@@ -35,6 +35,8 @@ class ActiveFeud:
     active: bool = True
     last_revenge_tick: int = -100
     revenge_count: int = 0
+    minor_raids: int = 0
+    raid_count: int = 0
 
 
 def process_conflicts_and_economy(
@@ -54,10 +56,13 @@ def process_conflicts_and_economy(
     seed: int,
     belief_counter: list[int],
     memory_counter: list[int],
+    resolved_grievance_event_ids: Set[int] | None = None,
 ) -> None:
     """
     Simulates monthly economic production, leadership, conflicts, and reconciliation.
     """
+    if resolved_grievance_event_ids is None:
+        resolved_grievance_event_ids = set()
     living_chars = [c for c in characters.values() if c.alive]
     sorted_chars = sorted(living_chars, key=lambda c: c.id)
     settlement_keys = sorted(settlements.keys())
@@ -108,29 +113,77 @@ def process_conflicts_and_economy(
         else:
             s.consecutive_starvation_ticks = max(0, s.consecutive_starvation_ticks - 1)
 
-        # Famine check: 2 consecutive months of severe depletion
-        if s.consecutive_starvation_ticks >= 2:
-            famine_roll = keyed_float(seed, "famine_event", s_id, tick)
-            if famine_roll < 0.20:
-                causes: list[int] = []
-                for past_evt in reversed(event_log.all_events()[-25:]):
-                    if past_evt.type == EventType.RAID and past_evt.location == s.id:
-                        causes.append(past_evt.id)
-                        break
+        # Directive 9: Wealth sink (maintenance costs & municipal upkeep)
+        maintenance = max(1, int(pop * 0.15 + (s.wealth * 0.01)))
+        s.wealth = max(0, s.wealth - maintenance)
 
-                famine_evt = event_log.append(
-                    tick=tick,
-                    location=s.id,
-                    event_type=EventType.FAMINE,
-                    participants={"settlement": s.id},
-                    causes=causes,
-                    intent=Intent.ACCIDENTAL,
-                    scale=Scale.AGGREGATE,
-                    payload={"description": f"Severe famine struck {s.name} as winter food stores collapsed.", "settlement": s.id},
-                )
-                s.consecutive_starvation_ticks = 0
+        # Directive 9: Emergency food purchases for wealthy starving settlements
+        if s.food < 15 and s.wealth >= 10:
+            for other_id in settlement_keys:
+                if other_id == s_id or other_id in collapsed_settlements:
+                    continue
+                other_s = settlements[other_id]
+                other_pop = len([c for c in living_chars if c.settlement_id == other_id])
+                surplus = max(0, other_s.food - max(15, other_pop * 2))
+                if surplus > 0:
+                    needed = min(20, 25 - s.food)
+                    price = 3
+                    units = min(needed, surplus, s.wealth // price)
+                    if units > 0:
+                        cost = units * price
+                        s.wealth -= cost
+                        other_s.wealth += cost
+                        s.food += units
+                        other_s.food -= units
+                        s.consecutive_starvation_ticks = max(0, s.consecutive_starvation_ticks - 1)
+                        if s.food >= 15:
+                            break
 
-                if len(local_living) > 4:
+        # Directive 8: Famine Consolidation (historical spell, not bi-monthly pulse)
+        if s.food >= max(20, pop * 2):
+            s.adequate_food_ticks += 1
+            if s.active_famine_event_id is not None and s.adequate_food_ticks >= 6:
+                # Famine spell resolved through sustained recovery
+                s.active_famine_event_id = None
+                s.active_famine_start_tick = None
+        else:
+            s.adequate_food_ticks = 0
+
+        # Trigger new Famine spell ONLY if no active famine and adequate recovery (>= 12 months)
+        if s.active_famine_event_id is None:
+            if s.consecutive_starvation_ticks >= 2 and s.adequate_food_ticks >= 12:
+                famine_roll = keyed_float(seed, "famine_event", s_id, tick)
+                if famine_roll < 0.20:
+                    causes: list[int] = []
+                    for past_evt in reversed(event_log.all_events()[-25:]):
+                        if past_evt.type == EventType.RAID and past_evt.location == s.id:
+                            causes.append(past_evt.id)
+                            break
+
+                    famine_evt = event_log.append(
+                        tick=tick,
+                        location=s.id,
+                        event_type=EventType.FAMINE,
+                        participants={"settlement": s.id},
+                        causes=causes,
+                        intent=Intent.ACCIDENTAL,
+                        scale=Scale.AGGREGATE,
+                        payload={
+                            "description": f"Severe famine struck {s.name} as winter food stores collapsed.",
+                            "settlement": s.id,
+                            "active_spell": True,
+                        },
+                    )
+                    s.active_famine_event_id = famine_evt.id
+                    s.active_famine_start_tick = tick
+                    s.adequate_food_ticks = 0
+                    s.consecutive_starvation_ticks = 0
+
+        # While famine spell is active, starvation deaths cite the active famine
+        if s.active_famine_event_id is not None and s.consecutive_starvation_ticks >= 1:
+            if len(local_living) > 4:
+                starve_roll = keyed_float(seed, "starve_roll", f"{s_id}_{s.active_famine_event_id}", tick)
+                if starve_roll < 0.25:
                     vulnerable = [c for c in local_living if c.age_years >= 60 or c.age_years <= 12]
                     starve_victim = keyed_choice(seed, "starve_victim", s_id, tick, vulnerable or local_living)
                     starve_victim.alive = False
@@ -139,34 +192,40 @@ def process_conflicts_and_economy(
                         location=s.id,
                         event_type=EventType.DEATH,
                         participants={"target": starve_victim.id},
-                        causes=[famine_evt.id],
+                        causes=[s.active_famine_event_id],
                         intent=Intent.ACCIDENTAL,
                         scale=Scale.INDIVIDUAL,
                         payload={
                             "description": f"{starve_victim.full_name} died of starvation during the famine in {s.name}",
                             "victim_name": starve_victim.full_name,
                             "cause": "Starvation",
+                            "famine_id": s.active_famine_event_id,
                         },
                     )
 
-                # Desperate food raid
-                food_rich = [other_id for other_id in settlement_keys if settlements[other_id].food > 40]
-                if food_rich and len(local_living) >= 4:
-                    target_s = keyed_choice(seed, "famine_target", s_id, tick, food_rich)
-                    action_roll = keyed_float(seed, "famine_action", s_id, tick)
-                    if action_roll < 0.35:
-                        event_log.append(
-                            tick=tick,
-                            location=target_s,
-                            event_type=EventType.RAID,
-                            participants={"initiator": s.id, "target": target_s},
-                            causes=[famine_evt.id],
-                            intent=Intent.MILITARY_ACTION,
-                            scale=Scale.AGGREGATE,
-                            payload={"description": f"Desperate food raid launched by starving {s.name} on {settlements[target_s].name}"},
-                        )
-                        settlements[target_s].food -= min(15, settlements[target_s].food // 3)
-                        s.food += 12
+            # Desperate food raid during active famine
+            food_rich = [other_id for other_id in settlement_keys if settlements[other_id].food > 40 and other_id not in collapsed_settlements]
+            if food_rich and len(local_living) >= 4:
+                target_s = keyed_choice(seed, "famine_target", s_id, tick, food_rich)
+                action_roll = keyed_float(seed, "famine_action", s_id, tick)
+                if action_roll < 0.20:
+                    leader_c = characters[s.leader_id] if s.leader_id and s.leader_id in characters and characters[s.leader_id].alive else local_living[0]
+                    event_log.append(
+                        tick=tick,
+                        location=target_s,
+                        event_type=EventType.RAID,
+                        participants={"initiator": s.id, "target": target_s, "instigator_char": leader_c.id},
+                        causes=[s.active_famine_event_id],
+                        intent=Intent.MILITARY_ACTION,
+                        scale=Scale.AGGREGATE,
+                        payload={
+                            "description": f"Desperate food raid launched by {s.name} on {settlements[target_s].name} driven by famine #{s.active_famine_event_id}",
+                            "feud_id": None,
+                            "famine_id": s.active_famine_event_id,
+                        },
+                    )
+                    settlements[target_s].food -= min(15, settlements[target_s].food // 3)
+                    s.food += 12
 
     # =========================================================================
     # 2. TRADE ROUTES (Continuous State & Historical Events, Section 4.2)
@@ -370,6 +429,10 @@ def process_conflicts_and_economy(
                 if not is_valid_offence or not offence_actor or offence_actor == char.id:
                     continue
 
+                # Directive 10: Closed grievances cannot start new feuds
+                if event_ref in resolved_grievance_event_ids:
+                    continue
+
                 accused = characters.get(offence_actor)
                 if not accused or not accused.alive:
                     continue
@@ -522,37 +585,54 @@ def process_conflicts_and_economy(
         raid_prob = 0.04 * (1.3 - 0.3 * defender_set.stability)
         raid_roll = keyed_float(seed, "raid_roll", f"feud_{feud.id}", tick)
         if raid_roll < raid_prob:
-            causes = [feud.id]
+            feud.raid_count += 1
             last_raid_ticks[pair_key] = tick
 
             looted_food = min(15, defender_set.food // 4)
             defender_set.food -= looted_food
             attacker_set.food += looted_food
 
-            raid_evt = event_log.append(
-                tick=tick,
-                location=defender_set.id,
-                event_type=EventType.RAID,
-                participants={
-                    "initiator": attacker_set.id,
-                    "target": defender_set.id,
-                    "instigator_char": instigator.id,
-                },
-                causes=causes,
-                intent=Intent.MILITARY_ACTION,
-                scale=Scale.AGGREGATE,
-                payload={
-                    "description": f"Raid launched by {attacker_set.name} on {defender_set.name} sparked by feud #{feud.id}",
-                    "looted_food": looted_food,
-                    "feud_id": feud.id,
-                },
-            )
-
             defender_living = [c for c in characters.values() if c.alive and c.settlement_id == defender_set.id and c.age_years >= 16]
+            casualty = None
             if len(defender_living) > 3:
-                casualty_roll = keyed_float(seed, "raid_casualty", str(raid_evt.id), tick)
+                casualty_roll = keyed_float(seed, "raid_casualty", f"{feud.id}_{feud.raid_count}", tick)
                 if casualty_roll < 0.08:
-                    casualty = keyed_choice(seed, "raid_victim", str(raid_evt.id), tick, defender_living)
+                    casualty = keyed_choice(seed, "raid_victim", f"{feud.id}_{feud.raid_count}", tick, defender_living)
+
+            # Directive 6: Log an event ONLY when there is a consequence:
+            # - First raid of a feud
+            # - A death
+            # - Food stolen >= 15
+            is_first_raid = (feud.raid_count == 1)
+            has_heavy_loot = (looted_food >= 15)
+            has_casualty = (casualty is not None)
+
+            if not (is_first_raid or has_heavy_loot or has_casualty):
+                feud.minor_raids += 1
+            else:
+                causes = [feud.id]
+                raid_evt = event_log.append(
+                    tick=tick,
+                    location=defender_set.id,
+                    event_type=EventType.RAID,
+                    participants={
+                        "initiator": attacker_set.id,
+                        "target": defender_set.id,
+                        "instigator_char": instigator.id,
+                    },
+                    causes=causes,
+                    intent=Intent.MILITARY_ACTION,
+                    scale=Scale.AGGREGATE,
+                    payload={
+                        "description": f"Raid launched by {attacker_set.name} on {defender_set.name} sparked by feud #{feud.id}",
+                        "looted_food": looted_food,
+                        "feud_id": feud.id,
+                        "minor_raids_preceding": feud.minor_raids,
+                    },
+                )
+                feud.minor_raids = 0
+
+                if casualty is not None:
                     casualty.alive = False
                     event_log.append(
                         tick=tick,
@@ -717,6 +797,13 @@ def process_conflicts_and_economy(
                                 "reconciliation_type": "Truth Revealed",
                             },
                         )
+
+                        # Directive 10: Grievance closure on Peace
+                        resolved_grievance_event_ids.add(feud.root_cause_event_id)
+                        resolved_grievance_event_ids.add(feud.id)
+                        for past_e in event_log.all_events()[-30:]:
+                            if feud.id in past_e.causes:
+                                resolved_grievance_event_ids.add(past_e.id)
                         continue
 
         # Path B: Negotiated Peace through Fatigue & Memory Decay
@@ -779,6 +866,13 @@ def process_conflicts_and_economy(
                             "reconciliation_type": "Negotiated Treaty",
                         },
                     )
+
+                    # Directive 10: Grievance closure on Peace
+                    resolved_grievance_event_ids.add(feud.root_cause_event_id)
+                    resolved_grievance_event_ids.add(feud.id)
+                    for past_e in event_log.all_events()[-30:]:
+                        if feud.id in past_e.causes:
+                            resolved_grievance_event_ids.add(past_e.id)
 
     # =========================================================================
     # 8. SETTLEMENT COLLAPSE & MIGRATION (Milestone 0.5.1 Section 3b)

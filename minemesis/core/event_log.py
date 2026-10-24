@@ -81,12 +81,27 @@ class EventLog:
         causes_tuple = tuple(causes)
         payload_dict = dict(payload) if payload else {}
 
-        # 1. Validate that referenced causes exist
+        # 1. Validate that referenced causes exist and respect lag caps
         cause_events: list[tuple[int, EventType]] = []
         for cause_id in causes_tuple:
             if cause_id not in self._by_id:
                 raise ValueError(f"Cause Event ID {cause_id} does not exist in EventLog")
-            cause_events.append((cause_id, self._by_id[cause_id].type))
+            cause_evt = self._by_id[cause_id]
+            cause_events.append((cause_id, cause_evt.type))
+
+            # Directive 11: Lag caps on cause edges
+            lag = tick - cause_evt.tick
+            if event_type == EventType.MARRIAGE:
+                if cause_evt.type == EventType.PEACE and lag > 12:
+                    raise CausalGrammarError(
+                        f"Marriage at tick {tick} citing Peace #{cause_id} exceeds lag cap "
+                        f"(lag={lag} ticks > 12 max allowed)"
+                    )
+                if cause_evt.type == EventType.TRADE_ROUTE_FOUNDED and lag > 24:
+                    raise CausalGrammarError(
+                        f"Marriage at tick {tick} citing TradeRouteFounded #{cause_id} exceeds lag cap "
+                        f"(lag={lag} ticks > 24 max allowed)"
+                    )
 
         # 2. Validate against CAUSE_GRAMMAR (Section 4.1)
         validate_causes(event_type, cause_events)

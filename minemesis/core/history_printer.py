@@ -10,7 +10,7 @@ Adheres to agent.md and Milestone 0.5 requirements (Section 4.1):
 from __future__ import annotations
 from typing import Sequence, Set
 from minemesis.core.event_log import Event, EventLog
-from minemesis.core.types import EventType
+from minemesis.core.types import EventType, Intent
 
 
 def get_causal_depth(event_log: EventLog, event_id: int) -> int:
@@ -134,9 +134,11 @@ def format_causal_chain(
     event_id: int,
     indent_level: int = 0,
     already_printed: Set[int] | None = None,
+    characters: Mapping[str, Any] | None = None,
 ) -> str:
     """
     Renders a formatted text causal DAG for an event without exponential re-printing.
+    Displays event causes and resolves character IDs to 'Full Name (id)'.
     """
     if already_printed is None:
         already_printed = set()
@@ -145,8 +147,19 @@ def format_causal_chain(
     indent = "  " * indent_level
     bullet = "|-> " if indent_level > 0 else "* "
 
-    participants_str = ", ".join(f"{role}={name}" for role, name in evt.participants)
-    desc = f"[Event #{evt.id} | Year {evt.tick // 12 + 1} Month {evt.tick % 12 + 1}] {evt.type.value} ({evt.intent.value}) @ {evt.location}"
+    # Resolve character names if available
+    part_strs = []
+    for role, name in evt.participants:
+        if characters and name in characters:
+            c_obj = characters[name]
+            full_name = getattr(c_obj, "full_name", str(name))
+            part_strs.append(f"{role}={full_name} ({name})")
+        else:
+            part_strs.append(f"{role}={name}")
+    participants_str = ", ".join(part_strs)
+
+    causes_str = f"Causes: [{', '.join(f'#{c}' for c in evt.causes)}]" if evt.causes else "Causes: none (root)"
+    desc = f"[Event #{evt.id} | Year {evt.tick // 12 + 1} Month {evt.tick % 12 + 1}] {evt.type.value} ({evt.intent.value}) @ {evt.location} | {causes_str}"
     details = f"{desc} | {participants_str}"
     
     if "description" in evt.payload:
@@ -159,9 +172,65 @@ def format_causal_chain(
     lines = [f"{indent}{bullet}{details}"]
 
     for cause_id in evt.causes:
-        lines.append(format_causal_chain(event_log, cause_id, indent_level + 1, already_printed))
+        lines.append(format_causal_chain(event_log, cause_id, indent_level + 1, already_printed, characters))
 
     return "\n".join(lines)
+
+
+def format_notable_deaths(
+    event_log: EventLog,
+    characters: Mapping[str, Any] | None = None,
+) -> list[str]:
+    """
+    Extracts and formats all notable deaths with their antecedent causes:
+    - Chiefs and leaders
+    - Revenge victims
+    - Accident victims (forestry mishaps)
+    - Starvation deaths during famine
+    - Raid casualties
+    - Religious martyrs/saints
+    """
+    notable: list[str] = []
+    for evt in event_log.all_events():
+        if evt.type == EventType.DEATH:
+            victim_id = (
+                evt.participants_dict.get("deceased")
+                or evt.participants_dict.get("target")
+                or evt.participants_dict.get("victim")
+            )
+            victim_name = str(victim_id)
+            if characters and victim_id in characters:
+                c_obj = characters[victim_id]
+                victim_name = f"{getattr(c_obj, 'full_name', victim_id)} ({victim_id})"
+            elif "victim_name" in evt.payload:
+                victim_name = f"{evt.payload['victim_name']} ({victim_id})"
+
+            causes_str = f"Causes: [{', '.join(f'#{c}' for c in evt.causes)}]" if evt.causes else "Causes: none (natural/root)"
+            
+            is_revenge = evt.payload.get("revenge") or ("Revenge" in str(evt.payload))
+            is_accidental = evt.intent == Intent.ACCIDENTAL
+            is_raid = any(event_log.get(c).type == EventType.RAID for c in evt.causes)
+            is_famine = any(event_log.get(c).type == EventType.FAMINE for c in evt.causes)
+            
+            category = "Natural"
+            if is_revenge:
+                category = "Revenge"
+            elif is_raid:
+                category = "Raid Casualty"
+            elif is_famine:
+                category = "Starvation"
+            elif is_accidental:
+                category = "Accident"
+
+            line = (
+                f"[Year {evt.tick // 12 + 1:2d} Month {evt.tick % 12 + 1:2d} | Event #{evt.id:3d}] "
+                f"Death of {victim_name} @ {evt.location} | Category: {category} | {causes_str}"
+            )
+            if "description" in evt.payload:
+                line += f" -- \"{evt.payload['description']}\""
+            notable.append(line)
+
+    return notable
 
 
 def format_linear_history(event_log: EventLog, event_id: int) -> list[str]:

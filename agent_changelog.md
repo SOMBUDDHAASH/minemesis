@@ -146,6 +146,31 @@ Diff of implemented `CAUSE_GRAMMAR` against brief Table 4.1:
   - Includes Negative Control 2: Verifies `validate_entire_history_no_dead_actors` detects and raises `InvariantViolationError` on posthumous actions.
   - Added `test_world_extinction_invariant`: Verifies zero posthumous events are emitted after world population drops to 0, with a negative control proving living worlds continue to advance.
 
+### Step 4. Event Consolidation, Causality Hardening, and History Printing
+- **Raid Consolidation & Consequence Filter**:
+  - Minor skirmishes without casualties, route breakage, or heavy loot (>= 15 food) are recorded as state counters (`feud.minor_raids += 1`) without emitting a `RAID` event.
+  - A `RAID` event is logged exclusively when there is genuine historical consequence: the 1st raid of a feud, a casualty death, or food stolen >= 15.
+  - Archive devastation applies only to logged consequential raid events, not silent skirmishes.
+- **Archive Damage Grief Scoping**:
+  - In `memory_system.py`, grief memories for `ARCHIVE_DAMAGED` are formed strictly by elders (`age_years >= 50`), scholars, or culturally invested characters (`suspicion < 0.25`), rather than every resident in town.
+- **Famine Consolidation (Spells vs Pulses)**:
+  - Famine is modeled as a continuous historical spell rather than a bi-monthly pulse.
+  - Settlements log ONE `FAMINE` event at spell onset. Starvation deaths during the spell cite the active famine.
+  - A minimum recovery period of 12 consecutive months of adequate food is required before any subsequent famine can trigger.
+- **Wealth Sinks & Emergency Food Trade**:
+  - Enforced monthly municipal maintenance costs on settlements (`max(1, pop * 0.15 + wealth * 0.01)`).
+  - Starving settlements with wealth >= 10 actively purchase emergency food at premium prices from neighboring settlements with surplus.
+- **Grievance Closure on Peace**:
+  - When a `Peace` treaty is signed (via Truth Revelation or exhaustion), the feud's root cause and antecedent conflict events are registered in `resolved_grievance_event_ids`.
+  - Future feuds cannot cite resolved grievances, closing causal edges.
+- **Lag Caps on Causal Edges**:
+  - Enforced in `event_log.py` and `life_cycle.py`: A `Marriage` citing `Peace` must occur within 12 ticks of the treaty. A `Marriage` citing `TradeRouteFounded` must occur within 24 ticks. Beyond that, marriages are strictly routine roots.
+- **History Printer & Automated Completeness Test**:
+  - `format_causal_chain` now prints event causes explicitly (`Causes: [#...]`) and resolves character IDs to `Full Name (id)`.
+  - Added `format_notable_deaths` extracting chiefs, martyrs, revenge victims, accident victims, and starvation casualties with causes.
+  - Added `test_printed_causal_chains_completeness_and_verifiability` in `test_causal_chains.py` with a negative control detecting broken/missing causal links.
+
+
 
 
 

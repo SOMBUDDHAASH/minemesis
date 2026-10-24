@@ -52,6 +52,9 @@ class Settlement:
     # Internal civic state
     stability: float = 1.0      # Reduced by SuccessionCrisis; increases raid risk
     consecutive_starvation_ticks: int = 0
+    active_famine_event_id: Optional[int] = None
+    active_famine_start_tick: Optional[int] = None
+    adequate_food_ticks: int = 12
 
     def distance_to(self, other: Settlement) -> float:
         return ((self.x - other.x) ** 2 + (self.y - other.y) ** 2) ** 0.5

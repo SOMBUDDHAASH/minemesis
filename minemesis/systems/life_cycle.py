@@ -88,9 +88,12 @@ def process_life_cycle(
                                     is_alliance = True
                                     break
 
-                        # Or cite opening of diplomatic trade route
+                        # Or cite opening of diplomatic trade route (within 24 ticks per Directive 11)
                         if not causes and route_key in active_trade_route_events:
-                            causes.append(active_trade_route_events[route_key])
+                            tr_id = active_trade_route_events[route_key]
+                            tr_evt = event_log.get(tr_id)
+                            if tr_evt and (tick - tr_evt.tick) <= 24:
+                                causes.append(tr_id)
 
                     relocation_info: dict[str, str] | None = None
                     s_m = settlements[m.settlement_id]

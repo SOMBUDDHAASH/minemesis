@@ -49,6 +49,7 @@ class Simulation:
         self.active_feuds: list[ActiveFeud] = []
         self.marriage_events: dict[tuple[str, str], int] = {}
         self.collapsed_settlements: set[str] = set()
+        self.resolved_grievance_event_ids: set[int] = set()
         
         # Monotonic counters
         self.char_counter = [len(self.characters)]
@@ -326,6 +327,7 @@ class Simulation:
             seed=self.seed,
             belief_counter=self.belief_counter,
             memory_counter=self.memory_counter,
+            resolved_grievance_event_ids=self.resolved_grievance_event_ids,
         )
         self._register_and_perceive_events(conflict_start)
 
