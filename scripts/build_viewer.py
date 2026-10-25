@@ -18,8 +18,8 @@ import zipfile
 # Ensure workspace root is in sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-BUILD_TAG = "m0.5.3"
-BUILD_COMMIT = "e519f52"
+BUILD_TAG = "m0.5.4"
+BUILD_COMMIT = "ec99dd5"
 SHOWCASE_SEEDS = [42, 2029, 2030, 2043, 2011]
 
 
@@ -144,19 +144,19 @@ def write_release_notes():
 
 ---
 
-## What Changed In This Build
-1. **Global Naming Diversity & Scale Upgrade:** Expanded to 10-35 settlements and 35-55 initial villagers across 9 continental cultural traditions, guaranteeing unique personal and settlement names.
-2. **Hard Target Demographics:** Replaced soft survival targets with zero-extinction requirements and verified exact mathematical demographic conservation (living = initial + births - deaths).
-3. **High-Performance Simulation Engine:** Added memoized causal DAG graph traversal, observer-indexed memory lookups, and cached feud sets, keeping execution under 2 minutes for 8,000 citizens.
-4. **Leak-Free Streaming Verifier:** Built a zero-memory-retention streaming JSONL verifier with instant `--single` audit mode and dynamic on-demand history exports.
-5. **Interactive Map & Dual-Seed Viewer:** Includes visual world map inspection, Crockford Base32 seed code sharing, and rapid event text generation with zero raw ID leaks.
+## What Changed In Milestone 0.5.4
+1. **4-Tier Knowledge & Memory Lifecycle Engine:** Eliminated the 75-350 GB memory explosion by tiering memories (Tier 0: Living Full Simulation, Tier 1: Recent Dead Legacy, Tier 2: Compressed Historical Archive, Tier 3: Settlement Epistemic Knowledge).
+2. **Relational Lore Compression & Intermediate Representation (IR):** Replaced raw string event floods with normalized relational references and on-demand template hydration, reducing memory footprint by >90%.
+3. **Procedural Literature & Scripture Engine:** Added 9 distinct book genres (scriptures, chronicles, genealogies, poetry, philosophical treatises, legal codes, memoirs, war accounts, manuals) and sacred religious canons with commandments and holy sites.
+4. **Direct Minecraft Book NBT Export:** Export any procedural book or scripture directly to Vanilla Minecraft JSON / NBT format and copy one-click `/give` commands ready for in-game lecterns.
+5. **Demographic Carrying-Capacity Governor:** Replaced unchecked exponential birth curves with logistic environmental equilibrium, preventing runaway population collapses while preserving kinship dynamics.
 
 ---
 
 ## 3 Things To Look For In The Viewer
-1. **'🗺 Same map, new history' Feature (Toolbar):** Click this button to generate a new history seed while keeping the world geography constant, watching completely different families and feuds unfold across the same valleys and mountains.
-2. **Interactive Settlement Inspection (🗺 Map Tab):** Click on any settlement circle to view its natural farmland, timber, ore, and defensibility endowments alongside year-end municipal stocks across 10-35 villages.
-3. **Dual Seed Box and Typo-Tolerant Seed Codes:** Type any number or phrase in World Seed (Minecraft-style SHA-256 hash), or paste Crockford Base32 codes (e.g. `WB84Q-PGW6-H8FX5:HBSGH-DGGJ-CE46D:V0:6`) to replay exact procedural worlds.
+1. **Books & Scriptures Tab with Minecraft Export:** Select any written book or holy scripture, read its multi-page generated text, and click **'📋 Copy /give Command'** or **'Export Minecraft Book'** to read it directly inside Vanilla Minecraft.
+2. **World & Census Tab Memory Tier Telemetry:** View the real-time breakdown of Tier 0 (Active), Tier 1 (Legacy), Tier 2 (Compressed Archive), and Tier 3 (Settlement Beliefs) objects across the centuries.
+3. **Interactive Map & Religion Inspector:** Inspect sacred holy sites, theological traits, and doctrinal schisms mapped directly across continental terrain endowments.
 
 ---
 
