@@ -14,7 +14,7 @@ import os
 from typing import Any, Mapping, Optional, Sequence
 
 
-SCHEMA_VERSION = "1.0"
+SCHEMA_VERSION = "2.0.0"
 
 
 @dataclass
@@ -107,6 +107,8 @@ class RunData:
     historical_archive_size: int = 0
     active_beliefs_count: int = 0
     compacted_beliefs_count: int = 0
+    epistemic_ledger: list[dict[str, Any]] = field(default_factory=list)
+    is_legacy_schema: bool = False
 
     def get_event_log_proxy(self) -> EventLogProxy:
         proxies = []
@@ -129,6 +131,46 @@ class RunData:
             ))
         return EventLogProxy(_events=proxies)
 
+    def get_book_pages(self, book_id: str) -> list[str]:
+        """Returns the full page strings for a book, synthesizing them lazily on demand if unloaded."""
+        book = next((b for b in self.books if b.get("id") == book_id), None)
+        if not book:
+            return ["[Manuscript not found in archives.]"]
+        pages = book.get("pages")
+        if pages and len(pages) > 0:
+            return list(pages)
+        
+        # Lazy synthesis on demand
+        title = book.get("title", "Untitled Volume")
+        author = book.get("author_name", "Anonymous Scribe")
+        lit = book.get("author_literacy", "Literate")
+        year = book.get("creation_year", 1)
+        genre = book.get("genre", "Chronicle")
+        settle = book.get("settlement_id", "Settlement")
+        bias = book.get("perspective_bias", "Objective")
+
+        page1 = (
+            f"# {title}\n\n"
+            f"Penned in Year {year} by {author} ({lit}) within {settle}.\n\n"
+            f"Genre: {genre}\n"
+            f"Perspective: {bias}\n\n"
+            f"--- [Transcribed from the Civic Lore Library Archive] ---"
+        )
+        page2 = (
+            f"Chapter I: The Historical Inscription\n\n"
+            f"In the early foundation of our people at {settle}, elders gathered to preserve "
+            f"the names and deeds of the lineages. This volume records the truth of our settlement "
+            f"as witnessed under the heavens and chronicled for future generations."
+        )
+        page3 = (
+            f"Chapter II: The Testament of the Years\n\n"
+            f"Though seasons bring famine, feud, and peace in turn, the written word endures. "
+            f"May those who read this manuscript remember the trials of Year {year}."
+        )
+        synth_pages = [page1, page2, page3]
+        book["pages"] = synth_pages
+        return synth_pages
+
     def to_dict(self) -> dict[str, Any]:
         return {
             "schema_version": self.schema_version,
@@ -143,6 +185,7 @@ class RunData:
             "historical_archive_size": self.historical_archive_size,
             "active_beliefs_count": self.active_beliefs_count,
             "compacted_beliefs_count": self.compacted_beliefs_count,
+            "epistemic_ledger": self.epistemic_ledger,
             "years": self.years,
             "toggles": self.toggles,
             "events": self.events,
@@ -163,8 +206,10 @@ class RunData:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> RunData:
+        raw_schema = str(data.get("schema_version", "1.0.0"))
+        is_legacy = raw_schema.startswith("1.") or ("epistemic_ledger" not in data)
         return cls(
-            schema_version=data.get("schema_version", SCHEMA_VERSION),
+            schema_version=raw_schema,
             build_info=data.get("build_info", {}),
             seed=int(data.get("seed", 42)),
             years=int(data.get("years", 100)),
@@ -185,6 +230,8 @@ class RunData:
             historical_archive_size=int(data.get("historical_archive_size", 0)),
             active_beliefs_count=int(data.get("active_beliefs_count", 0)),
             compacted_beliefs_count=int(data.get("compacted_beliefs_count", 0)),
+            epistemic_ledger=data.get("epistemic_ledger", []),
+            is_legacy_schema=is_legacy,
         )
 
     @classmethod
@@ -308,18 +355,23 @@ class RunData:
         total_evts = len(ev_dicts) or 1
         event_share = {k: round((v / total_evts) * 100, 2) for k, v in counts.most_common()}
 
-        # 7. Census (yearly sampling)
+        # 7. Census (yearly sampling with population, food, wealth)
         census = []
         for y in range(1, years + 1):
             y_tick = y * 12
-            # Calculate living characters at year y
             set_pops = {}
-            for s_id in settle_dicts.keys():
+            set_foods = {}
+            set_wealths = {}
+            for s_id, s_data in settle_dicts.items():
                 pop = sum(1 for c in char_dicts.values() if c["settlement_id"] == s_id and (c["alive"] or (c.get("death_tick") or 99999) > y_tick))
                 set_pops[s_id] = pop
+                set_foods[s_id] = s_data.get("food", 0)
+                set_wealths[s_id] = s_data.get("wealth", 0)
             census.append({
                 "year": y,
                 "populations": set_pops,
+                "food": set_foods,
+                "wealth": set_wealths,
                 "total_population": sum(set_pops.values()),
             })
 
@@ -372,6 +424,71 @@ class RunData:
         active_beliefs = sum(len(b) for b in sim.beliefs_by_character.values())
         compacted_beliefs = getattr(sim, "compacted_beliefs_total", 0)
 
+        # 10. Epistemic Ledger (Ground Truth vs Subjective Belief for Conflict & Revelations)
+        epistemic_ledger = []
+        ev_by_id = {e.id: e for e in sim.event_log.all_events()}
+        for e in sim.event_log.all_events():
+            t_val = e.type.value if hasattr(e.type, "value") else str(e.type)
+            if t_val in ("Feud", "FeudBegins", "Revelation", "Death", "SuccessionCrisis"):
+                parts = dict(e.participants)
+                actor_id = parts.get("instigator") or parts.get("witness") or parts.get("actor") or parts.get("aggressor")
+                if not actor_id:
+                    continue
+                # For events caused by prior conflict/accidents
+                for c_id in getattr(e, "causes", ()):
+                    c_evt = ev_by_id.get(c_id)
+                    if not c_evt:
+                        continue
+                    act_type = c_evt.type.value if hasattr(c_evt.type, "value") else str(c_evt.type)
+                    act_intent = c_evt.intent.value if hasattr(c_evt.intent, "value") else str(c_evt.intent)
+                    c_parts = dict(c_evt.participants)
+                    act_actor = c_parts.get("actor") or c_parts.get("aggressor") or ""
+
+                    char_beliefs = sim.beliefs_by_character.get(actor_id, {})
+                    b = char_beliefs.get(c_id)
+                    if b:
+                        bel_type = b.believed_type.value if hasattr(b.believed_type, "value") else str(b.believed_type)
+                        bel_intent = b.believed_intent.value if hasattr(b.believed_intent, "value") else str(b.believed_intent)
+                        bel_actor = b.believed_actor or ""
+                        conf = b.confidence
+                        src = b.source.value if hasattr(b.source, "value") else str(b.source)
+                    elif e.payload.get("is_wrongful"):
+                        bel_type = "Death"
+                        bel_intent = "Intentional"
+                        bel_actor = parts.get("target", "")
+                        conf = 1.0
+                        src = "DistortedGossip"
+                    else:
+                        bel_type = act_type
+                        bel_intent = act_intent
+                        bel_actor = act_actor
+                        conf = 1.0
+                        src = "Witness"
+
+                    is_div = (bel_intent != act_intent) or (bel_actor != act_actor) or (bel_type != act_type)
+                    epistemic_ledger.append({
+                        "event_id": e.id,
+                        "event_tick": e.tick,
+                        "year": (e.tick // 12) + 1,
+                        "event_type": t_val,
+                        "character_id": actor_id,
+                        "character_name": char_dicts.get(actor_id, {}).get("full_name", actor_id),
+                        "target_id": parts.get("target", ""),
+                        "target_name": char_dicts.get(parts.get("target", ""), {}).get("full_name", ""),
+                        "root_cause_id": c_evt.id,
+                        "root_cause_type": act_type,
+                        "believed_type": bel_type,
+                        "believed_intent": bel_intent,
+                        "believed_actor": bel_actor,
+                        "actual_type": act_type,
+                        "actual_intent": act_intent,
+                        "actual_actor": act_actor,
+                        "is_divergent": is_div,
+                        "confidence": conf,
+                        "source": src,
+                        "is_wrongful": bool(e.payload.get("is_wrongful")),
+                    })
+
         # SeedPair and WorldSpec capture
         seed_pair_dict = {}
         pair_code = ""
@@ -407,4 +524,20 @@ class RunData:
             historical_archive_size=historical_size,
             active_beliefs_count=active_beliefs,
             compacted_beliefs_count=compacted_beliefs,
+            epistemic_ledger=epistemic_ledger,
         )
+
+
+def build_run_snapshot(
+    sim: Any,
+    years: int,
+    build_info: Optional[dict[str, Any]] = None,
+) -> RunData:
+    """
+    Produces a read-only RunSnapshot (RunData) containing everything required by the Story Viewer tabs.
+    Prevents any dependency on live simulation objects that compaction or garbage collection may modify.
+    """
+    return RunData.from_simulation(sim, years=years, build_info=build_info)
+
+
+RunSnapshot = RunData

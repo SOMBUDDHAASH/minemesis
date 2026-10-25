@@ -1,6 +1,6 @@
 # Minemesis Story Viewer - Release Notes (m0.5.4)
 
-**Build Commit:** `ec99dd5`  
+**Build Commit:** `3bc4134`  
 **Build Date:** `2026-10-25`  
 **Executable Path:** `releases/MinemesisViewer-m0.5.4.exe` (and `releases/MinemesisViewer-latest.exe`)  
 **Folder Distribution:** `releases/MinemesisViewer-m0.5.4-folder.zip`  

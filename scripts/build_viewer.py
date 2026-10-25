@@ -19,7 +19,7 @@ import zipfile
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 BUILD_TAG = "m0.5.4"
-BUILD_COMMIT = "ec99dd5"
+BUILD_COMMIT = "3bc4134"
 SHOWCASE_SEEDS = [42, 2029, 2030, 2043, 2011]
 
 

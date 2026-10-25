@@ -14,14 +14,17 @@ import threading
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog, scrolledtext
 from typing import Any, Callable, Mapping, Optional, Sequence
+from datetime import datetime
+import traceback
 
 from minemesis.core.seed import SeedPair, new_game, parse_world_seed, parse_history_seed
-from viewer.model import RunData, EventProxy, EventLogProxy, SCHEMA_VERSION
+from viewer.model import RunData, EventProxy, EventLogProxy, SCHEMA_VERSION, build_run_snapshot
 from viewer.formatter import (
     format_event_sentence,
     format_because_clause,
     format_character_name,
     format_settlement_name,
+    format_religion_name,
     get_event_category_color,
 )
 from viewer.threads import extract_story_threads, StoryThread
@@ -34,11 +37,19 @@ from viewer.export import (
 
 
 BUILD_TAG = "m0.5.4"
-BUILD_COMMIT = "55f1d33"
+BUILD_COMMIT = "3bc4134"
 BUILD_TIME = "2026-10-25"
 
 DEFAULT_SEED_PAIR = SeedPair.from_legacy(42)
 SHOWCASE_SEEDS = [42, 2029, 2030, 2043, 2011]
+
+
+def log_viewer_error(context: str, exc: Exception) -> None:
+    """Appends an unhandled viewer error and full stack trace to viewer_errors.log."""
+    tb = traceback.format_exc()
+    with open("viewer_errors.log", "a", encoding="utf-8") as f:
+        f.write(f"\n[{datetime.now().isoformat()}] ERROR in {context}: {exc}\n{tb}\n")
+    print(f"[VIEWER ERROR] {context}: {exc}\n{tb}", file=sys.stderr)
 
 
 class StoryViewerApp:
@@ -61,6 +72,9 @@ class StoryViewerApp:
 
         # Styles
         self._setup_styles()
+
+        # Error interception
+        self.root.report_callback_exception = lambda exc, val, tb: log_viewer_error("Tkinter Callback", val)
 
         # Build UI layout
         self._build_top_controls()
@@ -210,6 +224,20 @@ class StoryViewerApp:
         self._build_religion_tab()
         self._build_changes_tab()
 
+        self.notebook.bind("<<NotebookTabChanged>>", self._on_tab_changed)
+
+    def _on_tab_changed(self, event=None):
+        if not self.run_data:
+            return
+        try:
+            sel_tab = self.notebook.select()
+            if sel_tab == str(self.tab_map):
+                self._redraw_map()
+            elif sel_tab == str(self.tab_world):
+                self._draw_population_chart()
+        except Exception as ex:
+            log_viewer_error("Tab switch redraw", ex)
+
     def _build_status_bar(self):
         self.status_bar = ttk.Frame(self.root, padding=4)
         self.status_bar.pack(side=tk.BOTTOM, fill=tk.X)
@@ -228,13 +256,21 @@ class StoryViewerApp:
         filt_frame = ttk.Frame(self.tab_story, padding=4)
         filt_frame.pack(side=tk.TOP, fill=tk.X)
 
+        self.filter_major_events_only = tk.BooleanVar(value=True)
+        ttk.Checkbutton(
+            filt_frame,
+            text="🌟 Major Events Only",
+            variable=self.filter_major_events_only,
+            command=self._apply_story_filters,
+        ).pack(side=tk.LEFT, padx=(2, 6))
+
         self.filter_hide_demographics = tk.BooleanVar(value=True)
         ttk.Checkbutton(
             filt_frame,
             text="Hide Routine Demographics",
             variable=self.filter_hide_demographics,
             command=self._apply_story_filters,
-        ).pack(side=tk.LEFT, padx=(2, 8))
+        ).pack(side=tk.LEFT, padx=(2, 6))
 
         self.filter_tally_conflicts = tk.BooleanVar(value=False)
         ttk.Checkbutton(
@@ -298,6 +334,7 @@ class StoryViewerApp:
         self.story_text.tag_configure("civic", foreground="#2C3E50")
         self.story_text.tag_configure("because", font=("Segoe UI", 9, "italic"), foreground="#707B7C", lmargin1=24, lmargin2=24)
         self.story_text.tag_configure("raw", font=("Consolas", 9), foreground="#2C3E50")
+        self.story_text.tag_configure("civic_tally", font=("Segoe UI", 9, "bold"), foreground="#1F618D", spacing1=2, spacing3=2)
 
     def _jump_to_year(self):
         val = self.story_year_jump_var.get().strip()
@@ -845,56 +882,89 @@ class StoryViewerApp:
         # TRUTH VS BELIEF AUDIT
         self.person_details_text.insert(tk.END, "TRUTH VS. BELIEF AUDIT (Epistemic Reality vs. Subjective Mind):\n", "sec_hdr")
         c_beliefs = self.run_data.beliefs.get(cid, {})
+        ledger_entries = [entry for entry in getattr(self.run_data, "epistemic_ledger", []) if entry.get("character_id") == cid or entry.get("target_id") == cid]
 
-        if not c_beliefs:
-            self.person_details_text.insert(tk.END, "  This character holds no recorded historical event beliefs.\n")
-        else:
+        if not c_beliefs and not ledger_entries:
             self.person_details_text.insert(
                 tk.END,
-                f"  This character holds {len(c_beliefs)} event beliefs. Comparing mind to reality:\n\n"
+                "  This citizen held no divergent wrongful beliefs or feud conflicts.\n"
+                "  (Peaceful memories and everyday beliefs are cleanly compressed into Tier 2 archive to preserve memory).\n"
             )
-
-            # Iterate through beliefs
-            divergence_count = 0
-            for e_id_str, b_dict in c_beliefs.items():
-                e_id = int(e_id_str)
-                real_evt = self.event_log_proxy.get(e_id) if self.event_log_proxy else None
-
-                b_type = b_dict.get("believed_type", "")
-                b_intent = b_dict.get("believed_intent", "")
-                b_actor = format_character_name(b_dict.get("believed_actor", ""), self.run_data.characters)
-                b_conf = b_dict.get("confidence", 1.0)
-                b_src = b_dict.get("source", "")
-
-                r_type = real_evt.type.value if real_evt else "Unknown"
-                r_intent = real_evt.intent.value if real_evt else "Unknown"
-                r_actor = format_character_name(real_evt.participants_dict.get("actor", "") or real_evt.participants_dict.get("aggressor", ""), self.run_data.characters) if real_evt else "None"
-
-                is_divergent = (b_type != r_type) or (b_intent != r_intent) or (b_dict.get("believed_actor") and b_dict.get("believed_actor") != real_evt.participants_dict.get("actor") if real_evt else False)
-                if is_divergent:
-                    divergence_count += 1
-
-                flag_tag = "divergence" if is_divergent else "accord"
-                flag_text = " [DIVERGENCE / MISTRUTH]" if is_divergent else " [TRUE WITNESS]"
-
-                self.person_details_text.insert(tk.END, f"  • Event #{e_id}{flag_text}\n", flag_tag)
+        else:
+            # 1. Epistemic Ledger (Permanent records of Feuds, Revelations, Murders)
+            if ledger_entries:
                 self.person_details_text.insert(
                     tk.END,
-                    f"      Belief ({b_src}, conf: {b_conf:.2f}): Considers it a '{b_type}' with '{b_intent}' intent by {b_actor}.\n",
-                    "belief_hdr"
+                    f"  Historical Conflict & Epistemic Encounters ({len(ledger_entries)} recorded):\n\n"
                 )
-                self.person_details_text.insert(
-                    tk.END,
-                    f"      Reality: Was actually a '{r_type}' with '{r_intent}' intent by {r_actor}.\n\n",
-                    "truth_hdr"
-                )
+                for entry in ledger_entries:
+                    flag_tag = "divergence" if entry.get("is_divergent") else "accord"
+                    flag_text = " [WRONGFUL GRUDGE / FALSE BELIEF]" if entry.get("is_wrongful") or entry.get("is_divergent") else " [OBJECTIVE TRUTH ACCORD]"
+                    self.person_details_text.insert(tk.END, f"  • Event #{entry['event_id']} ({entry['event_type']} in Year {entry['year']}){flag_text}\n", flag_tag)
+                    bel_act = format_character_name(entry.get("believed_actor", ""), self.run_data.characters)
+                    act_act = format_character_name(entry.get("actual_actor", ""), self.run_data.characters)
+                    self.person_details_text.insert(
+                        tk.END,
+                        f"      Belief ({entry.get('source')}, conf: {entry.get('confidence', 1.0):.2f}): Believed root #{entry.get('root_cause_id')} was '{entry.get('believed_type')}' with '{entry.get('believed_intent')}' intent by {bel_act}.\n",
+                        "belief_hdr"
+                    )
+                    self.person_details_text.insert(
+                        tk.END,
+                        f"      Reality: Was actually an objective '{entry.get('actual_type')}' with '{entry.get('actual_intent')}' intent by {act_act}.\n\n",
+                        "truth_hdr"
+                    )
 
-            if divergence_count > 0:
+            # 2. Active Personal Beliefs
+            if c_beliefs:
                 self.person_details_text.insert(
                     tk.END,
-                    f"  Summary: {divergence_count} of {len(c_beliefs)} beliefs diverge from ground truth reality, driving suspicion and grudges.\n",
-                    "divergence"
+                    f"  Active Personal Beliefs ({len(c_beliefs)} events held in memory):\n\n"
                 )
+                divergence_count = 0
+                for e_id_str, b_dict in c_beliefs.items():
+                    e_id = int(e_id_str)
+                    real_evt = self.event_log_proxy.get(e_id) if self.event_log_proxy else None
+
+                    b_type = b_dict.get("believed_type", "")
+                    b_intent = b_dict.get("believed_intent", "")
+                    b_actor = format_character_name(b_dict.get("believed_actor", ""), self.run_data.characters)
+                    b_conf = b_dict.get("confidence", 1.0)
+                    b_src = b_dict.get("source", "")
+
+                    r_type = real_evt.type.value if real_evt else "Unknown"
+                    r_intent = real_evt.intent.value if real_evt else "Unknown"
+                    r_actor = format_character_name(real_evt.participants_dict.get("actor", "") or real_evt.participants_dict.get("aggressor", ""), self.run_data.characters) if real_evt else "None"
+
+                    is_divergent = False
+                    if real_evt:
+                        if b_type != r_type or b_intent != r_intent:
+                            is_divergent = True
+                        elif b_dict.get("believed_actor") and b_dict.get("believed_actor") != real_evt.participants_dict.get("actor"):
+                            is_divergent = True
+                    if is_divergent:
+                        divergence_count += 1
+
+                    flag_tag = "divergence" if is_divergent else "accord"
+                    flag_text = " [DIVERGENCE / MISTRUTH]" if is_divergent else " [TRUE WITNESS]"
+
+                    self.person_details_text.insert(tk.END, f"  • Event #{e_id}{flag_text}\n", flag_tag)
+                    self.person_details_text.insert(
+                        tk.END,
+                        f"      Belief ({b_src}, conf: {b_conf:.2f}): Considers it a '{b_type}' with '{b_intent}' intent by {b_actor}.\n",
+                        "belief_hdr"
+                    )
+                    self.person_details_text.insert(
+                        tk.END,
+                        f"      Reality: Was actually a '{r_type}' with '{r_intent}' intent by {r_actor}.\n\n",
+                        "truth_hdr"
+                    )
+
+                if divergence_count > 0:
+                    self.person_details_text.insert(
+                        tk.END,
+                        f"  Summary: {divergence_count} of {len(c_beliefs)} active beliefs diverge from ground truth reality.\n",
+                        "divergence"
+                    )
 
     # -------------------------------------------------------------------------
     # TAB 5: WORLD & CENSUS
@@ -1171,7 +1241,7 @@ class StoryViewerApp:
         if not self.run_data or not self.run_data.books:
             return
         b = self.run_data.books[self.current_book_index]
-        pages = b.get("pages", [])
+        pages = self.run_data.get_book_pages(b.get("id", ""))
         total_pages = len(pages)
 
         self.reader_meta_lbl.config(
@@ -1200,7 +1270,8 @@ class StoryViewerApp:
         if not self.run_data or not self.run_data.books:
             return
         b = self.run_data.books[self.current_book_index]
-        if self.current_book_page < len(b.get("pages", [])) - 1:
+        pages = self.run_data.get_book_pages(b.get("id", ""))
+        if self.current_book_page < len(pages) - 1:
             self.current_book_page += 1
             self._render_current_book_page()
 
@@ -1441,13 +1512,43 @@ class StoryViewerApp:
     # DATA POPULATION
     # =========================================================================
 
+    def _safe_populate_tab(self, tab_name: str, tab_widget: ttk.Frame, populate_func: Callable[[], None]):
+        """Executes a tab population function safely. On error, logs traceback and shows a visible banner."""
+        for child in tab_widget.winfo_children():
+            if getattr(child, "_is_error_banner", False):
+                child.destroy()
+        try:
+            populate_func()
+        except Exception as ex:
+            log_viewer_error(f"Tab '{tab_name}' population", ex)
+            banner = tk.Frame(tab_widget, bg="#FADBD8", bd=1, relief=tk.SOLID)
+            banner._is_error_banner = True
+            lbl = tk.Label(
+                banner,
+                text=f"⚠️ Error loading {tab_name} tab: {ex}\n(Traceback logged to viewer_errors.log)",
+                fg="#78281F", bg="#FADBD8", font=("Segoe UI", 9, "bold"), justify=tk.LEFT, padx=6, pady=4
+            )
+            lbl.pack(side=tk.LEFT, fill=tk.X, expand=True)
+            banner.pack(side=tk.TOP, fill=tk.X, padx=4, pady=4)
+
     def set_run_data(self, run_data: RunData):
         self.run_data = run_data
         self.event_log_proxy = run_data.get_event_log_proxy()
 
+        # Resilient dual seed extraction
         if run_data.seed_pair:
-            self.world_var.set(str(run_data.seed_pair[0]))
-            self.history_var.set(str(run_data.seed_pair[1]))
+            if isinstance(run_data.seed_pair, dict):
+                w = run_data.seed_pair.get("world", run_data.seed)
+                h = run_data.seed_pair.get("history") or run_data.seed_pair.get("chronicle", run_data.seed)
+            else:
+                w = run_data.seed_pair[0]
+                h = run_data.seed_pair[1]
+            self.world_var.set(str(w))
+            self.history_var.set(str(h))
+        elif hasattr(run_data, "seed"):
+            self.world_var.set(str(run_data.seed))
+            self.history_var.set(str(run_data.seed))
+
         if run_data.pair_code:
             self.code_var.set(run_data.pair_code)
 
@@ -1462,22 +1563,26 @@ class StoryViewerApp:
         self.filter_type.current(0)
 
         # Extract conflict storylines
-        self.threads = extract_story_threads(
-            event_log=self.event_log_proxy,
-            characters=run_data.characters,
-            settlements=run_data.settlements,
-            min_events=3,
-        )
+        try:
+            self.threads = extract_story_threads(
+                event_log=self.event_log_proxy,
+                characters=run_data.characters,
+                settlements=run_data.settlements,
+                min_events=3,
+            )
+        except Exception as ex:
+            log_viewer_error("Extracting story threads", ex)
+            self.threads = []
 
-        # Refresh all views
-        self._apply_story_filters()
-        self._redraw_map()
-        self._populate_why_tab()
-        self._populate_threads_tab()
-        self._populate_people_tab()
-        self._populate_world_tab()
-        self._populate_books_tab()
-        self._populate_religion_tab()
+        # Refresh all views safely so an error in one tab never prevents other tabs from rendering!
+        self._safe_populate_tab("Story", self.tab_story, self._apply_story_filters)
+        self._safe_populate_tab("Map", self.tab_map, self._redraw_map)
+        self._safe_populate_tab("Why", self.tab_why, self._populate_why_tab)
+        self._safe_populate_tab("Threads", self.tab_threads, self._populate_threads_tab)
+        self._safe_populate_tab("People & Truth", self.tab_people, self._populate_people_tab)
+        self._safe_populate_tab("World & Census", self.tab_world, self._populate_world_tab)
+        self._safe_populate_tab("Books", self.tab_books, self._populate_books_tab)
+        self._safe_populate_tab("Religion", self.tab_religion, self._populate_religion_tab)
 
     def _apply_story_filters(self):
         if not self.run_data or not self.event_log_proxy:
@@ -1485,6 +1590,7 @@ class StoryViewerApp:
 
         hide_demographics = self.filter_hide_demographics.get()
         tally_conflicts = self.filter_tally_conflicts.get()
+        major_only = self.filter_major_events_only.get()
         sel_settle = self.filter_settlement.get()
         sel_type = self.filter_type.get()
         search_query = self.story_search_var.get().strip().lower()
@@ -1492,21 +1598,18 @@ class StoryViewerApp:
 
         self.story_text.delete("1.0", tk.END)
 
+        ROUTINE_EVENT_TYPES = {
+            "LocalCustomCelebrated", "SeasonalCustomCelebration",
+            "Pilgrimage", "Conversion", "TradeRouteFounded", "TradeRouteBroken"
+        }
+
+        from collections import defaultdict
+        year_routine_counts = defaultdict(lambda: defaultdict(int))
         filtered_events = []
+
         for e in self.event_log_proxy.all_events():
             t_val = e.type.value
-
-            # Filter demographics
-            if hide_demographics:
-                if t_val in ("Birth", "Marriage"):
-                    continue
-                if t_val == "Death" and e.payload.get("cause") in ("old_age", "natural_causes", "illness", "fever"):
-                    continue
-
-            # Tally conflicts
-            if tally_conflicts:
-                if t_val not in ("Feud", "Raid", "Death", "Peace", "SuccessionCrisis", "SettlementCollapse"):
-                    continue
+            year = (e.tick // 12) + 1
 
             # Settlement filter
             if sel_settle != "All Settlements":
@@ -1519,7 +1622,25 @@ class StoryViewerApp:
                 if t_val != sel_type:
                     continue
 
-            sentence = format_event_sentence(e, self.run_data.characters, self.run_data.settlements)
+            # Filter routine background events if major_only mode is on
+            if major_only and not raw_mode and sel_type == "All Types":
+                if t_val in ROUTINE_EVENT_TYPES:
+                    year_routine_counts[year][t_val] += 1
+                    continue
+
+            # Filter demographics
+            if hide_demographics and not raw_mode and sel_type == "All Types":
+                if t_val in ("Birth", "Marriage"):
+                    continue
+                if t_val == "Death" and e.payload.get("cause") in ("old_age", "natural_causes", "illness", "fever"):
+                    continue
+
+            # Tally conflicts
+            if tally_conflicts:
+                if t_val not in ("Feud", "Raid", "Death", "Peace", "SuccessionCrisis", "SettlementCollapse"):
+                    continue
+
+            sentence = format_event_sentence(e, self.run_data.characters, self.run_data.settlements, self.run_data.religions)
             if search_query:
                 if (search_query not in sentence.lower() and
                     search_query not in t_val.lower() and
@@ -1528,43 +1649,74 @@ class StoryViewerApp:
 
             filtered_events.append((e, sentence))
 
-        # Group by year
-        current_year = -1
-        for e, sentence in filtered_events:
-            year = (e.tick // 12) + 1
-            if year != current_year:
-                current_year = year
-                self.story_text.insert(tk.END, f"\n=== YEAR {current_year:02d} ===\n", "year_hdr")
+        # Render events grouped by year
+        events_by_year = defaultdict(list)
+        for e, sent in filtered_events:
+            events_by_year[(e.tick // 12) + 1].append((e, sent))
 
-            if raw_mode:
-                self.story_text.insert(
-                    tk.END,
-                    f"  [#{e.id:04d} Y{year:02d} T{e.tick:04d}] {e.type.value} @ {e.location} causes={list(e.causes)}: {sentence}\n",
-                    "raw"
-                )
-            else:
-                tag = "civic"
-                t_val = e.type.value
-                if t_val in ("Feud", "Raid", "SuccessionCrisis", "SettlementCollapse"):
-                    tag = "conflict"
-                elif t_val in ("Peace", "Marriage", "Birth"):
-                    tag = "flourishing"
-                elif t_val in ("Conversion", "Revelation", "HolySiteDiscovered", "HolySiteElevated", "ReligiousSchism", "Pilgrimage"):
-                    tag = "religion"
-                elif t_val in ("BookWritten", "ArchiveDamaged"):
-                    tag = "literature"
-                elif t_val in ("Famine",):
-                    tag = "famine"
+        all_display_years = sorted(set(list(events_by_year.keys()) + list(year_routine_counts.keys())))
 
-                self.story_text.insert(tk.END, f"  • {sentence}\n", tag)
-                because_clause = format_because_clause(e, self.event_log_proxy, self.run_data.characters, self.run_data.settlements)
-                if because_clause:
-                    self.story_text.insert(tk.END, f"      [↳ {because_clause}]\n", "because")
+        for y in all_display_years:
+            self.story_text.insert(tk.END, f"\n=== YEAR {y:02d} ===\n", "year_hdr")
+            # If routine events were tallied for this year, render consolidated summary
+            r_counts = year_routine_counts[y]
+            if r_counts:
+                tally_bits = []
+                if r_counts.get("Pilgrimage"):
+                    tally_bits.append(f"{r_counts['Pilgrimage']} pilgrimages")
+                if r_counts.get("Conversion"):
+                    tally_bits.append(f"{r_counts['Conversion']} conversions")
+                cust_cnt = r_counts.get("LocalCustomCelebrated", 0) + r_counts.get("SeasonalCustomCelebration", 0)
+                if cust_cnt:
+                    tally_bits.append(f"{cust_cnt} seasonal customs celebrated")
+                tr_cnt = r_counts.get("TradeRouteFounded", 0) + r_counts.get("TradeRouteBroken", 0)
+                if tr_cnt:
+                    tally_bits.append(f"{tr_cnt} trade route developments")
+                if tally_bits:
+                    self.story_text.insert(tk.END, f"  📊 Annual Civic Tally: {', '.join(tally_bits)}.\n", "civic_tally")
+
+            for e, sentence in events_by_year[y]:
+                if raw_mode:
+                    self.story_text.insert(
+                        tk.END,
+                        f"  [#{e.id:04d} Y{y:02d} T{e.tick:04d}] {e.type.value} @ {e.location} causes={list(e.causes)}: {sentence}\n",
+                        "raw"
+                    )
+                else:
+                    tag = "civic"
+                    t_val = e.type.value
+                    if t_val in ("Feud", "Raid", "SuccessionCrisis", "SettlementCollapse"):
+                        tag = "conflict"
+                    elif t_val in ("Peace", "Marriage", "Birth"):
+                        tag = "flourishing"
+                    elif t_val in ("Conversion", "Revelation", "HolySiteDiscovered", "HolySiteElevated", "ReligiousSchism", "Pilgrimage"):
+                        tag = "religion"
+                    elif t_val in ("BookWritten", "ArchiveDamaged"):
+                        tag = "literature"
+                    elif t_val in ("Famine",):
+                        tag = "famine"
+
+                    self.story_text.insert(tk.END, f"  • {sentence}\n", tag)
+                    because_clause = format_because_clause(e, self.event_log_proxy, self.run_data.characters, self.run_data.settlements, self.run_data.religions)
+                    if because_clause:
+                        self.story_text.insert(tk.END, f"      [↳ {because_clause}]\n", "because")
 
     def _populate_why_tab(self):
         self.why_tree.delete(*self.why_tree.get_children())
         self.why_details_text.delete("1.0", tk.END)
         self._filter_why_events()
+        # Auto-select the first event with causes so causality details are immediately visible
+        children = self.why_tree.get_children()
+        if children:
+            chosen_iid = children[0]
+            for iid in children:
+                e_id = int(iid)
+                evt = self.event_log_proxy.get(e_id) if self.event_log_proxy else None
+                if evt and getattr(evt, "causes", None):
+                    chosen_iid = iid
+                    break
+            self.why_tree.selection_set(chosen_iid)
+            self.inspect_event_causality(int(chosen_iid))
 
     def _populate_threads_tab(self):
         self.threads_tree.delete(*self.threads_tree.get_children())
@@ -1581,14 +1733,34 @@ class StoryViewerApp:
         if self.threads:
             self.threads_tree.selection_set(self.threads[0].thread_id)
             self._on_thread_select()
+        else:
+            self.thread_detail_text.insert(
+                tk.END,
+                "No Multi-Generational Conflict Threads Detected\n\n",
+                "thread_title"
+            )
+            self.thread_detail_text.insert(
+                tk.END,
+                "Story threads require chains of 3 or more causally linked conflict events (such as murders, feuds, revenge killings, and peace treaties).\n\n"
+                "In this historical epoch, settlements remained largely peaceful or disputes resolved before escalating into sustained blood vendettas.\n"
+                "Try running a longer simulation or a seed with tighter resource competition."
+            )
 
     def _populate_people_tab(self):
         self.people_tree.delete(*self.people_tree.get_children())
         self.person_details_text.delete("1.0", tk.END)
         self._filter_people_list()
-        all_cids = list(self.run_data.characters.keys())
-        if all_cids:
-            self.people_tree.selection_set(all_cids[0])
+        children = self.people_tree.get_children()
+        if children:
+            # Auto-select a person who holds epistemic beliefs or is part of epistemic ledger
+            chosen_cid = children[0]
+            ledger = getattr(self.run_data, "epistemic_ledger", [])
+            divergent_cids = {entry["character_id"] for entry in ledger if entry.get("character_id")}
+            for cid in children:
+                if cid in divergent_cids:
+                    chosen_cid = cid
+                    break
+            self.people_tree.selection_set(chosen_cid)
             self._on_person_select()
 
     def _populate_world_tab(self):
@@ -1624,6 +1796,7 @@ class StoryViewerApp:
                                causes=tuple(e.get("causes", ())), intent_val="", scale_val="", payload=dict(e.get("payload",{}))),
                     self.run_data.characters,
                     self.run_data.settlements,
+                    self.run_data.religions,
                 )
                 self.crisis_tree.insert("", tk.END, values=(y, s_name, sent))
 
@@ -1683,6 +1856,7 @@ class StoryViewerApp:
                                causes=tuple(e.get("causes", ())), intent_val="", scale_val="", payload=dict(e.get("payload",{}))),
                     self.run_data.characters,
                     self.run_data.settlements,
+                    self.run_data.religions,
                 )
                 self.rel_events_tree.insert("", tk.END, values=(y, t, sent))
                 rel_events.append((y, t, sent))
@@ -1743,11 +1917,29 @@ class StoryViewerApp:
     def load_run_file(self, file_path: str):
         try:
             run_data = RunData.load_from_json(file_path)
-            self.seed_var.set(str(run_data.seed))
+            if run_data.seed_pair:
+                if isinstance(run_data.seed_pair, dict):
+                    w = run_data.seed_pair.get("world", run_data.seed)
+                    h = run_data.seed_pair.get("history") or run_data.seed_pair.get("chronicle", run_data.seed)
+                else:
+                    w = run_data.seed_pair[0]
+                    h = run_data.seed_pair[1]
+                self.world_var.set(str(w))
+                self.history_var.set(str(h))
+            else:
+                self.world_var.set(str(run_data.seed))
+                self.history_var.set(str(run_data.seed))
+
+            if run_data.pair_code:
+                self.code_var.set(run_data.pair_code)
+
             self.years_var.set(str(run_data.years))
             self.toggle_religion.set(run_data.toggles.get("religion", True))
             self.toggle_lore.set(run_data.toggles.get("lore", True))
             self.set_run_data(run_data)
+        except Exception as ex:
+            log_viewer_error(f"Loading run file '{file_path}'", ex)
+            messagebox.showerror("Error Loading File", f"Could not load run file:\n{ex}")
             self.status_label.config(text=f"Loaded: {os.path.basename(file_path)}")
         except Exception as ex:
             messagebox.showerror("Load Failed", f"Could not load run file:\n{ex}")

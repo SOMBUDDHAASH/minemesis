@@ -22,7 +22,7 @@ from viewer.formatter import (
 from viewer.model import EventProxy, EventLogProxy
 
 
-RAW_ID_REGEX = re.compile(r"\b(char_\d+|set_[a-z0-9_]+)\b")
+RAW_ID_REGEX = re.compile(r"\b(char_\d+|set_[a-z0-9_]+|rel_\w+)\b")
 
 
 def test_character_and_settlement_name_formatting():
@@ -148,9 +148,34 @@ def test_format_because_clause():
 
 def test_negative_control_raw_id_detector():
     """Negative control: proves RAW_ID_REGEX actually catches raw IDs when present."""
-    bad_sentence = "At set_ironwood, char_42 declared a blood feud against char_99."
+    bad_sentence = "At set_ironwood, char_42 converted from rel_1 to rel_2 and feuded with char_99."
     leaks = RAW_ID_REGEX.findall(bad_sentence)
-    assert leaks == ["set_ironwood", "char_42", "char_99"], "Negative control failed: detector did not catch raw IDs"
+    assert leaks == ["set_ironwood", "char_42", "rel_1", "rel_2", "char_99"], "Negative control failed: detector did not catch raw IDs"
+
+
+def test_religion_formatting_and_no_raw_religion_ids():
+    """Ensures religion IDs like rel_1, rel_2 resolve cleanly with no leaks."""
+    chars = {"char_1": {"full_name": "Alden Thorne"}}
+    settlements = {"set_streamford": {"name": "Streamford"}}
+    religions = {
+        "rel_1": {"name": "River Faith of Streamford"},
+        "rel_2": {"name": "Children of the Sun"},
+    }
+
+    ev_conv = EventProxy(
+        id=101, tick=12, location="set_streamford", type_val="Conversion",
+        participants=(("convert", "char_1"),), causes=(),
+        intent_val="Intentional", scale_val="Individual",
+        payload={"character_id": "char_1", "old_religion": "rel_1", "new_religion": "rel_2", "reason": "Marriage"},
+    )
+    sentence = format_event_sentence(ev_conv, chars, settlements, religions)
+    assert "Alden Thorne converted from River Faith of Streamford to Children of the Sun in Streamford (Marriage)." == sentence
+    assert not RAW_ID_REGEX.findall(sentence)
+
+    # Even without explicit religions dict, fallback must never leak raw rel_1
+    sentence_fallback = format_event_sentence(ev_conv, chars, settlements, None)
+    assert not RAW_ID_REGEX.findall(sentence_fallback)
+    assert "rel_1" not in sentence_fallback and "rel_2" not in sentence_fallback
 
 
 def test_minecraft_book_export_and_give_command():
