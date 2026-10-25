@@ -38,7 +38,7 @@ def test_cast_generation_guarantees_per_settlement():
         # Check per settlement
         for site in world_spec.settlements:
             s_chars = [c for c in characters.values() if c.settlement_id == site.id]
-            assert 18 <= len(s_chars) <= 40, f"Settlement {site.id} has {len(s_chars)} characters"
+            assert 35 <= len(s_chars) <= 55, f"Settlement {site.id} has {len(s_chars)} characters"
 
             # Unique full names per settlement
             names = [f"{c.first_name} {c.last_name}" for c in s_chars]

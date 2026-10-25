@@ -243,6 +243,11 @@ def process_conflicts_and_economy(
     # =========================================================================
     # 2. TRADE ROUTES (Continuous State & Historical Events, Section 4.2)
     # =========================================================================
+    active_feud_by_settlements = {
+        tuple(sorted([f.instigator_settlement_id, f.target_settlement_id])): f
+        for f in active_feuds if f.active
+    }
+
     for i, s1_id in enumerate(settlement_keys):
         for s2_id in settlement_keys[i + 1 :]:
             route_key = tuple(sorted([s1_id, s2_id]))
@@ -251,24 +256,13 @@ def process_conflicts_and_economy(
                 route = TradeRoute(settlement_a=s1_id, settlement_b=s2_id, active=False)
                 trade_routes[route_key] = route
 
-            has_feud = any(
-                f.active and (
-                    (f.instigator_settlement_id == s1_id and f.target_settlement_id == s2_id)
-                    or (f.instigator_settlement_id == s2_id and f.target_settlement_id == s1_id)
-                )
-                for f in active_feuds
-            )
+            feud_causing = active_feud_by_settlements.get(route_key)
+            has_feud = feud_causing is not None
 
             s1 = settlements[s1_id]
             s2 = settlements[s2_id]
 
-            if route.active and has_feud:
-                feud_causing = next(
-                    f for f in active_feuds if f.active and (
-                        (f.instigator_settlement_id == s1_id and f.target_settlement_id == s2_id)
-                        or (f.instigator_settlement_id == s2_id and f.target_settlement_id == s1_id)
-                    )
-                )
+            if route.active and has_feud and feud_causing is not None:
                 event_log.append(
                     tick=tick,
                     location=s1.id,
@@ -409,11 +403,16 @@ def process_conflicts_and_economy(
     total_active = sum(1 for f in active_feuds if f.active)
 
     if total_active < 4:
+        active_instigators = {f.instigator_char_id for f in active_feuds if f.active}
+        active_char_pairs = {(f.instigator_char_id, f.target_char_id) for f in active_feuds if f.active}
+        active_settlement_pairs = {tuple(sorted([f.instigator_settlement_id, f.target_settlement_id])) for f in active_feuds if f.active}
+
         for char in sorted_chars:
-            if any(f.active and f.instigator_char_id == char.id for f in active_feuds):
+            if char.id in active_instigators:
                 continue
 
             char_beliefs = beliefs_by_character.get(char.id, {})
+            started_feud_for_char = False
             for event_ref in sorted(char_beliefs.keys()):
                 belief = char_beliefs[event_ref]
 
@@ -453,11 +452,11 @@ def process_conflicts_and_economy(
                 if not accused or not accused.alive:
                     continue
 
-                if any(f.active and f.instigator_char_id == char.id and f.target_char_id == accused.id for f in active_feuds):
+                if (char.id, accused.id) in active_char_pairs:
                     continue
 
                 pair_key = tuple(sorted([char.settlement_id, accused.settlement_id]))
-                if any(f.active and tuple(sorted([f.instigator_settlement_id, f.target_settlement_id])) == pair_key for f in active_feuds):
+                if pair_key in active_settlement_pairs:
                     continue
 
                 rel = get_relationship(char.id, accused.id)
@@ -493,20 +492,27 @@ def process_conflicts_and_economy(
                             },
                         )
 
-                        active_feuds.append(
-                            ActiveFeud(
-                                id=evt.id,
-                                instigator_char_id=char.id,
-                                target_char_id=accused.id,
-                                instigator_settlement_id=char.settlement_id,
-                                target_settlement_id=accused.settlement_id,
-                                root_cause_event_id=event_ref,
-                                is_wrongful=is_wrongful,
-                                start_tick=tick,
-                                active=True,
-                            )
+                        new_feud = ActiveFeud(
+                            id=evt.id,
+                            instigator_char_id=char.id,
+                            target_char_id=accused.id,
+                            instigator_settlement_id=char.settlement_id,
+                            target_settlement_id=accused.settlement_id,
+                            root_cause_event_id=event_ref,
+                            is_wrongful=is_wrongful,
+                            start_tick=tick,
+                            active=True,
                         )
+                        active_feuds.append(new_feud)
+                        active_instigators.add(char.id)
+                        active_char_pairs.add((char.id, accused.id))
+                        active_settlement_pairs.add(pair_key)
+                        total_active += 1
+                        started_feud_for_char = True
                         break
+
+            if started_feud_for_char and total_active >= 4:
+                break
 
     # =========================================================================
     # 5. REVENGE KILLINGS (Historical Pressure 1, Section 4.5)

@@ -9,6 +9,7 @@ Rules:
 """
 
 from __future__ import annotations
+import re
 from typing import Any, Mapping, Optional, Sequence
 from minemesis.core.types import EventType, Intent
 
@@ -186,12 +187,12 @@ def format_event_sentence(
 
     # 11. Trade Routes
     elif t_val == "TradeRouteFounded":
-        s1 = format_settlement_name(participants.get("settlement1", ""), settlements)
-        s2 = format_settlement_name(participants.get("settlement2", ""), settlements)
+        s1 = format_settlement_name(participants.get("settlement_a") or participants.get("settlement1", ""), settlements)
+        s2 = format_settlement_name(participants.get("settlement_b") or participants.get("settlement2", ""), settlements)
         return f"A bilateral commercial and diplomatic trade route was opened between {s1} and {s2}."
     elif t_val == "TradeRouteBroken":
-        s1 = format_settlement_name(participants.get("settlement1", ""), settlements)
-        s2 = format_settlement_name(participants.get("settlement2", ""), settlements)
+        s1 = format_settlement_name(participants.get("settlement_a") or participants.get("settlement1", ""), settlements)
+        s2 = format_settlement_name(participants.get("settlement_b") or participants.get("settlement2", ""), settlements)
         reason = payload.get("reason", "conflict")
         return f"The trade corridor between {s1} and {s2} was severed due to {reason}."
 
@@ -213,10 +214,8 @@ def format_event_sentence(
     elif t_val == "BookWritten":
         title = payload.get("title", "Untitled Volume")
         # Format any raw settlement IDs embedded in book title
-        for sid, s_obj in settlements.items():
-            if sid in title:
-                s_name = s_obj.get("name") if isinstance(s_obj, dict) else getattr(s_obj, "name", sid)
-                title = title.replace(sid, s_name)
+        if settlements and "set_" in title:
+            title = re.sub(r"set_\w+", lambda m: format_settlement_name(m.group(0), settlements), title)
         author = format_character_name(participants.get("author", ""), characters)
         genre = payload.get("genre", "Literature")
         return f"{author} penned '{title}', a {genre} preserved in the archives of {loc_name}."
@@ -285,14 +284,10 @@ def format_event_sentence(
     if desc:
         # Clean any raw IDs from description
         cleaned = desc
-        if characters:
-            for cid, cobj in characters.items():
-                if cid in cleaned:
-                    cleaned = cleaned.replace(cid, format_character_name(cid, characters))
-        if settlements:
-            for sid, sobj in settlements.items():
-                if sid in cleaned:
-                    cleaned = cleaned.replace(sid, format_settlement_name(sid, settlements))
+        if characters and "char_" in cleaned:
+            cleaned = re.sub(r"char_\w+", lambda m: format_character_name(m.group(0), characters), cleaned)
+        if settlements and "set_" in cleaned:
+            cleaned = re.sub(r"set_\w+", lambda m: format_settlement_name(m.group(0), settlements), cleaned)
         return cleaned
 
     return f"A notable {t_val} event occurred in {loc_name}."

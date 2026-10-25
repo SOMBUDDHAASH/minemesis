@@ -13,32 +13,48 @@ from minemesis.core.event_log import Event, EventLog
 from minemesis.core.types import EventType, Intent
 
 
-def get_causal_depth(event_log: EventLog, event_id: int) -> int:
+def get_causal_depth(event_log: EventLog, event_id: int, memo: dict[int, int] | None = None) -> int:
     """
     Returns the maximum depth of backwards causal chain from this event.
     Depth 0 means no causes (root event).
     """
+    if memo is not None and event_id in memo:
+        return memo[event_id]
     evt = event_log.get(event_id)
     if not evt.causes:
-        return 0
-    return 1 + max(get_causal_depth(event_log, c_id) for c_id in evt.causes)
+        res = 0
+    else:
+        res = 1 + max(get_causal_depth(event_log, c_id, memo=memo) for c_id in evt.causes)
+    if memo is not None:
+        memo[event_id] = res
+    return res
 
 
-def get_longest_causal_path(event_log: EventLog, event_id: int) -> list[int]:
+def get_longest_causal_path(
+    event_log: EventLog, event_id: int, memo: dict[int, list[int]] | None = None
+) -> list[int]:
     """
     Returns the list of Event IDs along the longest causal path ending at event_id.
     """
+    if memo is not None and event_id in memo:
+        return memo[event_id]
     evt = event_log.get(event_id)
     if not evt.causes:
-        return [event_id]
+        res = [event_id]
+        if memo is not None:
+            memo[event_id] = res
+        return res
 
     longest_ancestor_path: list[int] = []
     for c_id in evt.causes:
-        ancestor_path = get_longest_causal_path(event_log, c_id)
+        ancestor_path = get_longest_causal_path(event_log, c_id, memo=memo)
         if len(ancestor_path) > len(longest_ancestor_path):
             longest_ancestor_path = ancestor_path
 
-    return longest_ancestor_path + [event_id]
+    res = longest_ancestor_path + [event_id]
+    if memo is not None:
+        memo[event_id] = res
+    return res
 
 
 def get_distinct_event_types_on_path(event_log: EventLog, path: Sequence[int]) -> set[EventType]:
@@ -59,27 +75,41 @@ CONFLICT_EVENT_TYPES = frozenset({
 })
 
 
-def get_longest_conflict_path(event_log: EventLog, event_id: int) -> list[int]:
+def get_longest_conflict_path(
+    event_log: EventLog, event_id: int, memo: dict[int, list[int]] | None = None
+) -> list[int]:
     """
     Returns the list of Event IDs along the longest conflict causal path ending at event_id.
     Edges and nodes are strictly restricted to CONFLICT_EVENT_TYPES:
     Death, Feud, Raid, Famine, SuccessionCrisis, Peace, Revelation.
     """
+    if memo is not None and event_id in memo:
+        return memo[event_id]
+
     evt = event_log.get(event_id)
     if evt.type not in CONFLICT_EVENT_TYPES:
-        return []
+        res = []
+        if memo is not None:
+            memo[event_id] = res
+        return res
 
     valid_causes = [c_id for c_id in evt.causes if event_log.get(c_id).type in CONFLICT_EVENT_TYPES]
     if not valid_causes:
-        return [event_id]
+        res = [event_id]
+        if memo is not None:
+            memo[event_id] = res
+        return res
 
     longest_ancestor: list[int] = []
     for c_id in valid_causes:
-        ancestor_path = get_longest_conflict_path(event_log, c_id)
+        ancestor_path = get_longest_conflict_path(event_log, c_id, memo=memo)
         if len(ancestor_path) > len(longest_ancestor):
             longest_ancestor = ancestor_path
 
-    return longest_ancestor + [event_id]
+    res = longest_ancestor + [event_id]
+    if memo is not None:
+        memo[event_id] = res
+    return res
 
 
 def get_deepest_conflict_chain_metrics(event_log: EventLog) -> tuple[int, int, int]:
@@ -91,11 +121,12 @@ def get_deepest_conflict_chain_metrics(event_log: EventLog) -> tuple[int, int, i
     best_id = -1
     best_depth = -1
     best_types_count = 0
+    memo: dict[int, list[int]] = {}
 
     for evt in event_log.all_events():
         if evt.type not in CONFLICT_EVENT_TYPES:
             continue
-        path = get_longest_conflict_path(event_log, evt.id)
+        path = get_longest_conflict_path(event_log, evt.id, memo=memo)
         if not path:
             continue
         depth = len(path) - 1
@@ -116,9 +147,10 @@ def get_deepest_causal_chain_metrics(event_log: EventLog) -> tuple[int, int, int
     best_id = -1
     best_depth = -1
     best_types_count = 0
+    memo: dict[int, list[int]] = {}
 
     for evt in event_log.all_events():
-        path = get_longest_causal_path(event_log, evt.id)
+        path = get_longest_causal_path(event_log, evt.id, memo=memo)
         depth = len(path) - 1
         distinct_types = len(get_distinct_event_types_on_path(event_log, path))
         if depth > best_depth or (depth == best_depth and distinct_types > best_types_count):

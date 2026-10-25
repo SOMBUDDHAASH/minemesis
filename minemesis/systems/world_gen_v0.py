@@ -20,25 +20,127 @@ from minemesis.core.rng import keyed_hash_int
 from minemesis.systems.world_spec import SettlementSite, WorldSpec, WorldProvider
 
 
-# Place Name Syllable Tables by Profile
-PLACE_NAME_TABLES = {
-    "river": {
-        "prefixes": ["River", "Water", "Brook", "Ford", "Stream", "Creek", "Clear", "Silver", "Swift", "Reed", "Otter", "Flow"],
-        "suffixes": ["bend", "ford", "mouth", "haven", "mere", "cross", "well", "reach", "bank", "wash", "side", "run"],
+# Multi-Continental Place Name Traditions (Spanning Global Continents)
+# Rendered in accessible English typography while preserving authentic cultural phonotactics
+GLOBAL_VILLAGE_TRADITIONS = {
+    # 1. Anglo-Celtic & Western European
+    "anglo_celtic": {
+        "prefixes": [
+            "Stone", "Ash", "River", "High", "Winter", "Black", "Oak", "Falcon", "Crow", "White",
+            "Silver", "Thorn", "Red", "Glen", "Loch", "Bryn", "Fjord", "Kirk", "Heath", "Moor",
+            "Raven", "Shield", "Vale", "Dale", "Cliff", "Brook", "Holm", "Bramble", "Fox", "Wolf",
+            "Alder", "Birch", "Iron", "Gold", "Hawk", "Hart", "Barrow", "Fair", "Amber", "Deep"
+        ],
+        "suffixes": [
+            "ford", "bury", "stead", "haven", "dale", "moor", "hurst", "wick", "ton", "croft",
+            "garth", "bridge", "wood", "ridge", "well", "crest", "cross", "gate", "holm", "field",
+            "berg", "kirk", "by", "vik", "gard", "nes", "low", "worth", "mouth", "mere"
+        ],
     },
-    "mountain": {
-        "prefixes": ["Iron", "High", "Stone", "Crag", "Peak", "Frost", "Cliff", "Rock", "Gray", "Storm", "Cold", "Copper"],
-        "suffixes": ["peak", "crag", "ridge", "spire", "mount", "hold", "crest", "rock", "horn", "fall", "pass", "deep"],
+    # 2. Mediterranean & Southern European
+    "mediterranean": {
+        "prefixes": [
+            "Monte", "Valle", "Porto", "Rocca", "Castel", "Riva", "Bella", "Serena", "Terra", "Costa",
+            "Ponte", "Fonte", "Sol", "Sierra", "Villa", "Camino", "Playa", "Isla", "Rio", "Bosco",
+            "San", "Santa", "Canto", "Alba", "Pico", "Viento", "Cielo", "Luz", "Plaza", "Faro"
+        ],
+        "suffixes": [
+            "monte", "valle", "porto", "rocca", "castello", "riva", "costa", "ponte", "fonte", "canto",
+            "villa", "camino", "bello", "vista", "verde", "mar", "pico", "sierra", "faro", "plaza"
+        ],
     },
-    "forest": {
-        "prefixes": ["Oak", "Green", "Timber", "Thorn", "Shadow", "Pine", "Elder", "Ash", "Moss", "Deep", "Briar", "Birch"],
-        "suffixes": ["wood", "haven", "grove", "glade", "shade", "vale", "hollow", "hurst", "dell", "bower", "wild", "copse"],
+    # 3. Nordic & Baltic
+    "nordic": {
+        "prefixes": [
+            "Fjord", "Frost", "Nord", "Is", "Skag", "Tind", "Foss", "Strom", "Vind", "Borg",
+            "Lund", "Hult", "Bred", "Stor", "Myr", "Klint", "Malm", "Gull", "Ulf", "Bjorn",
+            "Varg", "Hauk", "Ravne", "Sjo", "Hav", "Vik", "Trom", "Vester", "Aust", "Syd"
+        ],
+        "suffixes": [
+            "vik", "gard", "holm", "by", "fjord", "foss", "tind", "nes", "skag", "borg",
+            "lund", "hult", "sund", "dal", "bu", "mark", "berg", "tuna", "valla", "havn"
+        ],
     },
-    "plain": {
-        "prefixes": ["Sun", "Golden", "Wind", "Meadow", "Low", "Amber", "Fair", "Broad", "Open", "Bright", "Dawn", "Spring"],
-        "suffixes": ["field", "plain", "meadow", "dale", "stead", "land", "vale", "bury", "heath", "moor", "down", "gate"],
+    # 4. Slavic & Eastern European
+    "slavic": {
+        "prefixes": [
+            "Bel", "Novo", "Stari", "Krasno", "Zlat", "Gora", "Reka", "Les", "Bor", "Yar",
+            "Dol", "Mir", "Svet", "Lug", "Pol", "Ozer", "Brod", "Grad", "Chern", "Dub",
+            "Lip", "Berez", "Ostrov", "Vysok", "Chist", "Tikh", "Zelen", "Kam", "Plam", "Voda"
+        ],
+        "suffixes": [
+            "grad", "pol", "yar", "bor", "les", "brod", "dol", "gora", "mir", "lug",
+            "reka", "voda", "selo", "stan", "pole", "ostrov", "kamen", "dub", "berez", "yar"
+        ],
+    },
+    # 5. East Asian (Sino / Japanese / Korean phonetics in English)
+    "east_asian": {
+        "prefixes": [
+            "Yama", "Shima", "Kawa", "Mori", "Hana", "Tani", "Oka", "Matsu", "Sugi", "Kuro",
+            "Shiro", "Qing", "Bai", "Jin", "Shan", "Jiang", "Long", "Feng", "Yun", "Chun",
+            "Cheon", "Baek", "Gang", "Han", "Gyeong", "Pyeong", "Song", "An", "Yue", "Tian",
+            "Tai", "Dong", "Nan", "Xi", "Bei", "Zhong", "Lu", "Hai", "He", "Chuan"
+        ],
+        "suffixes": [
+            "yama", "shima", "kawa", "mori", "hara", "sato", "tani", "oka", "mura", "zaki",
+            "shan", "jiang", "zhou", "ping", "lin", "hai", "yuan", "cheon", "san", "gang",
+            "jin", "dong", "seong", "gok", "do", "ri", "man", "kou", "tan", "wan"
+        ],
+    },
+    # 6. South Asian / Indic
+    "south_asian": {
+        "prefixes": [
+            "Surya", "Chandra", "Ganga", "Shanti", "Ratna", "Sagar", "Nandi", "Vana", "Deva", "Amrita",
+            "Kalyan", "Rishi", "Sundar", "Megha", "Pushpa", "Jala", "Himal", "Tara", "Arjun", "Ashok",
+            "Kashi", "Shiva", "Brahma", "Indra", "Padma", "Anand", "Vayu", "Agni", "Prithvi", "Shri",
+            "Hari", "Om", "Dharma", "Satya", "Maha", "Raj", "Vijay", "Nil", "Swarna", "Kesh"
+        ],
+        "suffixes": [
+            "pur", "nagar", "giri", "durg", "ghat", "sar", "vapi", "gram", "kanda", "palli",
+            "khet", "vada", "kund", "tal", "daha", "bazaar", "pura", "dham", "sthan", "garh"
+        ],
+    },
+    # 7. Middle Eastern & North African (Semitic / Persian)
+    "middle_eastern": {
+        "prefixes": [
+            "Nahr", "Jabal", "Ain", "Beit", "Qasr", "Bandar", "Dar", "Bahr", "Noor", "Wadi",
+            "Bustan", "Mina", "Rabat", "Bab", "Zaytoun", "Sultan", "Shah", "Firuz", "Roshan", "Shirin",
+            "Mir", "Khor", "Diyar", "Medina", "Kuh", "Dasht", "Gul", "Chinar", "Daryacheh", "Sahar"
+        ],
+        "suffixes": [
+            "bad", "abad", "stan", "oasis", "wadi", "kasbah", "medina", "sar", "bazar", "bahr",
+            "jabal", "dar", "makan", "khan", "gah", "kuh", "nahr", "gard", "roud", "gah"
+        ],
+    },
+    # 8. African (Swahili, Bantu, West African)
+    "african": {
+        "prefixes": [
+            "Kilima", "Ziwa", "Bonde", "Mto", "Shamba", "Imani", "Jua", "Simba", "Amani", "Mlima",
+            "Kaya", "Nyota", "Kazi", "Baraka", "Mawenzi", "Umoja", "Kwame", "Oba", "Zuri", "Tano",
+            "Asante", "Kibo", "Serengeti", "Ruvuma", "Mara", "Bantu", "Zambezi", "Limpopo", "Nile", "Congo",
+            "Kano", "Ife", "Oyo", "Kumasi", "Lamu", "Malindi", "Kilwa", "Sofala", "Kigali", "Goma"
+        ],
+        "suffixes": [
+            "zuri", "boma", "kwa", "mji", "kaya", "vlei", "dala", "mani", "shamba", "ziwa",
+            "mto", "hills", "haven", "springs", "falls", "pass", "ridge", "vale", "grove", "point"
+        ],
+    },
+    # 9. Indigenous Americas & Oceanic
+    "americas_oceanic": {
+        "prefixes": [
+            "Canyon", "Bluff", "Mesa", "Prairie", "Arroyo", "Creek", "Ridge", "Bayou", "Pueblo", "Sierra",
+            "Moana", "Atoll", "Reef", "Wai", "Motu", "Tane", "Rua", "Aroha", "Hawa", "Koa",
+            "Kauri", "Totara", "Anahuac", "Tenoch", "Cuzco", "Andes", "Pampa", "Selva", "Rani", "Tahiti"
+        ],
+        "suffixes": [
+            "tlan", "pan", "co", "koti", "wai", "moana", "nui", "motu", "mesa", "bluff",
+            "creek", "canyon", "bayou", "falls", "pass", "ridge", "haven", "shores", "peak", "run"
+        ],
     },
 }
+
+# Retained alias for backward compatibility
+PLACE_NAME_TABLES = GLOBAL_VILLAGE_TRADITIONS
 
 
 def _uint64_hash(x: int, y: int, seed: int, salt: int = 0) -> int:
@@ -96,25 +198,36 @@ def distance_euclidean(x1: int, y1: int, x2: int, y2: int) -> float:
 class V0WorldGenerator:
     """
     WorldProvider implementation for Milestone 0.5.3.
+    Generates 10 to 35 settlements across a 300x300 world with multi-continental naming traditions.
     """
-    def __init__(self, map_width: int = 200, map_height: int = 200, margin: int = 20):
+    def __init__(
+        self,
+        map_width: int = 300,
+        map_height: int = 300,
+        margin: int = 20,
+        min_settlements: int = 10,
+        max_settlements: int = 35,
+    ):
         self.map_width = map_width
         self.map_height = map_height
         self.margin = margin
+        self.min_settlements = min_settlements
+        self.max_settlements = max_settlements
 
     def generate(self, world_seed: int, name_salt: int = 0) -> WorldSpec:
         """
         Deterministically produces an immutable WorldSpec from world_seed.
         Guarantees 100% economic viability and minimum spacing through deterministic retries.
-        Place names use isolated 'name:' domain keying.
+        Place names use isolated 'name:' domain keying across global continental traditions.
         """
-        # Determine target settlement count: 3 to 7 (average 4.5)
+        # Determine target settlement count: 10 to 35
         count_roll = keyed_hash_int(world_seed, "target_settlement_count", 0, 0)
-        target_count = 3 + (count_roll % 5)  # 3, 4, 5, 6, or 7
+        span = max(1, self.max_settlements - self.min_settlements + 1)
+        target_count = self.min_settlements + (count_roll % span)  # 10 to 35
 
         current_count = target_count
-        while current_count >= 3:
-            for attempt in range(20):
+        while current_count >= self.min_settlements:
+            for attempt in range(25):
                 attempt_seed = keyed_hash_int(world_seed, "world_attempt", attempt, current_count)
                 sites = self._attempt_generate_sites(attempt_seed, current_count, name_salt=name_salt)
                 if sites and self._is_world_viable(sites):
@@ -125,10 +238,10 @@ class V0WorldGenerator:
                         settlements=tuple(sites),
                         generator_version="v0",
                     )
-            # If 20 attempts failed at current_count, decrease settlement count by 1
+            # If 25 attempts failed at current_count, decrease settlement count by 1
             current_count -= 1
 
-        # Fallback to guaranteed baseline 3 sites
+        # Fallback to guaranteed baseline 10 sites
         fallback_seed = keyed_hash_int(world_seed, "fallback_sites", 0, 0)
         fallback_sites = self._generate_guaranteed_baseline(fallback_seed, name_salt=name_salt)
         return WorldSpec(
@@ -141,14 +254,14 @@ class V0WorldGenerator:
 
     def _attempt_generate_sites(self, seed: int, count: int, name_salt: int = 0) -> list[SettlementSite] | None:
         """Attempts to sample count sites with minimum distance and valid profiles."""
-        min_distance = 32.0
+        min_distance = max(18.0, 36.0 - (count * 0.45))
         usable_w = self.map_width - (2 * self.margin)
         usable_h = self.map_height - (2 * self.margin)
         if usable_w <= 0 or usable_h <= 0:
             return None
 
         candidates: list[tuple[int, int]] = []
-        max_candidate_tries = 150
+        max_candidate_tries = 600
 
         for try_idx in range(max_candidate_tries):
             if len(candidates) >= count:
@@ -264,30 +377,44 @@ class V0WorldGenerator:
         return sites
 
     def _generate_place_name(self, site_type: str, seed: int, index: int, used_names: set[str], name_salt: int = 0) -> str:
-        """Generates a unique thematic place name using the isolated 'name:' key domain."""
-        tables = PLACE_NAME_TABLES.get(site_type, PLACE_NAME_TABLES["plain"])
-        prefs = tables["prefixes"]
-        suffs = tables["suffixes"]
+        """Generates a unique thematic place name spanning diverse global naming traditions."""
+        tradition_keys = list(GLOBAL_VILLAGE_TRADITIONS.keys())
+        # Pick culture tradition based on site index and seed hash
+        t_choice = tradition_keys[keyed_hash_int(seed, "name:tradition_choice", index, 0, salt=name_salt) % len(tradition_keys)]
+        tradition_tables = GLOBAL_VILLAGE_TRADITIONS[t_choice]
+        prefs = tradition_tables["prefixes"]
+        suffs = tradition_tables["suffixes"]
 
-        for var_idx in range(50):
+        for var_idx in range(100):
             p_idx = keyed_hash_int(seed, "name:place_prefix", index, var_idx, salt=name_salt) % len(prefs)
             s_idx = keyed_hash_int(seed, "name:place_suffix", index, var_idx, salt=name_salt) % len(suffs)
-            candidate = f"{prefs[p_idx]}{suffs[s_idx]}"
-            if candidate not in used_names:
-                return candidate
+            pref = prefs[p_idx]
+            suff = suffs[s_idx]
+            if suff.lower().startswith(pref[-1].lower()):
+                cand = f"{pref}{suff[1:]}"
+            else:
+                cand = f"{pref}{suff}"
+            if cand not in used_names:
+                return cand
 
-        # Fallback with index tag if all combinations clashed
-        return f"{prefs[0]}{suffs[0]} {index + 1}"
+        # Fallback with regional descriptor to ensure 100% uniqueness
+        modifiers = ["Upper", "Lower", "New", "Great", "Old", "Port", "Fort", "Mount", "Cape", "Saint"]
+        mod = modifiers[keyed_hash_int(seed, "name:place_mod", index, 0, salt=name_salt) % len(modifiers)]
+        cand = f"{mod} {prefs[index % len(prefs)]}{suffs[index % len(suffs)]}"
+        if cand not in used_names:
+            return cand
+        return f"{prefs[index % len(prefs)]}{suffs[index % len(suffs)]} {index + 1}"
 
     def _is_world_viable(self, sites: list[SettlementSite]) -> bool:
         """
         Viability at generation time:
-        1. Every settlement has farmland >= 0.45 OR water_access >= 0.40 OR ore_richness >= 1.20.
-        2. World contains at least one agricultural hub with farmland >= 1.20.
-        3. World contains resource diversity (ore or forest variation).
-        4. Pairwise distance >= 30 between all sites.
+        1. Settlement count >= min_settlements.
+        2. Every settlement has farmland >= 0.45 OR water_access >= 0.40 OR ore_richness >= 1.20.
+        3. World contains at least one agricultural hub with farmland >= 1.20.
+        4. World contains resource diversity (ore or forest variation).
+        5. Pairwise distance >= min_distance between all sites.
         """
-        if len(sites) < 3:
+        if len(sites) < self.min_settlements:
             return False
 
         # Check each site's subsistence viability
@@ -309,19 +436,27 @@ class V0WorldGenerator:
             return False
 
         # Minimum spacing
+        min_distance = max(18.0, 36.0 - (len(sites) * 0.45))
         for i in range(len(sites)):
             for j in range(i + 1, len(sites)):
-                if distance_euclidean(sites[i].x, sites[i].y, sites[j].x, sites[j].y) < 30.0:
+                if distance_euclidean(sites[i].x, sites[i].y, sites[j].x, sites[j].y) < min_distance:
                     return False
 
         return True
 
     def _generate_guaranteed_baseline(self, seed: int, name_salt: int = 0) -> list[SettlementSite]:
-        """Guaranteed viable baseline of 3 well-spaced settlements as ultimate fallback."""
+        """Guaranteed viable baseline of 10 well-spaced settlements as ultimate fallback."""
         configs = [
             ("set_0", "Highplain", 40, 40, 1.45, 1.10, 0.65, 0.90, 0.40, "plain"),
-            ("set_1", "Riverford", 160, 50, 1.10, 1.35, 0.85, 1.05, 0.85, "river"),
-            ("set_2", "Ironhold", 100, 160, 0.75, 0.80, 1.70, 1.45, 0.30, "mountain"),
+            ("set_1", "Riverford", 150, 40, 1.10, 1.35, 0.85, 1.05, 0.85, "river"),
+            ("set_2", "Ironhold", 260, 40, 0.75, 0.80, 1.70, 1.45, 0.30, "mountain"),
+            ("set_3", "Greenwood", 40, 150, 1.00, 1.50, 0.60, 1.00, 0.50, "forest"),
+            ("set_4", "Sunvalley", 150, 150, 1.50, 1.00, 0.55, 0.85, 0.35, "plain"),
+            ("set_5", "Deepcrag", 260, 150, 0.65, 0.75, 1.80, 1.50, 0.25, "mountain"),
+            ("set_6", "Otterbend", 40, 260, 1.15, 1.25, 0.70, 0.95, 0.90, "river"),
+            ("set_7", "Timberhurst", 150, 260, 0.90, 1.65, 0.65, 1.10, 0.45, "forest"),
+            ("set_8", "Goldridge", 260, 260, 0.80, 0.85, 1.60, 1.40, 0.30, "mountain"),
+            ("set_9", "Fairmeadow", 200, 200, 1.40, 1.05, 0.60, 0.90, 0.55, "plain"),
         ]
         sites = []
         for s_id, default_name, x, y, farm, forst, ore, defn, water, s_type in configs:

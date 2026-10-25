@@ -24,7 +24,13 @@ from minemesis.models.character import Character
 from minemesis.systems.world_spec import WorldSpec, SettlementSite
 
 
+# =============================================================================
+# MULTI-CONTINENTAL GLOBAL NAMING CATALOG (All Continents, English Typography)
+# Spanning European, East Asian, South Asian, Middle Eastern, African, and Americas/Oceanic
+# =============================================================================
+
 GIVEN_NAMES_MALE = [
+    # Anglo-Celtic, Nordic & Western European
     "Arthur", "Rowan", "Caleb", "Gideon", "Tobias", "Bram", "Cedric", "Aldous",
     "Gareth", "Eldrin", "Silas", "Corin", "Lucan", "Orson", "Theron", "Vance",
     "Benedict", "Casper", "Dorian", "Evander", "Finnian", "Gregor", "Halden", "Isaac",
@@ -32,9 +38,41 @@ GIVEN_NAMES_MALE = [
     "Roderick", "Soren", "Tristan", "Ulric", "Valen", "Wilhelm", "Yorick", "Zane",
     "Ansel", "Bastian", "Colm", "Declan", "Eamon", "Fenton", "Galen", "Hollis",
     "Idris", "Kael", "Lorcan", "Magnus", "Ned", "Oskar", "Pierce", "Ronan",
+    "Henrik", "Liam", "Callum", "Alistair", "Stefan", "Lars", "Emil", "Hugo",
+    # Southern European & Romance
+    "Mateo", "Rafael", "Marco", "Giovanni", "Dante", "Leonardo", "Lorenzo", "Thiago",
+    "Diego", "Javier", "Alvaro", "Santiago", "Manuel", "Esteban", "Emilio", "Bruno",
+    # Eastern European & Slavic
+    "Nikolai", "Alexei", "Dmitry", "Milan", "Igor", "Boris", "Viktor", "Marek",
+    "Bogdan", "Stanislav", "Pavel", "Yuri", "Vadim", "Anton", "Lev", "Oleg",
+    # East Asian (transliterated)
+    "Jun", "Wei", "Chen", "Ming", "Liang", "Tao", "Feng", "Bo", "Zhi", "Ren",
+    "Kenji", "Hiroshi", "Daiki", "Kaito", "Kazuki", "Sora", "Minho", "Jihoon", "Sangwoo",
+    "Donghyun", "Taejin", "Seung", "Haruto", "Shin", "Koji", "Bao", "Huy", "Quang",
+    "Jian", "Haoran", "Ryu", "Akira", "Yuto", "Kenta", "Takeshi", "Zhen", "Kang",
+    # South Asian / Indic
+    "Aarav", "Rohan", "Arjun", "Dev", "Kabir", "Neil", "Kian", "Vihaan", "Samar",
+    "Aryan", "Rishi", "Aditya", "Taran", "Vikram", "Kiran", "Anand", "Nikhil", "Pranav",
+    "Siddharth", "Amar", "Rajesh", "Sanjay", "Tarun", "Gautam", "Mohan", "Hari", "Prakash",
+    "Alok", "Deepak", "Manish", "Sunil", "Vivek", "Ajay", "Amit", "Ashwin", "Bhaskar",
+    # Middle Eastern & North African
+    "Amir", "Zayd", "Tariq", "Samir", "Farhan", "Rayan", "Malik", "Omar", "Karim",
+    "Navid", "Reza", "Arash", "Sorush", "Darius", "Eren", "Kaan", "Emre", "Baris",
+    "Timur", "Harun", "Salim", "Nabil", "Farid", "Rashid", "Amin", "Mansur", "Zayn",
+    "Bilal", "Hamza", "Ilyas", "Mustafa", "Sami", "Yasin", "Zubair", "Jamal", "Nader",
+    # Sub-Saharan African (Swahili, Yoruba, Akan, Amharic, Zulu)
+    "Kwame", "Kofi", "Jengo", "Tendai", "Tunde", "Babatunde", "Kojo", "Ade", "Femi",
+    "Chidi", "Emeka", "Obinna", "Juma", "Baraka", "Simba", "Kizza", "Faraji", "Dawit",
+    "Yohannes", "Bekele", "Thabo", "Sipho", "Mandla", "Bongani", "Musa", "Sekou", "Jabari",
+    "Khamisi", "Lekan", "Nkosi", "Olu", "Tafari", "Kato", "Sefu", "Amadi", "Chinua",
+    # Indigenous Americas & Oceanic
+    "Kai", "Keanu", "Maui", "Tane", "Rangi", "Mana", "Ariki", "Hemi", "Kauri", "Tupi",
+    "Inti", "Tupaq", "Amaru", "Nayar", "Tenoch", "Yaro", "Nahuel", "Lautaro", "Hakan",
+    "Dakota", "Chayton", "Takoda", "Bodhi", "Ahanu", "Enoha", "Kuruk", "Nikan", "Mato",
 ]
 
 GIVEN_NAMES_FEMALE = [
+    # Anglo-Celtic, Nordic & Western European
     "Lyra", "Eleni", "Maeve", "Freya", "Astrid", "Briony", "Isolde", "Sylvia",
     "Kaelen", "Morwen", "Brenna", "Thalia", "Vesper", "Sari", "Daphne", "Elora",
     "Aislinn", "Beatrix", "Calla", "Danica", "Elowen", "Fiora", "Gisela", "Helena",
@@ -42,19 +80,60 @@ GIVEN_NAMES_FEMALE = [
     "Rhiannon", "Selene", "Tamsin", "Una", "Valeria", "Willa", "Yvaine", "Zara",
     "Althea", "Blythe", "Cora", "Dahlia", "Elspeth", "Faye", "Greta", "Hazel",
     "Iona", "Junia", "Kendra", "Livia", "Mira", "Nessa", "Oriana", "Priscilla",
+    "Sigrid", "Fiona", "Genevieve", "Camille", "Sylvie", "Nora", "Elsa", "Vera",
+    # Southern European & Romance
+    "Elena", "Sofia", "Lucia", "Chiara", "Valentina", "Camila", "Isabella", "Catalina",
+    "Martina", "Bianca", "Silvia", "Celia", "Ines", "Carmen", "Rosa", "Renata",
+    # Eastern European & Slavic
+    "Anya", "Daria", "Mila", "Svetlana", "Ksenia", "Tatiana", "Yelena", "Irina",
+    "Oksana", "Polina", "Galina", "Zoya", "Vera", "Larisa", "Marina", "Olga",
+    # East Asian (transliterated)
+    "Mei", "Lin", "Xia", "Yan", "Fen", "Jing", "Yue", "Ting", "Sakura", "Aoi",
+    "Yuna", "Rin", "Hina", "Emi", "Hana", "Koharu", "Jiwoo", "Minseo", "Chaewon",
+    "Yeseo", "Haewon", "Sujin", "Mai", "Lan", "Zhihan", "Jia", "Yihan", "Qian",
+    "Nanami", "Yuki", "Chiyo", "Haruka", "Ayaka", "Eunji", "Sohee", "Bich", "Trang",
+    # South Asian / Indic
+    "Ananya", "Priya", "Maya", "Diya", "Tara", "Leela", "Meera", "Nisha", "Kavya",
+    "Riya", "Sita", "Aditi", "Pooja", "Shalini", "Neha", "Sunita", "Radhika", "Anika",
+    "Shreya", "Veda", "Gita", "Indira", "Pallavi", "Malini", "Uma", "Kamala", "Divya",
+    "Deepa", "Ila", "Laxmi", "Madhuri", "Nandini", "Rani", "Roshni", "Swati", "Vidya",
+    # Middle Eastern & North African
+    "Layla", "Amira", "Yasmin", "Soraya", "Farah", "Samira", "Noor", "Dalia", "Mariam",
+    "Shirin", "Parisa", "Roxana", "Roya", "Nilou", "Elif", "Ayla", "Selin", "Defne",
+    "Zehra", "Fatima", "Salma", "Rania", "Iman", "Huda", "Aziza", "Mina", "Dina",
+    "Lina", "Reem", "Nour", "Zahra", "Asma", "Basma", "Habiba", "Jumana", "Mona",
+    # Sub-Saharan African (Swahili, Yoruba, Akan, Amharic, Zulu)
+    "Amara", "Zola", "Nia", "Ayanna", "Amani", "Sade", "Ife", "Chioma", "Ngozi",
+    "Adanna", "Folami", "Asha", "Subira", "Wanjiku", "Nyambura", "Selam", "Almaz",
+    "Tigist", "Lerato", "Nandi", "Zanele", "Bongiwe", "Mariama", "Fatou", "Kande",
+    "Abena", "Akosua", "Chiamaka", "Damilola", "Efe", "Halima", "Khadija", "Malaika",
+    # Indigenous Americas & Oceanic
+    "Moana", "Leilani", "Kailani", "Aroha", "Kiri", "Marama", "Ngaire", "Pania", "Kiana",
+    "Kori", "Kantu", "Urpi", "Suyana", "Nayra", "Xochitl", "Citlali", "Itzel", "Meztli",
+    "Alawa", "Winona", "Tala", "Chenoa", "Halona", "Aiyana", "Maiara", "Huanani", "Nalani",
 ]
 
+# Surnames: Global Root Banks + Compound Generation
 SURNAME_PREFIXES = [
+    # Topographic & Nature
     "Iron", "Ash", "Black", "River", "Stone", "Crow", "Oak", "Thorn", "Winter",
     "Frost", "Falcon", "Hawk", "Wolf", "Vale", "Dale", "Wood", "Brook", "Hill",
     "Gold", "Silver", "Red", "Bright", "Swift", "Strong", "Long", "Hart", "Fox",
     "Bramble", "Alder", "Birch", "Raven", "Shield", "Spear", "Bow", "Heath", "Moor",
+    "Sun", "Moon", "Star", "Cloud", "Shadow", "Cliff", "Ridge", "High", "Low", "Deep",
+    "Clear", "Green", "White", "Fair", "Amber", "Storm", "Wind", "Pine", "Moss", "Lake",
+    # Multi-Cultural Roots
+    "Chen", "Tanaka", "Patel", "Silva", "Diallo", "Mensah", "Kim", "Nair",
+    "Navarro", "Kamau", "Sato", "Rao", "Haddad", "Novak", "Larsen", "Khoury",
+    "Santos", "Abebe", "Morales", "Okafor", "Dlamini", "Takahashi", "Sharma", "Borges",
 ]
 
 SURNAME_SUFFIXES = [
     "wood", "ford", "well", "man", "field", "croft", "ley", "ton", "berg",
     "smith", "son", "wick", "thorne", "ridge", "stone", "water", "brook", "hurst",
     "worth", "gate", "bridge", "hall", "stead", "land", "dale", "beck", "low",
+    "crest", "glen", "haven", "moor", "gard", "holm", "cross", "kirk", "path",
+    "tree", "lake", "shore", "view", "bank", "marsh", "rock", "cliff", "fell",
 ]
 
 
@@ -138,12 +217,12 @@ class CastGenerator:
         """Generates realistic starting families for a single settlement site."""
         site_seed = keyed_hash_int(self.history_seed, "settlement_cast", site.id, site_index)
 
-        # Scale population with farmland: 20 to 36 citizens
-        pop_target = 20 + int(round((site.farmland - 0.60) * 11))
-        pop_target = max(20, min(36, pop_target))
+        # Scale population with farmland: 35 to 55 citizens per village
+        pop_target = 35 + int(round((site.farmland - 0.60) * 15))
+        pop_target = max(35, min(55, pop_target))
 
-        # Generate exactly 8 distinct family surnames using isolated name domain
-        NUM_FAMILIES = 8
+        # Generate exactly 16 distinct family surnames using isolated name domain
+        NUM_FAMILIES = 16
         family_names: list[str] = []
         for slot in range(NUM_FAMILIES):
             sub = 0
@@ -175,9 +254,9 @@ class CastGenerator:
         unindexed_chars: list[dict] = []
         temp_id_counter = 0
 
-        # Guarantee at least 4 fertile couples (aged 22 to 42)
+        # Guarantee at least 7 fertile couples (aged 22 to 42)
         # Surnames rotate among families to ensure non-kin marriages
-        num_couples = 4 + (keyed_hash_int(site_seed, "num_couples", 0, 0) % 3)  # 4, 5, or 6
+        num_couples = 7 + (keyed_hash_int(site_seed, "num_couples", 0, 0) % 4)  # 7, 8, 9, or 10
         num_couples = min(num_couples, len(family_names) - 1)
 
         for c_idx in range(num_couples):
@@ -269,8 +348,8 @@ class CastGenerator:
 
             unindexed_chars.extend(kid_dicts)
 
-        # Add 2 to 4 Elders (Aged 50 to 65)
-        num_elders = 2 + (keyed_hash_int(site_seed, "num_elders", 0, 0) % 3)
+        # Add 4 to 8 Elders (Aged 50 to 65)
+        num_elders = 4 + (keyed_hash_int(site_seed, "num_elders", 0, 0) % 5)
         for e_idx in range(num_elders):
             e_temp = f"t_{site.id}_e_{e_idx}"
             e_sex = "M" if (e_idx % 2 == 0) else "F"

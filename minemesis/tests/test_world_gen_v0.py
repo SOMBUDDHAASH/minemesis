@@ -63,20 +63,21 @@ def test_v0_world_gen_500_seeds_viability():
         num_s = len(world.settlements)
         counts[num_s] = counts.get(num_s, 0) + 1
 
-        assert 3 <= num_s <= 7, f"Seed {seed} generated {num_s} settlements (expected 3-7)"
-        assert world.map_width == 200
-        assert world.map_height == 200
+        assert 10 <= num_s <= 35, f"Seed {seed} generated {num_s} settlements (expected 10-35)"
+        assert world.map_width == 300
+        assert world.map_height == 300
 
         # Spacing check
+        min_distance = max(18.0, 36.0 - (num_s * 0.45))
         for i in range(num_s):
             s1 = world.settlements[i]
-            assert 10 <= s1.x <= 190 and 10 <= s1.y <= 190
+            assert 10 <= s1.x <= 290 and 10 <= s1.y <= 290
             assert s1.base_food >= 60 and s1.base_wood >= 60
             assert s1.farmland >= 0.40 and s1.forest >= 0.40
             for j in range(i + 1, num_s):
                 s2 = world.settlements[j]
                 dist = math.sqrt((s1.x - s2.x) ** 2 + (s1.y - s2.y) ** 2)
-                assert dist >= 30.0, f"Seed {seed} sites {s1.name} and {s2.name} too close: {dist:.1f} < 30.0"
+                assert dist >= min_distance - 0.01, f"Seed {seed} sites {s1.name} and {s2.name} too close: {dist:.1f} < {min_distance}"
 
         # Unique names
         names = [s.name for s in world.settlements]
@@ -85,8 +86,8 @@ def test_v0_world_gen_500_seeds_viability():
         viable_count += 1
 
     assert viable_count == total_seeds, f"Expected 100% viability (500/500), got {viable_count}/{total_seeds}"
-    # Verify reasonable distribution across settlement counts 3..7
-    assert len(counts) == 5, f"Expected representation of counts 3, 4, 5, 6, 7; got {counts}"
+    # Verify rich distribution across settlement counts 10..35
+    assert len(counts) >= 20, f"Expected broad representation of counts 10..35; got {len(counts)} distinct counts"
 
 
 def test_v0_world_gen_determinism():

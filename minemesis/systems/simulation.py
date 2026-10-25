@@ -77,6 +77,7 @@ class Simulation:
             c_id: {} for c_id in self.characters.keys()
         }
         self.memories: list[Memory] = []
+        self.memories_by_observer: dict[str, list[Memory]] = {}
         self.superseded_memory_ids: set[int] = set()
 
         self.active_feuds: list[ActiveFeud] = []
@@ -195,7 +196,7 @@ class Simulation:
         is_spouse = source.spouse_id == target.id
         same_settlement = source.settlement_id == target.settlement_id
 
-        source_memories = [m for m in self.memories if m.observer_id == source_id]
+        source_memories = self.memories_by_observer.get(source_id, [])
 
         base_rel = compute_relationship(
             source_id=source_id,
@@ -297,6 +298,8 @@ class Simulation:
                 )
                 self.memory_counter[0] += len(new_mems)
                 self.memories.extend(new_mems)
+                for m in new_mems:
+                    self.memories_by_observer.setdefault(m.observer_id, []).append(m)
 
     def step_month(self) -> None:
         """
@@ -351,6 +354,8 @@ class Simulation:
             )
             self.memory_counter[0] += len(gossip_mems)
             self.memories.extend(gossip_mems)
+            for m in gossip_mems:
+                self.memories_by_observer.setdefault(m.observer_id, []).append(m)
 
         # -------------------------------------------------------------
         # Step 3: Conflict, Scarcity, Trade Routes, Leadership, Peace

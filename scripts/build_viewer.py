@@ -19,7 +19,7 @@ import zipfile
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 BUILD_TAG = "m0.5.3"
-BUILD_COMMIT = "1a84f30"
+BUILD_COMMIT = "e519f52"
 SHOWCASE_SEEDS = [42, 2029, 2030, 2043, 2011]
 
 
@@ -109,17 +109,24 @@ def export_showcase_runs():
     m_tag_dir = os.path.join(releases_dir, BUILD_TAG)
     os.makedirs(m_tag_dir, exist_ok=True)
 
+    if "--skip-showcase" in sys.argv:
+        print("  [INFO] Skipping showcase re-simulation (--skip-showcase specified).")
+        return
+
     for seed in SHOWCASE_SEEDS:
+        out_path = os.path.join(m_tag_dir, f"minemesis_run_seed{seed}.json")
+        if os.path.exists(out_path) and os.path.getsize(out_path) > 1000:
+            print(f"  [INFO] Showcase data for Seed {seed} already exists at {out_path}, skipping re-simulation.")
+            continue
         print(f"  Simulating Seed {seed} for 100 years...")
         sim = Simulation(seed=seed, enable_religion=True, enable_lore=True)
         sim.run_years(100)
         build_info = {
             "tag": BUILD_TAG,
             "commit": BUILD_COMMIT,
-            "date": "2026-10-24",
+            "date": "2026-10-25",
         }
         run_data = RunData.from_simulation(sim, years=100, build_info=build_info)
-        out_path = os.path.join(m_tag_dir, f"minemesis_run_seed{seed}.json")
         run_data.save_to_json(out_path)
         print(f"    Saved {out_path} ({len(run_data.events)} events, {len(run_data.characters)} characters)")
 
@@ -131,24 +138,24 @@ def write_release_notes():
     content = f"""# Minemesis Story Viewer - Release Notes ({BUILD_TAG})
 
 **Build Commit:** `{BUILD_COMMIT}`  
-**Build Date:** `2026-10-24`  
+**Build Date:** `2026-10-25`  
 **Executable Path:** `releases/MinemesisViewer-{BUILD_TAG}.exe` (and `releases/MinemesisViewer-latest.exe`)  
 **Folder Distribution:** `releases/MinemesisViewer-{BUILD_TAG}-folder.zip`  
 
 ---
 
 ## What Changed In This Build
-1. **Independent Dual Seed Split:** Decoupled world geography from history. World Seed governs terrain, settlement layout, and resources; History Seed governs families, traits, faiths, and events.
-2. **Procedural World Generator v0:** Replaced fixed settlements with procedural site placement (3 to 7 settlements, minimum spacing 30, 100% economic viability across 500 tested seeds).
-3. **Procedural Cast Generator & Name Domain Isolation:** Populates starting settlements with biologically sound families, >= 4 fertile couples per settlement, strict kin-avoidance guarantees, and completely isolated name keying ('name:').
-4. **Interactive Map Tab:** Added a new 200x200 canvas map view in the Story Viewer to visualize settlement locations, archetypes, and click to inspect natural resource endowments.
-5. **Crockford Base32 Seed Codes:** Typo-safe formatted codes with check digits allow one-click copying, sharing, and reloading of custom worlds.
+1. **Global Naming Diversity & Scale Upgrade:** Expanded to 10-35 settlements and 35-55 initial villagers across 9 continental cultural traditions, guaranteeing unique personal and settlement names.
+2. **Hard Target Demographics:** Replaced soft survival targets with zero-extinction requirements and verified exact mathematical demographic conservation (living = initial + births - deaths).
+3. **High-Performance Simulation Engine:** Added memoized causal DAG graph traversal, observer-indexed memory lookups, and cached feud sets, keeping execution under 2 minutes for 8,000 citizens.
+4. **Leak-Free Streaming Verifier:** Built a zero-memory-retention streaming JSONL verifier with instant `--single` audit mode and dynamic on-demand history exports.
+5. **Interactive Map & Dual-Seed Viewer:** Includes visual world map inspection, Crockford Base32 seed code sharing, and rapid event text generation with zero raw ID leaks.
 
 ---
 
 ## 3 Things To Look For In The Viewer
 1. **'🗺 Same map, new history' Feature (Toolbar):** Click this button to generate a new history seed while keeping the world geography constant, watching completely different families and feuds unfold across the same valleys and mountains.
-2. **Interactive Settlement Inspection (🗺 Map Tab):** Click on any settlement circle to view its natural farmland, timber, ore, and defensibility endowments alongside year-end municipal stocks.
+2. **Interactive Settlement Inspection (🗺 Map Tab):** Click on any settlement circle to view its natural farmland, timber, ore, and defensibility endowments alongside year-end municipal stocks across 10-35 villages.
 3. **Dual Seed Box and Typo-Tolerant Seed Codes:** Type any number or phrase in World Seed (Minecraft-style SHA-256 hash), or paste Crockford Base32 codes (e.g. `WB84Q-PGW6-H8FX5:HBSGH-DGGJ-CE46D:V0:6`) to replay exact procedural worlds.
 
 ---
