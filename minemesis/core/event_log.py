@@ -126,6 +126,10 @@ class EventLog:
     def __init__(self) -> None:
         self._events: list[Event] = []
         self._by_id: dict[int, Event] = {}
+        self._listeners: list[Callable[[Event], None]] = []
+
+    def add_listener(self, listener: Callable[[Event], None]) -> None:
+        self._listeners.append(listener)
 
     def append(
         self,
@@ -189,6 +193,8 @@ class EventLog:
         )
         self._events.append(evt)
         self._by_id[next_id] = evt
+        for fn in self._listeners:
+            fn(evt)
         return evt
 
     def get(self, event_id: int) -> Event:

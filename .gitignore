@@ -7,7 +7,9 @@ Thumbs.db
 *.exe
 *.zip
 releases/**/*.json
+releases/samples/
 build/
 dist/
 *.spec
+sample_20yr_test*
 

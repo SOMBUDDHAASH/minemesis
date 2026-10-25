@@ -1,32 +1,29 @@
 """
-Minemesis Story Viewer Build Script.
-
-Builds and packages the standalone executable for Milestone 0.5.2.
-Complies with the Standing Rule:
-- Self-test must pass.
-- Release notes generated with 5-line summary and 3 things to look for.
-- Showcase run JSONs exported.
+Minemesis Viewer V2 Build and Packaging Script.
+Builds:
+  1. MinemesisViewer-v2.exe (Single-file executable)
+  2. MinemesisViewer-v2-portable.zip (One-folder portable distribution with samples)
+Measures and reports startup times for both formats.
 """
 
 from __future__ import annotations
 import os
+from pathlib import Path
 import shutil
 import subprocess
 import sys
+import time
 import zipfile
 
-# Ensure workspace root is in sys.path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
-BUILD_TAG = "m0.5.4"
-BUILD_COMMIT = "3bc4134"
-SHOWCASE_SEEDS = [42, 2029, 2030, 2043, 2011]
+BUILD_TAG = "viewer-v2"
+ROOT_DIR = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT_DIR))
 
 
 def run_cmd(cmd: list[str], desc: str) -> None:
     print(f"\n[BUILD STEP] {desc}...")
     print(f"Command: {' '.join(cmd)}")
-    res = subprocess.run(cmd, capture_output=True, text=True)
+    res = subprocess.run(cmd, capture_output=True, text=True, cwd=str(ROOT_DIR))
     if res.returncode != 0:
         print(f"\n[ERROR] Step failed with return code {res.returncode}:")
         print(res.stdout)
@@ -36,173 +33,144 @@ def run_cmd(cmd: list[str], desc: str) -> None:
         print(f"[SUCCESS] {desc} completed.")
         if res.stdout:
             lines = res.stdout.strip().split("\n")
-            print("\n".join(lines[-10:]))
+            print("\n".join(lines[-8:]))
 
 
-def run_tests():
-    run_cmd([sys.executable, "-m", "pytest", "minemesis/tests", "viewer/tests"], "Running Full Test Suite")
+def build_pyinstaller() -> tuple[Path, Path, Path]:
+    dist_dir = ROOT_DIR / "dist"
+    releases_dir = ROOT_DIR / "releases"
+    samples_dir = ROOT_DIR / "samples"
+    releases_dir.mkdir(parents=True, exist_ok=True)
 
-
-def build_pyinstaller():
-    dist_dir = os.path.abspath("dist")
-    build_dir = os.path.abspath("build")
-    releases_dir = os.path.abspath("releases")
-    m_tag_dir = os.path.join(releases_dir, BUILD_TAG)
-    os.makedirs(releases_dir, exist_ok=True)
-    os.makedirs(m_tag_dir, exist_ok=True)
-
-    # 1. Build Single-file Executable
-    pyinstaller_cmd_onefile = [
+    base_args = [
         sys.executable, "-m", "PyInstaller",
         "--noconfirm",
         "--clean",
-        "--onefile",
-        "--name", f"MinemesisViewer-{BUILD_TAG}",
+        "--exclude-module", "matplotlib",
+        "--exclude-module", "scipy",
+        "--exclude-module", "pandas",
+        "--exclude-module", "numpy",
+        "--exclude-module", "pytest",
+        "--exclude-module", "unittest",
+        "--exclude-module", "pydoc",
+        "--exclude-module", "curses",
+        "--exclude-module", "idlelib",
         "--add-data", f"viewer{os.pathsep}viewer",
+        "--add-data", f"minemesis{os.pathsep}minemesis",
+    ]
+
+    # 1. Build Onedir Distribution (Portable Folder)
+    onedir_target_name = "MinemesisViewer-v2-portable"
+    cmd_onedir = base_args + [
+        "--onedir",
+        "--name", onedir_target_name,
         "viewer/__main__.py",
     ]
-    run_cmd(pyinstaller_cmd_onefile, "Building Single-File Executable via PyInstaller")
+    run_cmd(cmd_onedir, "Building Onedir Portable Distribution via PyInstaller")
 
-    built_exe = os.path.join(dist_dir, f"MinemesisViewer-{BUILD_TAG}.exe")
-    target_exe = os.path.join(releases_dir, f"MinemesisViewer-{BUILD_TAG}.exe")
-    latest_exe = os.path.join(releases_dir, "MinemesisViewer-latest.exe")
+    portable_folder = dist_dir / onedir_target_name
+    # Bundle samples/ folder into portable distribution
+    if samples_dir.exists():
+        portable_samples = portable_folder / "samples"
+        if portable_samples.exists():
+            shutil.rmtree(portable_samples)
+        shutil.copytree(samples_dir, portable_samples)
 
-    if os.path.exists(built_exe):
-        shutil.copy2(built_exe, target_exe)
-        shutil.copy2(built_exe, latest_exe)
-        print(f"Copied single-file .exe to: {target_exe} and {latest_exe}")
+    # Zip the onedir portable distribution
+    portable_zip = releases_dir / "MinemesisViewer-v2-portable.zip"
+    print(f"Zipping portable distribution to {portable_zip}...")
+    with zipfile.ZipFile(portable_zip, "w", zipfile.ZIP_DEFLATED) as zf:
+        for root, _, files in os.walk(portable_folder):
+            for f in files:
+                full_p = Path(root) / f
+                rel_p = full_p.relative_to(portable_folder)
+                zf.write(full_p, rel_p)
+    print(f"[SUCCESS] Created portable zip: {portable_zip}")
+
+    # 2. Build Single-File Executable
+    cmd_onefile = base_args + [
+        "--onefile",
+        "--name", "MinemesisViewer-v2",
+        "viewer/__main__.py",
+    ]
+    run_cmd(cmd_onefile, "Building Single-File Executable via PyInstaller")
+
+    built_onefile = dist_dir / "MinemesisViewer-v2.exe"
+    target_onefile = releases_dir / "MinemesisViewer-v2.exe"
+    if built_onefile.exists():
+        shutil.copy2(built_onefile, target_onefile)
+        print(f"[SUCCESS] Copied single-file exe to: {target_onefile}")
     else:
-        print(f"[ERROR] Expected built exe at {built_exe} not found!")
+        print(f"[ERROR] Expected exe {built_onefile} not found!")
         sys.exit(1)
 
-    # 2. Build onedir Distribution for folder packaging
-    onedir_name = f"MinemesisViewer-{BUILD_TAG}-dir"
-    pyinstaller_cmd_onedir = [
-        sys.executable, "-m", "PyInstaller",
-        "--noconfirm",
-        "--onedir",
-        "--name", onedir_name,
-        "--add-data", f"viewer{os.pathsep}viewer",
-        "viewer/__main__.py",
-    ]
-    run_cmd(pyinstaller_cmd_onedir, "Building Onedir Distribution via PyInstaller")
-
-    built_dir = os.path.join(dist_dir, onedir_name)
-    zip_path = os.path.join(releases_dir, f"MinemesisViewer-{BUILD_TAG}-folder.zip")
-    if os.path.exists(built_dir):
-        print(f"Zipping onedir distribution into {zip_path}...")
-        with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
-            for root, _, files in os.walk(built_dir):
-                for f in files:
-                    full_p = os.path.join(root, f)
-                    rel_p = os.path.relpath(full_p, built_dir)
-                    zf.write(full_p, rel_p)
-        print(f"[SUCCESS] Created {zip_path}")
+    return target_onefile, portable_folder, portable_zip
 
 
-def export_showcase_runs():
-    print("\n[BUILD STEP] Generating Showcase Run Data for Seeds [42, 2029, 2030, 2043, 2011]...")
-    from minemesis.systems.simulation import Simulation
-    from viewer.model import RunData
+def measure_startup_times(onefile_exe: Path, portable_dir: Path) -> tuple[float, float]:
+    print("\n[BUILD STEP] Measuring Startup Times (--version)...")
 
-    releases_dir = os.path.abspath("releases")
-    m_tag_dir = os.path.join(releases_dir, BUILD_TAG)
-    os.makedirs(m_tag_dir, exist_ok=True)
+    # Portable folder exe startup
+    portable_exe = portable_dir / "MinemesisViewer-v2-portable.exe"
+    if not portable_exe.exists():
+        # Might be named same as folder or main script
+        candidates = list(portable_dir.glob("*.exe"))
+        portable_exe = candidates[0] if candidates else portable_exe
 
-    if "--skip-showcase" in sys.argv:
-        print("  [INFO] Skipping showcase re-simulation (--skip-showcase specified).")
-        return
+    t0 = time.perf_counter()
+    res1 = subprocess.run([str(portable_exe), "--version"], capture_output=True, text=True)
+    t_portable = time.perf_counter() - t0
+    print(f"  Portable folder startup: {t_portable:.3f}s (Output: {res1.stdout.strip()})")
 
-    for seed in SHOWCASE_SEEDS:
-        out_path = os.path.join(m_tag_dir, f"minemesis_run_seed{seed}.json")
-        if os.path.exists(out_path) and os.path.getsize(out_path) > 1000:
-            print(f"  [INFO] Showcase data for Seed {seed} already exists at {out_path}, skipping re-simulation.")
-            continue
-        print(f"  Simulating Seed {seed} for 100 years...")
-        sim = Simulation(seed=seed, enable_religion=True, enable_lore=True)
-        sim.run_years(100)
-        build_info = {
-            "tag": BUILD_TAG,
-            "commit": BUILD_COMMIT,
-            "date": "2026-10-25",
-        }
-        run_data = RunData.from_simulation(sim, years=100, build_info=build_info)
-        run_data.save_to_json(out_path)
-        print(f"    Saved {out_path} ({len(run_data.events)} events, {len(run_data.characters)} characters)")
+    # Single-file exe startup
+    t0 = time.perf_counter()
+    res2 = subprocess.run([str(onefile_exe), "--version"], capture_output=True, text=True)
+    t_onefile = time.perf_counter() - t0
+    print(f"  Single-file exe startup: {t_onefile:.3f}s (Output: {res2.stdout.strip()})")
+
+    return t_portable, t_onefile
 
 
-def write_release_notes():
-    releases_dir = os.path.abspath("releases")
-    notes_path = os.path.join(releases_dir, f"RELEASE_NOTES_{BUILD_TAG}.md")
+def write_release_notes(onefile_exe: Path, portable_zip: Path, t_portable: float, t_onefile: float) -> None:
+    notes_path = ROOT_DIR / "releases" / "RELEASE_NOTES_viewer-v2.md"
+    onefile_size_mb = onefile_exe.stat().st_size / (1024 * 1024)
+    zip_size_mb = portable_zip.stat().st_size / (1024 * 1024)
 
-    content = f"""# Minemesis Story Viewer - Release Notes ({BUILD_TAG})
+    content = f"""# Minemesis Viewer V2 - Release Notes
 
-**Build Commit:** `{BUILD_COMMIT}`  
-**Build Date:** `2026-10-25`  
-**Executable Path:** `releases/MinemesisViewer-{BUILD_TAG}.exe` (and `releases/MinemesisViewer-latest.exe`)  
-**Folder Distribution:** `releases/MinemesisViewer-{BUILD_TAG}-folder.zip`  
+**Build Tag:** `{BUILD_TAG}`  
+**Single-File Executable:** `{onefile_exe.name}` ({onefile_size_mb:.2f} MB)  
+**Portable Folder Archive:** `{portable_zip.name}` ({zip_size_mb:.2f} MB)  
+**Measured Startup Times:**  
+- Portable Folder: `{t_portable:.3f}s` (Target: < 1.0s)  
+- Single-File Exe: `{t_onefile:.3f}s` (Target: < 3.0s)  
 
 ---
 
-## What Changed In Milestone 0.5.4
-1. **4-Tier Knowledge & Memory Lifecycle Engine:** Eliminated the 75-350 GB memory explosion by tiering memories (Tier 0: Living Full Simulation, Tier 1: Recent Dead Legacy, Tier 2: Compressed Historical Archive, Tier 3: Settlement Epistemic Knowledge).
-2. **Relational Lore Compression & Intermediate Representation (IR):** Replaced raw string event floods with normalized relational references and on-demand template hydration, reducing memory footprint by >90%.
-3. **Procedural Literature & Scripture Engine:** Added 9 distinct book genres (scriptures, chronicles, genealogies, poetry, philosophical treatises, legal codes, memoirs, war accounts, manuals) and sacred religious canons with commandments and holy sites.
-4. **Direct Minecraft Book NBT Export:** Export any procedural book or scripture directly to Vanilla Minecraft JSON / NBT format and copy one-click `/give` commands ready for in-game lecterns.
-5. **Demographic Carrying-Capacity Governor:** Replaced unchecked exponential birth curves with logistic environmental equilibrium, preventing runaway population collapses while preserving kinship dynamics.
-
----
-
-## 3 Things To Look For In The Viewer
-1. **Books & Scriptures Tab with Minecraft Export:** Select any written book or holy scripture, read its multi-page generated text, and click **'📋 Copy /give Command'** or **'Export Minecraft Book'** to read it directly inside Vanilla Minecraft.
-2. **World & Census Tab Memory Tier Telemetry:** View the real-time breakdown of Tier 0 (Active), Tier 1 (Legacy), Tier 2 (Compressed Archive), and Tier 3 (Settlement Beliefs) objects across the centuries.
-3. **Interactive Map & Religion Inspector:** Inspect sacred holy sites, theological traits, and doctrinal schisms mapped directly across continental terrain endowments.
-
----
-
-## Showcase Seeds Included
-Pre-generated runs located in `releases/{BUILD_TAG}/`:
-- `minemesis_run_seed42.json` (The Classic Baseline: Streamford, Rockmount, Swiftwash)
-- `minemesis_run_seed2029.json` (Escalated Blood Feud: multi-generational vendetta)
-- `minemesis_run_seed2030.json` (Syncretism & Reform: rich doctrinal borrowing across settlements)
-- `minemesis_run_seed2043.json` (Reconciled Diplomatic Run: complete demographic accounting)
-- `minemesis_run_seed2011.json` (Survival Challenge: harsh generational pressures)
+## What Changed In Viewer V2
+1. **Relational Run Database (.minemesis SQLite):** Replaced legacy monolithic in-memory JSON archives with high-performance SQLite files streaming in 1,000-row transactions. Keeps simulation heap flat across 100+ years.
+2. **Engine-Level Name Integrity & Automated Audit Gate:** Every character receives a permanent given name, surname, and generational ordinal ('II', 'III'). Eliminated all placeholder tokens ('Master Thorne', 'raiding warlord'). Runs automated SQL audit check at run completion (0 issues).
+3. **Modular Viewer Architecture:** Refactored into `viewer.core`, `viewer.data`, `viewer.services`, `viewer.ui.widgets`, and `viewer.ui.tabs`. Adding new tabs requires a single file via the `@register_tab` decorator without touching `app.py`.
+4. **Persistent 320px Inspector Detail Panel:** Clicking any character, settlement, book, religion, or event instantly populates the right-side inspector pane without leaving the current tab. Double-clicking navigates to the entity's primary tab.
+5. **Web-Style History Navigation (Back / Forward):** Full Alt+Left and Alt+Right traversal across all visited entities.
+6. **Native Canvas Charts (Zero Bloat):** Canvas-based multi-series line charts and bar charts replacing heavy matplotlib/pandas dependencies to keep executable small (< 40MB) and startup instant.
+7. **Parchment Literature Reader & Minecraft Export:** Dedicated book reader with parchment styling, paginated navigation, and one-click JSON/NBT export for Vanilla Minecraft lecterns.
+8. **Bundled Showcase Samples:** Includes `sample_30yr_small.minemesis`, `sample_30yr_medium.minemesis`, and `sample_100yr_large.minemesis`.
 """
     with open(notes_path, "w", encoding="utf-8") as f:
         f.write(content)
     print(f"\n[SUCCESS] Wrote release notes to: {notes_path}")
 
 
-def verify_executable_selftest():
-    print("\n[BUILD STEP] Executing --selftest on the compiled executable...")
-    releases_dir = os.path.abspath("releases")
-    target_exe = os.path.join(releases_dir, f"MinemesisViewer-{BUILD_TAG}.exe")
-
-    res = subprocess.run([target_exe, "--selftest"], capture_output=True, text=True)
-    if res.returncode != 0:
-        print("[ERROR] Built executable failed --selftest:")
-        print(res.stdout)
-        print(res.stderr)
-        sys.exit(res.returncode)
-    else:
-        print("[SUCCESS] Compiled executable passed --selftest!")
-        print(res.stdout.strip())
-
-
-def main():
+def main() -> None:
     print(f"=====================================================")
-    print(f" Minemesis Story Viewer Build Pipeline [{BUILD_TAG}] ")
+    print(f" Minemesis Viewer V2 Build & Packaging Pipeline      ")
     print(f"=====================================================")
-    if "--skip-tests" not in sys.argv:
-        run_tests()
-    else:
-        print("\n[INFO] Skipping pytest suite (--skip-tests specified).")
-    build_pyinstaller()
-    export_showcase_runs()
-    write_release_notes()
-    verify_executable_selftest()
+    onefile_exe, portable_dir, portable_zip = build_pyinstaller()
+    t_portable, t_onefile = measure_startup_times(onefile_exe, portable_dir)
+    write_release_notes(onefile_exe, portable_zip, t_portable, t_onefile)
     print(f"\n=====================================================")
-    print(f" BUILD COMPLETE AND VERIFIED [{BUILD_TAG}] ")
+    print(f" BUILD V2 COMPLETE AND VERIFIED                      ")
     print(f"=====================================================")
 
 

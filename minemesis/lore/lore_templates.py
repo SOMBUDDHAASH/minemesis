@@ -105,6 +105,34 @@ def get_term(literacy: LiteracyLevel, category: str, rng: KeyedRNG) -> str:
     return rng.choice(terms)
 
 
+def resolve_participant_name(
+    entity_id: str,
+    characters: Optional[Mapping[str, Any]] = None,
+    archive: Optional[Mapping[str, Any]] = None,
+    default_role: str = "an unidentified assailant",
+) -> str:
+    """
+    Resolves an entity or character ID into an authentic display name.
+    If actor is missing or unrecorded, returns default_role (e.g. 'an unidentified assailant').
+    Never invents fake placeholder characters like 'Master Thorne'.
+    """
+    if not entity_id or str(entity_id).strip() in ("", "None", "Unknown", "unknown", "someone", "Someone"):
+        return default_role
+    if characters and entity_id in characters:
+        c = characters[entity_id]
+        return getattr(c, "display_name", None) or getattr(c, "name", None) or getattr(c, "full_name", str(entity_id))
+    if archive and entity_id in archive:
+        arch = archive[entity_id]
+        if isinstance(arch, dict):
+            return arch.get("display_name") or arch.get("name") or str(entity_id)
+        return getattr(arch, "display_name", None) or getattr(arch, "name", str(entity_id))
+    if str(entity_id).startswith("set_"):
+        return format_settlement_name(str(entity_id))
+    if str(entity_id).startswith("rel_"):
+        return format_religion_name(str(entity_id))
+    return str(entity_id)
+
+
 # =============================================================================
 # Event Sentence Template Synthesis
 # =============================================================================
@@ -121,8 +149,18 @@ def render_event_sentence(
     """
     year = context.get("year", 1)
     tick = context.get("tick", 0)
-    actor = context.get("actor_name", "Someone")
-    target = context.get("target_name", "someone")
+    raw_actor = context.get("actor_name")
+    if not raw_actor or str(raw_actor).strip() in ("", "None", "Unknown", "unknown", "Someone", "someone"):
+        actor = "an unidentified assailant" if event_type_val in ("Death", "Raid", "Feud") else "an unidentified party"
+    else:
+        actor = str(raw_actor)
+
+    raw_target = context.get("target_name")
+    if not raw_target or str(raw_target).strip() in ("", "None", "Unknown", "unknown", "someone", "the house", "the realm", "the community"):
+        target = "an unidentified party"
+    else:
+        target = str(raw_target)
+
     loc = format_settlement_name(str(context.get("location", "the settlement")))
     cause_desc = context.get("cause_desc", "unforeseen circumstances")
 
@@ -138,7 +176,9 @@ def render_event_sentence(
 
         # Directive 5.2: Books read author beliefs rather than raw event reality
         if believed_intent == Intent.INTENTIONAL or (believed_intent is not None and str(believed_intent).lower() == "intentional"):
-            killer = believed_actor or context.get("target_name") or "an unknown assailant"
+            killer = believed_actor or context.get("target_name") or "an unidentified assailant"
+            if not killer or str(killer).strip() in ("", "None", "Unknown", "unknown", "an enemy"):
+                killer = "an unidentified assailant"
             murder_templates = [
                 f"In Year {year}, {actor} was murdered at {loc}. {killer} was believed responsible for the deliberate slaying.",
                 f"Year {year}: {actor} fell to murder at {loc}, slain by {killer} in cold blood.",

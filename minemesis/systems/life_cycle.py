@@ -227,8 +227,15 @@ def process_life_cycle(
 
             child_sex = "M" if keyed_float(seed, "child_sex", child_id, tick) < 0.5 else "F"
             name_pool = FIRST_NAMES_MALE if child_sex == "M" else FIRST_NAMES_FEMALE
-            first_name = keyed_choice(seed, "name:child_name", child_id, tick, name_pool, salt=name_salt)
-            last_name = husband.last_name
+            first_name = keyed_choice(seed, "name:child_name", child_id, tick, name_pool, salt=name_salt) or ("Son" if child_sex == "M" else "Daughter")
+            last_name = husband.last_name or "Commoner"
+
+            base_full = f"{first_name} {last_name}".strip()
+            existing_same = [
+                c for c in characters.values()
+                if c.alive and f"{c.first_name} {c.last_name}".strip() == base_full
+            ]
+            ordinal = (max(c.name_ordinal for c in existing_same) + 1) if existing_same else 1
 
             child = Character(
                 id=child_id,
@@ -242,6 +249,7 @@ def process_life_cycle(
                 suspicion=0.45,
                 forgiveness=0.55,
                 family_id=getattr(husband, "family_id", "") or last_name,
+                name_ordinal=ordinal,
             )
             characters[child_id] = child
             settlements[wife.settlement_id].member_ids.append(child_id)

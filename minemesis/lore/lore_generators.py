@@ -25,6 +25,7 @@ from minemesis.lore.lore_templates import (
     get_term,
     paginate_text,
     render_event_sentence,
+    resolve_participant_name,
 )
 from minemesis.core.event_log import Event
 from minemesis.models.character import Character
@@ -95,8 +96,11 @@ def generate_family_history(
                 b_target = getattr(b, "believed_target", None)
                 b_loc = getattr(b, "believed_location", None)
 
-                actor_name = b_actor if (b and b_actor) else (evt.participants[0][1] if evt.participants else family_name)
-                target_name = b_target if (b and b_target) else (evt.participants[1][1] if len(evt.participants) > 1 else "the house")
+                kin_map = {k.id: k for k in kin_characters}
+                raw_act = evt.participants[0][1] if evt.participants else ""
+                raw_tgt = evt.participants[1][1] if len(evt.participants) > 1 else ""
+                actor_name = b_actor if (b and b_actor) else resolve_participant_name(raw_act, kin_map, default_role=f"House {family_name}")
+                target_name = b_target if (b and b_target) else resolve_participant_name(raw_tgt, kin_map, default_role="the homestead")
                 loc_name = format_settlement_name(b_loc) if (b and b_loc) else format_settlement_name(evt.location)
 
                 cause_desc = evt.payload.get("cause_of_death") or evt.payload.get("reason", "unforeseen fate")
@@ -445,8 +449,10 @@ def generate_historical_chronicle(
                 b_target = getattr(b, "believed_target", None)
                 b_loc = getattr(b, "believed_location", None)
 
-                actor_name = b_actor if (b and b_actor) else (evt.participants[0][1] if evt.participants else clean_set)
-                target_name = b_target if (b and b_target) else (evt.participants[1][1] if len(evt.participants) > 1 else "the realm")
+                raw_act = evt.participants[0][1] if evt.participants else ""
+                raw_tgt = evt.participants[1][1] if len(evt.participants) > 1 else ""
+                actor_name = b_actor if (b and b_actor) else resolve_participant_name(raw_act, default_role=clean_set)
+                target_name = b_target if (b and b_target) else resolve_participant_name(raw_tgt, default_role="the realm")
                 loc_name = format_settlement_name(b_loc) if (b and b_loc) else format_settlement_name(evt.location)
 
                 cause_desc = evt.payload.get("cause_of_death") or evt.payload.get("reason", "unforeseen cause")
@@ -761,8 +767,9 @@ def generate_biography(
                 b_target = getattr(b, "believed_target", None)
                 b_loc = getattr(b, "believed_location", None)
 
-                actor_name = subject.full_name
-                target_name = b_target if (b and b_target) else (evt.participants[1][1] if len(evt.participants) > 1 else "the community")
+                actor_name = subject.display_name or subject.full_name
+                raw_tgt = evt.participants[1][1] if len(evt.participants) > 1 else ""
+                target_name = b_target if (b and b_target) else resolve_participant_name(raw_tgt, default_role="the community")
                 loc_name = format_settlement_name(b_loc) if (b and b_loc) else format_settlement_name(evt.location)
 
                 cause_desc = evt.payload.get("cause_of_death", "fate")

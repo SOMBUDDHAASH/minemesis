@@ -43,7 +43,9 @@ class Simulation:
         enable_lore: Optional[bool] = None,
         world_provider: Optional[Any] = None,
         name_salt: int = 0,
+        export_sink: Optional[Any] = None,
     ) -> None:
+        self.export_sink = None
         h_seed = history_seed if history_seed is not None else chronicle_seed
         self.legacy_seed: Optional[int] = seed if isinstance(seed, int) else None
         if isinstance(seed, SeedPair):
@@ -125,6 +127,109 @@ class Simulation:
         except ImportError:
             self.lore_engine = None
 
+        if export_sink:
+            self.set_export_sink(export_sink)
+
+    def set_export_sink(self, sink: Any) -> None:
+        """Attaches an export sink and registers listeners."""
+        self.export_sink = sink
+        if self.export_sink:
+            for s in self.settlements.values():
+                self.export_sink.record_settlement(
+                    id=s.id,
+                    name=s.name,
+                    founded_tick=0,
+                    biome=getattr(s, "biome", "Temperate Forest"),
+                    culture=getattr(s, "culture", "Common"),
+                )
+            self.event_log.add_listener(self._on_event_logged)
+
+    def _on_event_logged(self, evt: Event) -> None:
+        """Streams event to export sink."""
+        if not self.export_sink:
+            return
+
+        part_tuples = []
+        for role, entity_id in evt.participants:
+            name_at_time = self.resolve_character_name(entity_id)
+            part_tuples.append((entity_id, role, name_at_time))
+
+        importance = 1.0
+        if evt.type in (EventType.FEUD, EventType.DEATH, EventType.REVELATION, EventType.BOOK_WRITTEN, EventType.SETTLEMENT_COLLAPSE):
+            importance = 2.0
+
+        self.export_sink.record_event(
+            event_id=evt.id,
+            tick=evt.tick,
+            year=(evt.tick // 12) + 1,
+            event_type=evt.type.value,
+            description=evt.description,
+            thread_id=None,
+            importance=importance,
+            participants=part_tuples,
+            causes=evt.causes,
+        )
+
+        if evt.type in (EventType.FEUD, EventType.FEUD_BEGINS):
+            instigator = evt.participants_dict.get("instigator", "")
+            target = evt.participants_dict.get("target", "")
+            self.export_sink.record_epistemic_case(
+                case_id=f"feud_{evt.id}",
+                case_type="Feud",
+                year=(evt.tick // 12) + 1,
+                subject_character_id=target,
+                ground_truth=f"Dispute between {self.resolve_character_name(instigator)} and {self.resolve_character_name(target)}",
+                believer_character_id=instigator,
+                belief_summary=f"Accusation of hostility against {self.resolve_character_name(target)}",
+                source_type="DIRECT_OBSERVATION" if not evt.payload.get("is_wrongful") else "WRONGFUL_ASSUMPTION",
+                confidence=0.95,
+            )
+        elif evt.type == EventType.REVELATION:
+            rec = evt.participants_dict.get("recipient", "")
+            wit = evt.participants_dict.get("witness", "")
+            self.export_sink.record_epistemic_case(
+                case_id=f"revelation_{evt.id}",
+                case_type="Revelation",
+                year=(evt.tick // 12) + 1,
+                subject_character_id=wit,
+                ground_truth=f"Uncovered truth transmitted by {self.resolve_character_name(wit)}",
+                believer_character_id=rec,
+                belief_summary="Received truthful revelation regarding prior grievances",
+                source_type="REVELATION",
+                confidence=0.90,
+            )
+        elif evt.type == EventType.DEATH and evt.payload.get("is_revenge"):
+            killer = evt.participants_dict.get("actor", "")
+            victim = evt.participants_dict.get("target") or evt.participants_dict.get("deceased", "")
+            self.export_sink.record_epistemic_case(
+                case_id=f"revenge_{evt.id}",
+                case_type="Revenge Killing",
+                year=(evt.tick // 12) + 1,
+                subject_character_id=victim,
+                ground_truth=f"Death of {self.resolve_character_name(victim)} in retribution",
+                believer_character_id=killer,
+                belief_summary="Retribution enacted for perceived blood debt",
+                source_type="VENGEANCE_BELIEF",
+                confidence=1.0,
+            )
+        elif evt.type == EventType.BOOK_WRITTEN and self.lore_engine and self.lore_engine.enabled:
+            book_id = evt.payload.get("book_id")
+            if book_id:
+                book = self.lore_engine.get_book(book_id)
+                if book:
+                    pages = book.pages
+                    self.export_sink.record_book(
+                        book_id=book.id,
+                        title=book.title,
+                        author_id=book.author_id,
+                        author_name=book.author_name,
+                        year_written=(evt.tick // 12) + 1,
+                        settlement_id=book.settlement_id or evt.location,
+                        topic=str(getattr(book, "genre", "History")),
+                        pages=pages,
+                    )
+                    book._pages = None
+
     def get_character_religion(self, character_id: str):
         """Returns the Religion object adhered to by a character, or None."""
         if self.religion_engine:
@@ -158,6 +263,23 @@ class Simulation:
         """Returns all books stored in a settlement's libraries and archives."""
         if self.lore_engine and self.lore_engine.enabled:
             return self.lore_engine.get_settlement_books(settlement_id, library_type)
+        return []
+
+    def resolve_character_name(self, char_id: str) -> str:
+        """Resolves a character or entity ID to their authentic display_name."""
+        if not char_id or str(char_id).strip() in ("", "None", "Unknown", "unknown", "Someone", "someone"):
+            return "Citizen"
+        if char_id in self.characters:
+            c = self.characters[char_id]
+            return c.display_name or c.full_name
+        if char_id in self.historical_archive:
+            arch = self.historical_archive[char_id]
+            return arch.get("display_name") or arch.get("name") or "Citizen"
+        if char_id in self.settlements:
+            return self.settlements[char_id].name
+        if self.religion_engine and char_id in self.religion_engine.religions:
+            return self.religion_engine.religions[char_id].name
+        return str(char_id)
         return []
 
     def get_book(self, book_id: str):
@@ -491,6 +613,56 @@ class Simulation:
             self.compact_history()
 
         # -------------------------------------------------------------
+        # Step 5c: Annual Census & Religion Export Telemetry
+        # -------------------------------------------------------------
+        if self.export_sink and self.tick > 0 and self.tick % 12 == 0:
+            year = self.tick // 12
+            living_pop_by_s: dict[str, int] = {}
+            for c in self.characters.values():
+                if c.alive:
+                    living_pop_by_s[c.settlement_id] = living_pop_by_s.get(c.settlement_id, 0) + 1
+            for s_id, s in self.settlements.items():
+                self.export_sink.record_census(
+                    year=year,
+                    settlement_id=s_id,
+                    population=living_pop_by_s.get(s_id, 0),
+                    food=s.food,
+                    wealth=s.wealth,
+                )
+            if self.religion_engine and self.religion_engine.enabled:
+                rel_counts: dict[str, int] = {}
+                for c in self.characters.values():
+                    if c.alive:
+                        r = self.religion_engine.get_character_religion(c.id)
+                        if r:
+                            rel_counts[r.id] = rel_counts.get(r.id, 0) + 1
+                for r_id, r in self.religion_engine.religions.items():
+                    self.export_sink.record_religion(
+                        rel_id=r.id,
+                        name=r.name,
+                        parent_id=getattr(r, "parent_id", None),
+                        founded_year=(getattr(r, "founded_tick", 0) // 12) + 1,
+                        founder_id=getattr(r, "founder_id", None),
+                        traits=getattr(r, "traits", {}),
+                        adherent_count=rel_counts.get(r_id, 0),
+                    )
+                for r in self.religion_engine.religions.values():
+                    for site in getattr(r, "holy_sites", []):
+                        self.export_sink.record_holy_site(
+                            settlement_id=site.settlement_id,
+                            religion_id=r.id,
+                            dedication_year=(getattr(site, "consecrated_tick", 0) // 12) + 1,
+                        )
+                    for myth in getattr(r, "myths", []):
+                        self.export_sink.record_myth(
+                            myth_id=getattr(myth, "myth_id", getattr(myth, "id", f"m_{r.id}")),
+                            religion_id=r.id,
+                            title=getattr(myth, "title", "Sacred Lore"),
+                            text=getattr(myth, "text", ""),
+                            year_recorded=(getattr(myth, "origin_tick", 0) // 12) + 1,
+                        )
+
+        # -------------------------------------------------------------
         # Step 6: Advance Simulation Tick
         # -------------------------------------------------------------
         self.tick += 1
@@ -520,7 +692,14 @@ class Simulation:
                     if c_id not in self.historical_archive:
                         self.historical_archive[c_id] = {
                             "id": char.id,
-                            "name": char.full_name,
+                            "first_name": char.first_name,
+                            "last_name": char.last_name,
+                            "display_name": char.display_name or char.full_name,
+                            "name": char.display_name or char.full_name,
+                            "name_ordinal": char.name_ordinal,
+                            "age_ticks": char.age_ticks,
+                            "sex": char.sex,
+                            "birth_tick": (char.death_tick - char.age_ticks) if char.death_tick is not None else 0,
                             "death_tick": char.death_tick,
                             "settlement_id": char.settlement_id,
                             "family_id": getattr(char, "family_id", "") or char.last_name,
@@ -528,7 +707,10 @@ class Simulation:
                             "mother_id": char.mother_id,
                             "spouse_id": char.spouse_id,
                             "children_ids": list(char.children_ids),
+                            "profession": char.profession,
                         }
+                    if hasattr(self, "export_sink") and self.export_sink:
+                        self.export_sink.record_character(char, is_historical=True)
                     # Free individual belief and memory dict entries
                     if c_id in self.beliefs_by_character:
                         self.beliefs_by_character[c_id].clear()
@@ -577,3 +759,25 @@ class Simulation:
     @property
     def current_year(self) -> int:
         return self.tick // 12
+
+    def finalize_export(self) -> None:
+        """Finalizes history export to .minemesis database."""
+        if not self.export_sink:
+            return
+        from datetime import datetime, timezone
+        from minemesis.export.schema import BUILD_ID, CURRENT_SCHEMA_VERSION
+
+        # Record all remaining characters
+        for char in self.characters.values():
+            self.export_sink.record_character(char, is_historical=not char.alive)
+
+        meta_info = {
+            "schema_version": CURRENT_SCHEMA_VERSION,
+            "build_id": BUILD_ID,
+            "world_seed": self.world_seed,
+            "history_seed": self.history_seed,
+            "pair_code": getattr(self.seed_pair, "code", f"{self.world_seed}:{self.history_seed}"),
+            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "duration_ticks": self.tick,
+        }
+        self.export_sink.finalize(meta_info)

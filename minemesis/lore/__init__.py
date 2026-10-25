@@ -21,6 +21,7 @@ from minemesis.lore.lore_templates import (
     get_term,
     paginate_text,
     render_event_sentence,
+    resolve_participant_name,
 )
 from minemesis.lore.lore_generators import (
     generate_biography,

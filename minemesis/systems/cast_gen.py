@@ -185,6 +185,7 @@ class CastGenerator:
             id_mapping[temp_id] = final_id
 
         # Second pass: construct immutable Character objects with remapped IDs
+        name_counts: dict[str, int] = {}
         for c_dict in all_unindexed_chars:
             final_id = id_mapping[c_dict["temp_id"]]
             spouse_id = id_mapping.get(c_dict["spouse_temp_id"]) if c_dict.get("spouse_temp_id") else None
@@ -192,10 +193,16 @@ class CastGenerator:
             mother_id = id_mapping.get(c_dict["mother_temp_id"]) if c_dict.get("mother_temp_id") else None
             children_ids = list(id_mapping[kid_t] for kid_t in c_dict.get("children_temp_ids", ()))
 
+            first_name = c_dict.get("first_name") or "Citizen"
+            last_name = c_dict.get("last_name") or "Commoner"
+            base_full_name = f"{first_name} {last_name}".strip()
+            name_counts[base_full_name] = name_counts.get(base_full_name, 0) + 1
+            ordinal = name_counts[base_full_name]
+
             char = Character(
                 id=final_id,
-                first_name=c_dict["first_name"],
-                last_name=c_dict["last_name"],
+                first_name=first_name,
+                last_name=last_name,
                 settlement_id=c_dict["settlement_id"],
                 age_ticks=c_dict["age_ticks"],
                 sex=c_dict["sex"],
@@ -208,6 +215,7 @@ class CastGenerator:
                 forgiveness=c_dict["forgiveness"],
                 profession=c_dict["profession"],
                 family_id=c_dict.get("family_id", ""),
+                name_ordinal=ordinal,
             )
             characters[final_id] = char
 
