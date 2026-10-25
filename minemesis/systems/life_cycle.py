@@ -146,9 +146,6 @@ def process_life_cycle(
                 intent=Intent.INTENTIONAL,
                 scale=Scale.INDIVIDUAL,
                 payload={
-                    "description": f"Marriage of {m.full_name} and {f.full_name}" + (" (Alliance Marriage)" if is_alliance else ""),
-                    "spouse1_name": m.full_name,
-                    "spouse2_name": f.full_name,
                     "is_alliance": is_alliance,
                     "relocation": relocation_info,
                 },
@@ -259,10 +256,7 @@ def process_life_cycle(
                 causes=causes,
                 intent=Intent.INTENTIONAL,
                 scale=Scale.INDIVIDUAL,
-                payload={
-                    "description": f"Birth of {child.full_name} to {husband.full_name} and {wife.full_name}",
-                    "child_name": child.full_name,
-                },
+                payload={},
             )
 
     # 4. Check Deaths (Natural & Accidental)
@@ -286,8 +280,6 @@ def process_life_cycle(
                     intent=Intent.ACCIDENTAL,
                     scale=Scale.INDIVIDUAL,
                     payload={
-                        "description": f"{char.full_name} passed away of old age at {char.age_years} years",
-                        "victim_name": char.full_name,
                         "natural": True,
                     },
                 )
@@ -312,10 +304,8 @@ def process_life_cycle(
                         intent=Intent.ACCIDENTAL,
                         scale=Scale.INDIVIDUAL,
                         payload={
-                            "description": f"{char.full_name} died accidentally in a forestry mishap with {partner.full_name}",
-                            "victim_name": char.full_name,
-                            "actor_name": partner.full_name,
                             "accidental": True,
+                            "cause_of_death": "forestry mishap",
                         },
                     )
                     char.death_event_id = evt.id

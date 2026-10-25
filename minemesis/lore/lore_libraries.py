@@ -73,6 +73,11 @@ class LibraryManager:
         """Returns all books across all settlements, sorted by ID for determinism."""
         return sorted(self._all_books.values(), key=lambda b: b.id)
 
+    def unload_all_pages(self) -> None:
+        """Unloads rendered page strings across all libraries to keep heap footprint minimal."""
+        for book in self._all_books.values():
+            book.unload_pages()
+
     def get_settlement_books(
         self,
         settlement_id: str,
@@ -139,6 +144,7 @@ class LibraryManager:
                         torn_pages = [p for i, p in enumerate(book.pages) if i < max(1, len(book.pages) // 2)]
                         torn_pages.append("[... Parchment torn and blackened by fire. Remaining text illegible ...]")
                         book.pages = torn_pages
+                        book.lazy_renderer = None  # Preserve damaged pages from being re-rendered undamaged
                         book.total_word_count = sum(len(p.split()) for p in book.pages)
                     affected_books.append(book)
                     surviving_books.append(book)

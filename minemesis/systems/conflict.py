@@ -183,7 +183,6 @@ def process_conflicts_and_economy(
                         intent=Intent.ACCIDENTAL,
                         scale=Scale.AGGREGATE,
                         payload={
-                            "description": f"Severe famine struck {s.name} as winter food stores collapsed.",
                             "settlement": s.id,
                             "active_spell": True,
                         },
@@ -211,8 +210,6 @@ def process_conflicts_and_economy(
                         intent=Intent.ACCIDENTAL,
                         scale=Scale.INDIVIDUAL,
                         payload={
-                            "description": f"{starve_victim.full_name} died of starvation during the famine in {s.name}",
-                            "victim_name": starve_victim.full_name,
                             "cause": "Starvation",
                             "famine_id": s.active_famine_event_id,
                         },
@@ -237,7 +234,6 @@ def process_conflicts_and_economy(
                             intent=Intent.MILITARY_ACTION,
                             scale=Scale.AGGREGATE,
                             payload={
-                                "description": f"Desperate food raid launched by {s.name} on {settlements[target_s].name} driven by famine #{s.active_famine_event_id}",
                                 "feud_id": None,
                                 "famine_id": s.active_famine_event_id,
                             },
@@ -276,7 +272,7 @@ def process_conflicts_and_economy(
                     causes=[feud_causing.id],
                     intent=Intent.MILITARY_ACTION,
                     scale=Scale.AGGREGATE,
-                    payload={"description": f"Trade route between {s1.name} and {s2.name} was severed by feud #{feud_causing.id}"},
+                    payload={"feud_id": feud_causing.id},
                 )
                 route.active = False
                 active_trade_route_events.pop(route_key, None)
@@ -305,7 +301,7 @@ def process_conflicts_and_economy(
                         causes=causes,
                         intent=Intent.INTENTIONAL,
                         scale=Scale.AGGREGATE,
-                        payload={"description": f"Formal trade route established between {s1.name} and {s2.name}"},
+                        payload={},
                     )
                     route.active = True
                     route.founded_event_id = evt.id
@@ -381,7 +377,7 @@ def process_conflicts_and_economy(
                             causes=[chief_death_evt_id],
                             intent=Intent.INTENTIONAL,
                             scale=Scale.AGGREGATE,
-                            payload={"description": f"Succession crisis erupted in {s.name} between {candidate_1.full_name} and {candidate_2.full_name}"},
+                            payload={},
                         )
                         crisis_occurred = True
                         crisis_evt_id = crisis_evt.id
@@ -396,7 +392,7 @@ def process_conflicts_and_economy(
                 causes=chief_causes,
                 intent=Intent.INTENTIONAL,
                 scale=Scale.AGGREGATE,
-                payload={"description": f"{successor.full_name} ascended as the new chief of {s.name}"},
+                payload={},
             )
             s.leader_id = successor.id
 
@@ -474,13 +470,6 @@ def process_conflicts_and_economy(
 
                         causes = [event_ref]
 
-                        feud_desc = (
-                            f"Wrongful feud declared by {char.full_name} against {accused.full_name}: "
-                            f"accused of murder based on distorted belief, though death was accidental."
-                            if is_wrongful
-                            else f"Blood feud declared by {char.full_name} against {accused.full_name} for aggression in event #{event_ref}."
-                        )
-
                         evt = event_log.append(
                             tick=tick,
                             location=char.settlement_id,
@@ -490,7 +479,6 @@ def process_conflicts_and_economy(
                             intent=Intent.INTENTIONAL,
                             scale=Scale.INDIVIDUAL,
                             payload={
-                                "description": feud_desc,
                                 "is_wrongful": is_wrongful,
                                 "victim_id": offence_target,
                                 "accused_id": accused.id,
@@ -561,9 +549,6 @@ def process_conflicts_and_economy(
                     intent=Intent.INTENTIONAL,
                     scale=Scale.INDIVIDUAL,
                     payload={
-                        "description": f"{instigator.full_name} exacted revenge and killed {target.full_name} for feud #{feud.id}",
-                        "victim_name": target.full_name,
-                        "actor_name": instigator.full_name,
                         "revenge": True,
                         "cause_of_death": "Revenge",
                         "feud_id": feud.id,
@@ -653,7 +638,6 @@ def process_conflicts_and_economy(
                     intent=Intent.MILITARY_ACTION,
                     scale=Scale.AGGREGATE,
                     payload={
-                        "description": f"Raid launched by {attacker_set.name} on {defender_set.name} sparked by feud #{feud.id}",
                         "looted_food": looted_food,
                         "feud_id": feud.id,
                         "minor_raids_preceding": feud.minor_raids,
@@ -673,8 +657,7 @@ def process_conflicts_and_economy(
                         intent=Intent.MILITARY_ACTION,
                         scale=Scale.INDIVIDUAL,
                         payload={
-                            "description": f"{casualty.full_name} was slain defending {defender_set.name} during raid #{raid_evt.id}",
-                            "victim_name": casualty.full_name,
+                            "cause_of_death": "Raid Casualty",
                         },
                     )
                     casualty.death_event_id = evt.id
@@ -736,10 +719,6 @@ def process_conflicts_and_economy(
                             intent=Intent.INTENTIONAL,
                             scale=Scale.INDIVIDUAL,
                             payload={
-                                "description": (
-                                    f"Truth revealed to {instigator.full_name} by eyewitness {witness.full_name}: "
-                                    f"The death in event #{feud.root_cause_event_id} was an accident, not murder."
-                                ),
                                 "witness": witness.id,
                                 "path": [witness.id, instigator.id],
                                 "corrected_intent": "Accidental",
@@ -820,10 +799,6 @@ def process_conflicts_and_economy(
                             intent=Intent.INTENTIONAL,
                             scale=Scale.AGGREGATE,
                             payload={
-                                "description": (
-                                    f"Reconciliation and Peace between {instigator.full_name} and {party2_name}: "
-                                    f"Truth revealed in #{rev_evt.id}. Feud #{feud.id} resolved."
-                                ),
                                 "feud_id": feud.id,
                                 "reconciliation_type": "Truth Revealed",
                             },
@@ -889,10 +864,6 @@ def process_conflicts_and_economy(
                         intent=Intent.INTENTIONAL,
                         scale=Scale.AGGREGATE,
                         payload={
-                            "description": (
-                                f"Peace treaty signed between {settlements[feud.instigator_settlement_id].name} "
-                                f"and {settlements[feud.target_settlement_id].name}, ending feud #{feud.id} through exhaustion."
-                            ),
                             "feud_id": feud.id,
                             "reconciliation_type": "Negotiated Treaty",
                         },
@@ -967,7 +938,6 @@ def process_conflicts_and_economy(
                 intent=Intent.ACCIDENTAL,
                 scale=Scale.AGGREGATE,
                 payload={
-                    "description": f"{s.name} collapsed as population dwindled to {len(survivors)} citizens under sustained pressure.",
                     "settlement_id": s_id,
                     "remaining_population": len(survivors),
                     "trigger_cause_id": collapse_causes[0],
@@ -1001,7 +971,6 @@ def process_conflicts_and_economy(
                     intent=Intent.INTENTIONAL,
                     scale=Scale.AGGREGATE,
                     payload={
-                        "description": f"Survivors of {s.name} ({len(survivors)} citizens) migrated to {dest_s.name} following settlement collapse #{collapse_evt.id}.",
                         "source_settlement_id": s_id,
                         "destination_settlement_id": dest_s.id,
                         "migrants": migrant_ids,

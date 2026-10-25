@@ -194,8 +194,9 @@ def format_causal_chain(
     desc = f"[Event #{evt.id} | Year {evt.tick // 12 + 1} Month {evt.tick % 12 + 1}] {evt.type.value} ({evt.intent.value}) @ {evt.location} | {causes_str}"
     details = f"{desc} | {participants_str}"
     
-    if "description" in evt.payload:
-        details += f" -- \"{evt.payload['description']}\""
+    desc_str = evt.payload.get("description") or getattr(evt, "description", "")
+    if desc_str:
+        details += f" -- \"{desc_str}\""
 
     if event_id in already_printed:
         return f"{indent}{bullet}{details} (causal history detailed above)"
@@ -258,8 +259,9 @@ def format_notable_deaths(
                 f"[Year {evt.tick // 12 + 1:2d} Month {evt.tick % 12 + 1:2d} | Event #{evt.id:3d}] "
                 f"Death of {victim_name} @ {evt.location} | Category: {category} | {causes_str}"
             )
-            if "description" in evt.payload:
-                line += f" -- \"{evt.payload['description']}\""
+            desc_str = evt.payload.get("description") or getattr(evt, "description", "")
+            if desc_str:
+                line += f" -- \"{desc_str}\""
             notable.append(line)
 
     return notable
@@ -273,11 +275,12 @@ def format_linear_history(event_log: EventLog, event_id: int) -> list[str]:
     result = []
     for e_id in path:
         e = event_log.get(e_id)
+        desc_str = e.payload.get("description") or getattr(e, "description", "")
         result.append(
             f"[Year {e.tick // 12 + 1:2d} M{e.tick % 12 + 1:2d} (Tick {e.tick:4d})] "
             f"Event #{e.id:3d}: {e.type.value:17s} | {e.intent.value:14s} | "
             f"Loc: {e.location:12s} | "
-            f"{e.payload.get('description', '')}"
+            f"{desc_str}"
         )
     return result
 

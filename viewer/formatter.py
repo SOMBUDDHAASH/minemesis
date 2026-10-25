@@ -103,13 +103,14 @@ def format_event_sentence(
         cause = payload.get("cause_of_death") or payload.get("cause", "")
         actor = payload.get("actor_name") or format_character_name(participants.get("actor", ""), characters)
 
-        if payload.get("natural") or "old age" in str(payload.get("description", "")).lower():
+        evt_desc = str(payload.get("description") or getattr(event, "description", "")).lower()
+        if payload.get("natural") or "old age" in evt_desc:
             return f"{victim} passed away peacefully of old age in {loc_name}."
         elif payload.get("revenge") or cause == "Revenge":
             return f"{victim} was slain in revenge by {actor} in {loc_name}."
         elif cause == "Starvation":
             return f"{victim} succumbed to starvation during the famine in {loc_name}."
-        elif "raid" in str(payload.get("description", "")).lower() or getattr(event, "intent", None) == Intent.MILITARY_ACTION:
+        elif "raid" in evt_desc or getattr(event, "intent", None) == Intent.MILITARY_ACTION:
             return f"{victim} was slain defending {loc_name} during a border raid."
         elif payload.get("accidental") or getattr(event, "intent", None) == Intent.ACCIDENTAL:
             if actor and actor != "Unknown Person":
@@ -280,7 +281,7 @@ def format_event_sentence(
         return f"{saint} was canonized as a sacred protector in the liturgy of {rel}."
 
     # General Fallback
-    desc = payload.get("description")
+    desc = payload.get("description") or getattr(event, "description", None)
     if desc:
         # Clean any raw IDs from description
         cleaned = desc

@@ -55,27 +55,68 @@ class LibraryType(str, Enum):
     SCHOLARS_STUDY = "ScholarsStudy"
 
 
-@dataclass
 class Book:
     """
     A written manuscript, chronicle, scripture, or journal authored within the simulation.
     Strictly generated from simulation state without LLMs.
+    Supports lazy page rendering to eliminate heap overhead when books are unread.
     """
-    id: str
-    title: str
-    author_id: str
-    author_name: str
-    author_literacy: LiteracyLevel
-    genre: BookGenre
-    settlement_id: str
-    creation_tick: int
-    creation_year: int
-    sources: list[int] = field(default_factory=list)
-    perspective_bias: str = "Objective"
-    pages: list[str] = field(default_factory=list)
-    total_word_count: int = 0
-    original_book_id: Optional[str] = None
-    is_damaged: bool = False
+    def __init__(
+        self,
+        id: str,
+        title: str,
+        author_id: str,
+        author_name: str,
+        author_literacy: LiteracyLevel,
+        genre: BookGenre,
+        settlement_id: str,
+        creation_tick: int,
+        creation_year: int,
+        sources: Optional[list[int]] = None,
+        perspective_bias: str = "Objective",
+        pages: Optional[list[str]] = None,
+        total_word_count: int = 0,
+        original_book_id: Optional[str] = None,
+        is_damaged: bool = False,
+        lazy_renderer: Optional[Callable[[], list[str]]] = None,
+    ) -> None:
+        self.id = id
+        self.title = title
+        self.author_id = author_id
+        self.author_name = author_name
+        self.author_literacy = author_literacy
+        self.genre = genre
+        self.settlement_id = settlement_id
+        self.creation_tick = creation_tick
+        self.creation_year = creation_year
+        self.sources = list(sources) if sources is not None else []
+        self.perspective_bias = perspective_bias
+        self._pages = list(pages) if pages is not None else None
+        self.total_word_count = total_word_count
+        self.original_book_id = original_book_id
+        self.is_damaged = is_damaged
+        self.lazy_renderer = lazy_renderer
+
+    @property
+    def pages(self) -> list[str]:
+        """Lazily synthesizes formatted page strings on demand."""
+        if self._pages is None:
+            if self.lazy_renderer is not None:
+                self._pages = self.lazy_renderer()
+                if self.total_word_count == 0 and self._pages:
+                    self.total_word_count = sum(len(p.split()) for p in self._pages)
+            else:
+                self._pages = []
+        return self._pages
+
+    @pages.setter
+    def pages(self, val: list[str]) -> None:
+        self._pages = val
+
+    def unload_pages(self) -> None:
+        """Frees rendered page strings from RAM if a lazy renderer is available."""
+        if self.lazy_renderer is not None and not self.is_damaged:
+            self._pages = None
 
     def full_text(self) -> str:
         """Returns the complete combined text across all pages."""

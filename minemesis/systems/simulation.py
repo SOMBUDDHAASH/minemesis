@@ -553,6 +553,10 @@ class Simulation:
         for k in expired:
             del self.relationship_cache._cache[k]
 
+        # 4. Unload rendered book pages to keep literature memory minimal (Lore Compression)
+        if self.lore_engine and self.lore_engine.enabled:
+            self.lore_engine.library_manager.unload_all_pages()
+
         gc.collect()
 
     def run_years(self, years: int) -> None:
