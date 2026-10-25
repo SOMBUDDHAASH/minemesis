@@ -82,6 +82,12 @@ def run_selftest() -> int:
         assert "<!DOCTYPE html>" in html_out
         print("   [OK] Chronicle text and HTML generation successful.")
 
+        print("7. Testing SeedPair and WorldSpec in RunData...")
+        assert run_data.seed_pair is not None, "Expected seed_pair in RunData"
+        assert run_data.pair_code is not None, "Expected pair_code in RunData"
+        assert run_data.world_spec is not None, "Expected world_spec in RunData"
+        print(f"   [OK] Verified SeedPair {run_data.pair_code} and WorldSpec ({len(run_data.world_spec.get('settlements', []))} settlements).")
+
         print(f"\nALL SELF-TEST CHECKS PASSED. Viewer is sound and ready.")
         return 0
     except Exception as ex:

@@ -9,6 +9,7 @@ import hashlib
 import os
 import sys
 from minemesis.analytics import run_batch_analytics
+from minemesis.core.seed import SeedPair, new_game, parse_world_seed, parse_history_seed
 from minemesis.core.history_printer import (
     export_causal_graph_dot,
     export_causal_graph_mermaid,
@@ -21,6 +22,30 @@ from minemesis.core.types import EventType
 from minemesis.systems.simulation import Simulation
 
 
+def _resolve_seed_pair(args: argparse.Namespace) -> SeedPair:
+    if getattr(args, "new", False):
+        return new_game()
+    if getattr(args, "code", None):
+        return SeedPair.decode(args.code)
+    
+    world_arg = getattr(args, "world", None)
+    hist_arg = getattr(args, "history", None)
+    if hist_arg is None:
+        hist_arg = getattr(args, "chronicle", None)
+
+    if world_arg is not None and hist_arg is not None:
+        return SeedPair(world=parse_world_seed(world_arg), history=parse_history_seed(hist_arg))
+    if world_arg is not None:
+        w_val = parse_world_seed(world_arg)
+        return SeedPair(world=w_val, history=w_val ^ 0x5555555555555555)
+    if hist_arg is not None:
+        h_val = parse_history_seed(hist_arg)
+        return SeedPair(world=h_val ^ 0xAAAAAAAAAAAAAAAA, history=h_val)
+    # Legacy seed fallback
+    legacy = getattr(args, "seed", 42)
+    return SeedPair.from_legacy(legacy)
+
+
 def run_single(args: argparse.Namespace) -> None:
     if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
         try:
@@ -28,17 +53,20 @@ def run_single(args: argparse.Namespace) -> None:
         except Exception:
             pass
 
-    print(f"=== Minemesis Simulation (Milestone 0.5) ===")
-    print(f"Seed: {args.seed} | Duration: {args.years} Simulated Years ({args.years * 12} Ticks)")
+    seed_pair = _resolve_seed_pair(args)
+    print(f"=== Minemesis Simulation (Milestone 0.5.3) ===")
+    print(f"World Seed: {seed_pair.world} | History Seed: {seed_pair.history}")
+    print(f"Seed Code: {seed_pair.encode()}")
+    print(f"Duration: {args.years} Simulated Years ({args.years * 12} Ticks)")
 
     if args.check_determinism:
         print("\n--- Running Determinism Verification ---")
-        sim_a = Simulation(args.seed)
+        sim_a = Simulation(seed=seed_pair)
         sim_a.run_years(args.years)
         json_a = sim_a.event_log.to_json(indent=None)
         hash_a = hashlib.sha256(json_a.encode("utf-8")).hexdigest()
 
-        sim_b = Simulation(args.seed)
+        sim_b = Simulation(seed=seed_pair)
         sim_b.run_years(args.years)
         json_b = sim_b.event_log.to_json(indent=None)
         hash_b = hashlib.sha256(json_b.encode("utf-8")).hexdigest()
@@ -49,11 +77,12 @@ def run_single(args: argparse.Namespace) -> None:
             print(f"[FAIL] Determinism mismatch! Hash A: {hash_a} != Hash B: {hash_b}")
             sys.exit(1)
 
-    sim = Simulation(args.seed)
+    sim = Simulation(seed=seed_pair)
     sim.run_years(args.years)
 
     events = sim.event_log.all_events()
     print(f"\n--- Simulation Completed: {args.years} Years ({sim.tick} Ticks) ---")
+    print(f"Settlements: {len(sim.settlements)} | Initial Population: {len(sim.characters)}")
     print(f"Total Objective Events: {len(events)}")
 
     # Breakdown by event type
@@ -68,7 +97,7 @@ def run_single(args: argparse.Namespace) -> None:
 
     # Demographics
     living = sim.living_characters
-    print(f"\nPopulation: {len(living)} living characters (started with {len(sim.settlements) * 10})")
+    print(f"\nPopulation: {len(living)} living characters (initially {len(sim.characters)})")
     for s_id, s in sorted(sim.settlements.items()):
         s_living = [c for c in living if c.settlement_id == s_id]
         print(f"  * {s.name:10s} (pos: {s.x}, {s.y}): {len(s_living)} citizens | Wealth: {s.wealth} | Food: {s.food}")
@@ -149,7 +178,12 @@ def run_cli() -> None:
     batch_parser.add_argument("--out", type=str, default="reports", help="Output directory (default: reports)")
 
     run_parser = subparsers.add_parser("run", help="Run a single simulation")
-    run_parser.add_argument("--seed", type=int, default=42, help="World generation seed (default: 42)")
+    run_parser.add_argument("--seed", type=int, default=42, help="Legacy world generation seed (default: 42)")
+    run_parser.add_argument("--world", type=str, default=None, help="Explicit World Seed (number or text)")
+    run_parser.add_argument("--history", type=str, default=None, help="Explicit History Seed (number or text)")
+    run_parser.add_argument("--chronicle", type=str, default=None, help="Alias for --history")
+    run_parser.add_argument("--code", type=str, default=None, help="Crockford Base32 SeedPair code (e.g. W...:H...:V0:K)")
+    run_parser.add_argument("--new", action="store_true", help="Generate fresh random game via OS entropy")
     run_parser.add_argument("--years", type=int, default=100, help="Simulated years to run (default: 100)")
     run_parser.add_argument("--check-determinism", action="store_true", help="Run twice and verify byte-identical output")
     run_parser.add_argument("--event-id", type=int, default=None, help="Trace causal chain for a specific event ID")
@@ -157,7 +191,12 @@ def run_cli() -> None:
     run_parser.add_argument("--export-dot", type=str, default=None, help="Export causal story as Graphviz DOT file")
     run_parser.add_argument("--export-mermaid", type=str, default=None, help="Export causal story as Mermaid file")
 
-    parser.add_argument("--seed", type=int, default=42, help="World generation seed")
+    parser.add_argument("--seed", type=int, default=42, help="Legacy world generation seed")
+    parser.add_argument("--world", type=str, default=None, help="Explicit World Seed (number or text)")
+    parser.add_argument("--history", type=str, default=None, help="Explicit History Seed (number or text)")
+    parser.add_argument("--chronicle", type=str, default=None, help="Alias for --history")
+    parser.add_argument("--code", type=str, default=None, help="Crockford Base32 SeedPair code")
+    parser.add_argument("--new", action="store_true", help="Generate fresh random game via OS entropy")
     parser.add_argument("--years", type=int, default=100, help="Simulated years")
     parser.add_argument("--check-determinism", action="store_true")
     parser.add_argument("--event-id", type=int, default=None)

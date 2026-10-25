@@ -531,13 +531,14 @@ def generate_legal_record(
     tick: int,
     rng: KeyedRNG,
     literacy: LiteracyLevel = LiteracyLevel.SCHOLAR,
+    settlement_name: Optional[str] = None,
 ) -> Book:
     """
     Compiles an official legal inquest, treaty document, or inquest verdict.
     """
     year = (tick // 12) + 1
     e_type = event.type.value
-    loc = event.location
+    loc = settlement_name or (event.location.replace("set_", "").capitalize() if event.location else "the Settlement")
 
     if e_type == "Death":
         title = f"Official Inquest into the Death of {event.participants[0][1] if event.participants else 'Citizen'}"
@@ -578,7 +579,7 @@ def generate_legal_record(
         author_name=author_name,
         author_literacy=literacy,
         genre=BookGenre.LEGAL_RECORD,
-        settlement_id=loc,
+        settlement_id=event.location,
         creation_tick=tick,
         creation_year=year,
         sources=[event.id],

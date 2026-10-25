@@ -29,6 +29,7 @@ def process_life_cycle(
     tick: int,
     seed: int,
     char_counter: list[int],
+    name_salt: int = 0,
 ) -> None:
     """
     Simulates monthly life cycle progressions:
@@ -62,7 +63,9 @@ def process_life_cycle(
         for f in singles_f:
             if f.spouse_id is not None:
                 continue
-            if m.last_name == f.last_name and (m.father_id is not None or f.father_id is not None):
+            m_fam = getattr(m, "family_id", "") or m.last_name
+            f_fam = getattr(f, "family_id", "") or f.last_name
+            if m_fam == f_fam and (m.father_id is not None or f.father_id is not None):
                 continue
             if f.id in m.children_ids or m.id in f.children_ids:
                 continue
@@ -162,7 +165,7 @@ def process_life_cycle(
 
             child_sex = "M" if keyed_float(seed, "child_sex", child_id, tick) < 0.5 else "F"
             name_pool = FIRST_NAMES_MALE if child_sex == "M" else FIRST_NAMES_FEMALE
-            first_name = keyed_choice(seed, "child_name", child_id, tick, name_pool)
+            first_name = keyed_choice(seed, "name:child_name", child_id, tick, name_pool, salt=name_salt)
             last_name = husband.last_name
 
             child = Character(
@@ -176,6 +179,7 @@ def process_life_cycle(
                 mother_id=wife.id,
                 suspicion=0.45,
                 forgiveness=0.55,
+                family_id=getattr(husband, "family_id", "") or last_name,
             )
             characters[child_id] = child
             settlements[wife.settlement_id].member_ids.append(child_id)

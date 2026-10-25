@@ -78,6 +78,11 @@ def process_conflicts_and_economy(
     else:
         season_mult = 1.15  # Spring / Summer
 
+    active_feud_pairs = {
+        tuple(sorted([f.instigator_settlement_id, f.target_settlement_id]))
+        for f in active_feuds if f.active
+    }
+
     for s_id in settlement_keys:
         s = settlements[s_id]
         local_living = [c for c in living_chars if c.settlement_id == s_id]
@@ -105,10 +110,11 @@ def process_conflicts_and_economy(
             spoilage = int(excess * 0.15)  # 15% monthly spoilage on excess
             s.food -= spoilage
 
+        critical_food_threshold = max(2, int(pop * 0.15))
         if s.food < 0:
             s.food = 0
             s.consecutive_starvation_ticks += 1
-        elif s.food <= 2:
+        elif s.food <= critical_food_threshold:
             s.consecutive_starvation_ticks += 1
         else:
             s.consecutive_starvation_ticks = max(0, s.consecutive_starvation_ticks - 1)
@@ -118,25 +124,27 @@ def process_conflicts_and_economy(
         s.wealth = max(0, s.wealth - maintenance)
 
         # Directive 9: Emergency food purchases for wealthy starving settlements
-        if s.food < 15 and s.wealth >= 10:
+        if s.food < max(15, int(pop * 0.35)) and s.wealth >= 10:
             for other_id in settlement_keys:
                 if other_id == s_id or other_id in collapsed_settlements:
+                    continue
+                # Cannot purchase emergency grain from settlements in active feud
+                if tuple(sorted([s_id, other_id])) in active_feud_pairs:
                     continue
                 other_s = settlements[other_id]
                 other_pop = len([c for c in living_chars if c.settlement_id == other_id])
                 surplus = max(0, other_s.food - max(15, other_pop * 2))
                 if surplus > 0:
-                    needed = min(20, 25 - s.food)
-                    price = 3
-                    units = min(needed, surplus, s.wealth // price)
-                    if units > 0:
-                        cost = units * price
+                    needed = min(max(20, int(pop * 0.50)), surplus, s.wealth // 3)
+                    if needed > 0:
+                        cost = needed * 3
                         s.wealth -= cost
                         other_s.wealth += cost
-                        s.food += units
-                        other_s.food -= units
-                        s.consecutive_starvation_ticks = max(0, s.consecutive_starvation_ticks - 1)
-                        if s.food >= 15:
+                        s.food += needed
+                        other_s.food -= needed
+                        if s.food > critical_food_threshold:
+                            s.consecutive_starvation_ticks = max(0, s.consecutive_starvation_ticks - 1)
+                        if s.food >= max(20, int(pop * 0.50)):
                             break
 
         # Directive 8: Famine Consolidation (historical spell, not bi-monthly pulse)
@@ -146,12 +154,13 @@ def process_conflicts_and_economy(
                 # Famine spell resolved through sustained recovery
                 s.active_famine_event_id = None
                 s.active_famine_start_tick = None
+                s.last_famine_end_tick = tick
         else:
             s.adequate_food_ticks = 0
 
-        # Trigger new Famine spell ONLY if no active famine and adequate recovery (>= 12 months)
+        # Trigger new Famine spell ONLY if no active famine and adequate recovery (>= 12 months since last famine)
         if s.active_famine_event_id is None:
-            if s.consecutive_starvation_ticks >= 2 and s.adequate_food_ticks >= 12:
+            if s.consecutive_starvation_ticks >= 2 and (tick - s.last_famine_end_tick >= 12):
                 famine_roll = keyed_float(seed, "famine_event", s_id, tick)
                 if famine_roll < 0.20:
                     causes: list[int] = []
@@ -206,28 +215,30 @@ def process_conflicts_and_economy(
                     starve_victim.death_event_id = evt.id
 
             # Desperate food raid during active famine
+            current_living = [c for c in characters.values() if c.alive and c.settlement_id == s_id and c.age_years >= 16]
             food_rich = [other_id for other_id in settlement_keys if settlements[other_id].food > 40 and other_id not in collapsed_settlements]
-            if food_rich and len(local_living) >= 4:
+            if food_rich and len(current_living) >= 4:
                 target_s = keyed_choice(seed, "famine_target", s_id, tick, food_rich)
                 action_roll = keyed_float(seed, "famine_action", s_id, tick)
                 if action_roll < 0.20:
-                    leader_c = characters[s.leader_id] if s.leader_id and s.leader_id in characters and characters[s.leader_id].alive else local_living[0]
-                    event_log.append(
-                        tick=tick,
-                        location=target_s,
-                        event_type=EventType.RAID,
-                        participants={"initiator": s.id, "target": target_s, "instigator_char": leader_c.id},
-                        causes=[s.active_famine_event_id],
-                        intent=Intent.MILITARY_ACTION,
-                        scale=Scale.AGGREGATE,
-                        payload={
-                            "description": f"Desperate food raid launched by {s.name} on {settlements[target_s].name} driven by famine #{s.active_famine_event_id}",
-                            "feud_id": None,
-                            "famine_id": s.active_famine_event_id,
-                        },
-                    )
-                    settlements[target_s].food -= min(15, settlements[target_s].food // 3)
-                    s.food += 12
+                    leader_c = characters[s.leader_id] if s.leader_id and s.leader_id in characters and characters[s.leader_id].alive else current_living[0]
+                    if leader_c and leader_c.alive:
+                        event_log.append(
+                            tick=tick,
+                            location=target_s,
+                            event_type=EventType.RAID,
+                            participants={"initiator": s.id, "target": target_s, "instigator_char": leader_c.id},
+                            causes=[s.active_famine_event_id],
+                            intent=Intent.MILITARY_ACTION,
+                            scale=Scale.AGGREGATE,
+                            payload={
+                                "description": f"Desperate food raid launched by {s.name} on {settlements[target_s].name} driven by famine #{s.active_famine_event_id}",
+                                "feud_id": None,
+                                "famine_id": s.active_famine_event_id,
+                            },
+                        )
+                        settlements[target_s].food -= min(15, settlements[target_s].food // 3)
+                        s.food += 12
 
     # =========================================================================
     # 2. TRADE ROUTES (Continuous State & Historical Events, Section 4.2)
@@ -351,7 +362,8 @@ def process_conflicts_and_economy(
             candidate_1 = children[0] if children else None
 
             standing_sorted = sorted(local_citizens, key=lambda c: c.age_ticks, reverse=True)
-            other_family = [c for c in standing_sorted if candidate_1 and c.last_name != candidate_1.last_name]
+            c1_fam = getattr(candidate_1, "family_id", "") or (candidate_1.last_name if candidate_1 else "")
+            other_family = [c for c in standing_sorted if candidate_1 and (getattr(c, "family_id", "") or c.last_name) != c1_fam]
             candidate_2 = other_family[0] if other_family else (standing_sorted[0] if standing_sorted else candidate_1)
 
             successor = candidate_1 or candidate_2
@@ -411,11 +423,13 @@ def process_conflicts_and_economy(
 
                 if belief.believed_type == EventType.DEATH and belief.believed_intent in (Intent.INTENTIONAL, Intent.MILITARY_ACTION):
                     victim = characters.get(belief.believed_target) if belief.believed_target else None
+                    v_fam = getattr(victim, "family_id", "") or (victim.last_name if victim else "")
+                    c_fam = getattr(char, "family_id", "") or char.last_name
                     is_kin = victim and (
                         victim.id in char.children_ids
                         or victim.id in (char.father_id, char.mother_id)
                         or victim.id == char.spouse_id
-                        or victim.last_name == char.last_name
+                        or (v_fam and v_fam == c_fam)
                     )
                     if is_kin:
                         offence_actor = belief.believed_actor

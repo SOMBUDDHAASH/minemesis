@@ -530,7 +530,7 @@ def test_100_year_unscripted_syncretism_and_culture():
     assert sim.religion_engine.enabled is True
 
     # Check cultural profiles initialized for all settlements
-    for s_id in ["set_oakhaven", "set_riverbend", "set_ironpeak"]:
+    for s_id in sim.settlements.keys():
         culture = sim.religion_engine.get_settlement_culture(s_id)
         assert culture is not None
         assert len(culture.social_values) >= 5

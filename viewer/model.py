@@ -98,6 +98,10 @@ class RunData:
     books: list[dict[str, Any]]
     census: list[dict[str, Any]]
     event_share: dict[str, float]
+    seed_pair: dict[str, int] = field(default_factory=dict)
+    pair_code: str = ""
+    world_spec: dict[str, Any] = field(default_factory=dict)
+    generator_version: str = "v0"
 
     def get_event_log_proxy(self) -> EventLogProxy:
         proxies = []
@@ -125,6 +129,10 @@ class RunData:
             "schema_version": self.schema_version,
             "build_info": self.build_info,
             "seed": self.seed,
+            "seed_pair": self.seed_pair,
+            "pair_code": self.pair_code,
+            "world_spec": self.world_spec,
+            "generator_version": self.generator_version,
             "years": self.years,
             "toggles": self.toggles,
             "events": self.events,
@@ -158,6 +166,10 @@ class RunData:
             books=data.get("books", []),
             census=data.get("census", []),
             event_share=data.get("event_share", {}),
+            seed_pair=data.get("seed_pair", {}),
+            pair_code=data.get("pair_code", ""),
+            world_spec=data.get("world_spec", {}),
+            generator_version=data.get("generator_version", "v0"),
         )
 
     @classmethod
@@ -276,6 +288,19 @@ class RunData:
             "lore": bool(sim.lore_engine and sim.lore_engine.enabled),
         }
 
+        # SeedPair and WorldSpec capture
+        seed_pair_dict = {}
+        pair_code = ""
+        if hasattr(sim, "seed_pair"):
+            seed_pair_dict = {"world": sim.seed_pair.world, "chronicle": sim.seed_pair.chronicle}
+            pair_code = sim.seed_pair.encode()
+
+        world_spec_dict = {}
+        gen_ver = "v0"
+        if hasattr(sim, "world_spec") and sim.world_spec is not None:
+            world_spec_dict = sim.world_spec.to_dict()
+            gen_ver = getattr(sim.world_spec, "generator_version", "v0")
+
         return cls(
             schema_version=SCHEMA_VERSION,
             build_info=build_info or {},
@@ -289,4 +314,8 @@ class RunData:
             books=book_dicts,
             census=census,
             event_share=event_share,
+            seed_pair=seed_pair_dict,
+            pair_code=pair_code,
+            world_spec=world_spec_dict,
+            generator_version=gen_ver,
         )

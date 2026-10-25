@@ -30,6 +30,12 @@ class Character:
     # Personality traits in [0.0, 1.0] used for bias/distortion in belief formation
     suspicion: float = 0.5  # Higher suspicion -> more likely to interpret ambiguous intent as hostile
     forgiveness: float = 0.5  # Higher forgiveness -> memories decay faster, reconciliation easier
+    profession: str = "Laborer"
+    family_id: str = ""
+
+    def __post_init__(self):
+        if not self.family_id:
+            self.family_id = self.last_name
 
     @property
     def full_name(self) -> str:
@@ -58,4 +64,6 @@ class Character:
             "father_id": self.father_id,
             "mother_id": self.mother_id,
             "children_ids": list(self.children_ids),
+            "profession": self.profession,
+            "family_id": self.family_id,
         }

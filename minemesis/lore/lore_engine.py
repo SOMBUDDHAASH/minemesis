@@ -203,6 +203,8 @@ class LoreEngine:
                     )
                     mag_lit = self.get_character_literacy(magistrate)
                     if mag_lit != LiteracyLevel.ILLITERATE:
+                        settle_obj = settlements.get(evt.location)
+                        s_name = getattr(settle_obj, "name", None) or (settle_obj.get("name") if isinstance(settle_obj, dict) else evt.location)
                         book = generate_legal_record(
                             book_id=self._next_book_id(),
                             event=evt,
@@ -211,6 +213,7 @@ class LoreEngine:
                             tick=tick,
                             rng=self.rng,
                             literacy=mag_lit,
+                            settlement_name=s_name,
                         )
                         self.library_manager.add_book(book, LibraryType.TOWN_ARCHIVE)
                         self._emit_book_event(book, event_log, [evt.id], tick)
@@ -262,10 +265,15 @@ class LoreEngine:
                                 self._emit_book_event(book, event_log, [evt.id], tick)
 
                     # B. Personal Journal of surviving kin / spouse
+                    d_fam = getattr(deceased, "family_id", "") or deceased.last_name
                     surviving_kin = [
                         c for c in characters.values()
-                        if c.alive and (c.last_name == deceased.last_name or c.spouse_id == deceased.id)
+                        if c.alive and (
+                            (bool(d_fam) and (getattr(c, "family_id", "") or c.last_name) == d_fam)
+                            or c.spouse_id == deceased.id
+                        )
                     ]
+                    surviving_kin.sort(key=lambda c: c.id)
                     for kin in surviving_kin[:2]:
                         kin_lit = self.get_character_literacy(kin)
                         if kin_lit != LiteracyLevel.ILLITERATE and self.rng.random() < 0.40:
@@ -478,11 +486,13 @@ class LoreEngine:
             families: dict[str, list[Character]] = {}
             for c in characters.values():
                 if c.alive:
-                    families.setdefault(c.last_name, []).append(c)
+                    f_key = getattr(c, "family_id", "") or c.last_name
+                    families.setdefault(f_key, []).append(c)
 
-            for f_name, kin_list in sorted(families.items()):
+            for f_key in sorted(families.keys()):
+                kin_list = sorted(families[f_key], key=lambda c: c.id)
                 if len(kin_list) >= 2:
-                    patriarch = max(kin_list, key=lambda c: c.age_ticks)
+                    patriarch = max(kin_list, key=lambda c: (c.age_ticks, c.id))
                     p_lit = self.get_character_literacy(patriarch)
                     if p_lit != LiteracyLevel.ILLITERATE:
                         f_events = [
@@ -491,7 +501,7 @@ class LoreEngine:
                         ]
                         book = generate_family_history(
                             book_id=self._next_book_id(),
-                            family_name=f_name,
+                            family_name=patriarch.last_name,
                             patriarch_or_author=patriarch,
                             kin_characters=kin_list,
                             family_events=f_events,

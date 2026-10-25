@@ -212,6 +212,11 @@ def format_event_sentence(
     # 14. Book Written
     elif t_val == "BookWritten":
         title = payload.get("title", "Untitled Volume")
+        # Format any raw settlement IDs embedded in book title
+        for sid, s_obj in settlements.items():
+            if sid in title:
+                s_name = s_obj.get("name") if isinstance(s_obj, dict) else getattr(s_obj, "name", sid)
+                title = title.replace(sid, s_name)
         author = format_character_name(participants.get("author", ""), characters)
         genre = payload.get("genre", "Literature")
         return f"{author} penned '{title}', a {genre} preserved in the archives of {loc_name}."

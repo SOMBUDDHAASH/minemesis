@@ -95,7 +95,9 @@ def form_memories_from_belief(
         is_child = victim and victim.id in believer.children_ids
         is_parent = victim and victim.id in (believer.father_id, believer.mother_id)
         is_spouse = victim and victim.id == believer.spouse_id
-        is_kin = is_child or is_parent or is_spouse or (victim and victim.last_name == believer.last_name)
+        v_fam = getattr(victim, "family_id", "") or (victim.last_name if victim else "")
+        b_fam = getattr(believer, "family_id", "") or believer.last_name
+        is_kin = is_child or is_parent or is_spouse or (bool(v_fam) and v_fam == b_fam)
 
         if is_kin:
             memories.append(
@@ -177,7 +179,10 @@ def form_memories_from_belief(
                 mem_id += 1
 
     elif b_type == EventType.FEUD:
-        if target_id == believer.id or (target_id and characters.get(target_id, Character("", "", "", "", 0, "")).last_name == believer.last_name):
+        target_char = characters.get(target_id) if target_id else None
+        t_fam = getattr(target_char, "family_id", "") or (target_char.last_name if target_char else "")
+        b_fam = getattr(believer, "family_id", "") or believer.last_name
+        if target_id == believer.id or (bool(t_fam) and t_fam == b_fam):
             if actor_id:
                 memories.append(
                     Memory(

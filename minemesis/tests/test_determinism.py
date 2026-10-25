@@ -88,6 +88,63 @@ print(hashlib.sha256(json_data.encode('utf-8')).hexdigest())
     assert hash_0 != hash_diff, "Negative control failed: different seeds produced identical hash!"
 
 
+def test_cross_process_seed_pair_determinism() -> None:
+    """
+    Validates cross-process determinism for SeedPair under different PYTHONHASHSEED environments.
+    Verifies that the same (world_seed, chronicle_seed) pair generates byte-identical logs,
+    and changing only the chronicle_seed yields a distinct history.
+    """
+    script = """
+import hashlib
+import sys
+from minemesis.core.seed import SeedPair
+from minemesis.systems.simulation import Simulation
+
+w = int(sys.argv[1])
+c = int(sys.argv[2])
+pair = SeedPair(world=w, chronicle=c)
+sim = Simulation(seed=pair)
+sim.run_years(20)
+json_data = sim.event_log.to_json(indent=None)
+print(hashlib.sha256(json_data.encode('utf-8')).hexdigest())
+"""
+
+    env_0 = os.environ.copy()
+    env_0["PYTHONHASHSEED"] = "0"
+    proc_0 = subprocess.run(
+        [sys.executable, "-c", script, "88888", "99999"],
+        env=env_0,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    hash_0 = proc_0.stdout.strip()
+
+    env_random = os.environ.copy()
+    env_random["PYTHONHASHSEED"] = "7654321"
+    proc_rand = subprocess.run(
+        [sys.executable, "-c", script, "88888", "99999"],
+        env=env_random,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    hash_rand = proc_rand.stdout.strip()
+
+    assert hash_0 == hash_rand, f"SeedPair cross-process hash mismatch: {hash_0} != {hash_rand}"
+
+    # Negative control: same world seed (88888), different chronicle seed (55555) must produce different hash
+    proc_diff_c = subprocess.run(
+        [sys.executable, "-c", script, "88888", "55555"],
+        env=env_0,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    hash_diff_c = proc_diff_c.stdout.strip()
+    assert hash_0 != hash_diff_c, "Negative control failed: different chronicle seeds produced identical hash!"
+
+
 def test_engine_toggle_off_zero_overhead_and_determinism() -> None:
     """
     Validates that when religion and lore engines are toggled OFF,

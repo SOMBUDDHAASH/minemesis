@@ -18,8 +18,8 @@ import zipfile
 # Ensure workspace root is in sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-BUILD_TAG = "m0.5.2"
-BUILD_COMMIT = "e322da2"
+BUILD_TAG = "m0.5.3"
+BUILD_COMMIT = "1a84f30"
 SHOWCASE_SEEDS = [42, 2029, 2030, 2043, 2011]
 
 
@@ -47,9 +47,9 @@ def build_pyinstaller():
     dist_dir = os.path.abspath("dist")
     build_dir = os.path.abspath("build")
     releases_dir = os.path.abspath("releases")
-    m052_dir = os.path.join(releases_dir, BUILD_TAG)
+    m_tag_dir = os.path.join(releases_dir, BUILD_TAG)
     os.makedirs(releases_dir, exist_ok=True)
-    os.makedirs(m052_dir, exist_ok=True)
+    os.makedirs(m_tag_dir, exist_ok=True)
 
     # 1. Build Single-file Executable
     pyinstaller_cmd_onefile = [
@@ -106,8 +106,8 @@ def export_showcase_runs():
     from viewer.model import RunData
 
     releases_dir = os.path.abspath("releases")
-    m052_dir = os.path.join(releases_dir, BUILD_TAG)
-    os.makedirs(m052_dir, exist_ok=True)
+    m_tag_dir = os.path.join(releases_dir, BUILD_TAG)
+    os.makedirs(m_tag_dir, exist_ok=True)
 
     for seed in SHOWCASE_SEEDS:
         print(f"  Simulating Seed {seed} for 100 years...")
@@ -119,7 +119,7 @@ def export_showcase_runs():
             "date": "2026-10-24",
         }
         run_data = RunData.from_simulation(sim, years=100, build_info=build_info)
-        out_path = os.path.join(m052_dir, f"minemesis_run_seed{seed}.json")
+        out_path = os.path.join(m_tag_dir, f"minemesis_run_seed{seed}.json")
         run_data.save_to_json(out_path)
         print(f"    Saved {out_path} ({len(run_data.events)} events, {len(run_data.characters)} characters)")
 
@@ -138,28 +138,28 @@ def write_release_notes():
 ---
 
 ## What Changed In This Build
-1. **Reconciled Demographics:** Fixed printed event numbering and population accounting so all birth, death, and census accounts match ground truth reality exactly.
-2. **Determinism Hardened:** Guaranteed byte-identical simulation outcomes across different operating systems and processes by eliminating Python string hash salting.
-3. **Event Balance Restored:** Demoted routine celebration and conversion spam down from 79% to ~8% of the event log so feuds, raids, and peace treaties stand out prominently.
-4. **Subjective Literature:** Re-anchored procedural book creation in author beliefs and perspectives, ensuring penned chronicles reflect personal biases rather than omniscient truth.
-5. **Interactive Story Viewer:** Delivered a complete Windows desktop application with 8 tabs to explore readable chronicles, causal roots, feud storylines, books, and beliefs.
+1. **Independent Dual Seed Split:** Decoupled world geography from history. World Seed governs terrain, settlement layout, and resources; History Seed governs families, traits, faiths, and events.
+2. **Procedural World Generator v0:** Replaced fixed settlements with procedural site placement (3 to 7 settlements, minimum spacing 30, 100% economic viability across 500 tested seeds).
+3. **Procedural Cast Generator & Name Domain Isolation:** Populates starting settlements with biologically sound families, >= 4 fertile couples per settlement, strict kin-avoidance guarantees, and completely isolated name keying ('name:').
+4. **Interactive Map Tab:** Added a new 200x200 canvas map view in the Story Viewer to visualize settlement locations, archetypes, and click to inspect natural resource endowments.
+5. **Crockford Base32 Seed Codes:** Typo-safe formatted codes with check digits allow one-click copying, sharing, and reloading of custom worlds.
 
 ---
 
 ## 3 Things To Look For In The Viewer
-1. **The '↳ because: ...' Causal Clauses (Story Tab):** Notice how raids and feuds cleanly explain their root motivations back to historical grudges and deaths.
-2. **Truth vs. Belief Comparison (People Tab):** Select any citizen to compare what they believe happened against objective reality, discovering how false rumors trigger conflicts.
-3. **100-Year Population Trajectory (World Tab):** Examine the dynamic settlement census chart and the event share audit table proving spam elimination.
+1. **'🗺 Same map, new history' Feature (Toolbar):** Click this button to generate a new history seed while keeping the world geography constant, watching completely different families and feuds unfold across the same valleys and mountains.
+2. **Interactive Settlement Inspection (🗺 Map Tab):** Click on any settlement circle to view its natural farmland, timber, ore, and defensibility endowments alongside year-end municipal stocks.
+3. **Dual Seed Box and Typo-Tolerant Seed Codes:** Type any number or phrase in World Seed (Minecraft-style SHA-256 hash), or paste Crockford Base32 codes (e.g. `WB84Q-PGW6-H8FX5:HBSGH-DGGJ-CE46D:V0:6`) to replay exact procedural worlds.
 
 ---
 
 ## Showcase Seeds Included
 Pre-generated runs located in `releases/{BUILD_TAG}/`:
-- `minemesis_run_seed42.json` (The Classic Baseline: balanced theological growth and stability)
-- `minemesis_run_seed2029.json` (Escalated Blood Feud: multi-generational vendetta and raiding)
+- `minemesis_run_seed42.json` (The Classic Baseline: Streamford, Rockmount, Swiftwash)
+- `minemesis_run_seed2029.json` (Escalated Blood Feud: multi-generational vendetta)
 - `minemesis_run_seed2030.json` (Syncretism & Reform: rich doctrinal borrowing across settlements)
 - `minemesis_run_seed2043.json` (Reconciled Diplomatic Run: complete demographic accounting)
-- `minemesis_run_seed2011.json` (Survival Challenge: harsh generational pressures and migration)
+- `minemesis_run_seed2011.json` (Survival Challenge: harsh generational pressures)
 """
     with open(notes_path, "w", encoding="utf-8") as f:
         f.write(content)

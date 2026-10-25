@@ -15,6 +15,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox, filedialog, scrolledtext
 from typing import Any, Callable, Mapping, Optional, Sequence
 
+from minemesis.core.seed import SeedPair, new_game, parse_world_seed, parse_history_seed
 from viewer.model import RunData, EventProxy, EventLogProxy, SCHEMA_VERSION
 from viewer.formatter import (
     format_event_sentence,
@@ -27,10 +28,11 @@ from viewer.threads import extract_story_threads, StoryThread
 from viewer.export import export_story_to_text, export_story_to_html
 
 
-BUILD_TAG = "m0.5.2"
-BUILD_COMMIT = "e322da2"
+BUILD_TAG = "m0.5.3"
+BUILD_COMMIT = "1a84f30"
 BUILD_TIME = "2026-10-24"
 
+DEFAULT_SEED_PAIR = SeedPair.from_legacy(42)
 SHOWCASE_SEEDS = [42, 2029, 2030, 2043, 2011]
 
 
@@ -38,7 +40,7 @@ class StoryViewerApp:
     def __init__(self, root: tk.Tk, initial_file: Optional[str] = None):
         self.root = root
         self.root.title(f"Minemesis Story Viewer - Milestone {BUILD_TAG}")
-        self.root.geometry("1240x820")
+        self.root.geometry("1240x840")
         self.root.minsize(1020, 700)
 
         # Application state
@@ -46,6 +48,7 @@ class StoryViewerApp:
         self.event_log_proxy: Optional[EventLogProxy] = None
         self.threads: list[StoryThread] = []
         self.is_simulating: bool = False
+        self.selected_map_site_id: Optional[str] = None
 
         # Book reader state
         self.current_book_index: int = 0
@@ -65,8 +68,8 @@ class StoryViewerApp:
         if initial_file and os.path.exists(initial_file):
             self.load_run_file(initial_file)
         else:
-            # Default: run seed 42 in background on startup
-            self.root.after(100, lambda: self._start_simulation(seed=42, years=100))
+            # Default: run default seed pair in background on startup
+            self.root.after(100, lambda: self._start_simulation(seed=DEFAULT_SEED_PAIR, years=100))
 
     def _setup_styles(self):
         style = ttk.Style()
@@ -88,50 +91,79 @@ class StoryViewerApp:
         toolbar = ttk.Frame(self.root, style="Toolbar.TFrame", padding=6)
         toolbar.pack(side=tk.TOP, fill=tk.X)
 
-        # Seed selection
-        ttk.Label(toolbar, text="Seed:", font=("Segoe UI", 9, "bold")).pack(side=tk.LEFT, padx=(4, 2))
-        self.seed_var = tk.StringVar(value="42")
-        self.seed_combo = ttk.Combobox(toolbar, textvariable=self.seed_var, width=8, values=[str(s) for s in SHOWCASE_SEEDS])
-        self.seed_combo.pack(side=tk.LEFT, padx=(0, 4))
+        # Row 1: Dual Seed Controls & Seed Code
+        row1 = ttk.Frame(toolbar, style="Toolbar.TFrame")
+        row1.pack(side=tk.TOP, fill=tk.X, pady=(0, 4))
 
-        self.btn_random = ttk.Button(toolbar, text="🎲 Random", width=9, command=self._on_random_seed)
-        self.btn_random.pack(side=tk.LEFT, padx=(0, 10))
+        ttk.Label(row1, text="World Seed:", font=("Segoe UI", 9, "bold")).pack(side=tk.LEFT, padx=(4, 2))
+        self.world_var = tk.StringVar(value=str(DEFAULT_SEED_PAIR.world))
+        self.world_entry = ttk.Entry(row1, textvariable=self.world_var, width=15)
+        self.world_entry.pack(side=tk.LEFT, padx=(0, 2))
 
-        # Years
-        ttk.Label(toolbar, text="Years:", font=("Segoe UI", 9, "bold")).pack(side=tk.LEFT, padx=(4, 2))
+        self.btn_copy_world = ttk.Button(row1, text="📋 Copy World", width=12, command=self._on_copy_world_seed)
+        self.btn_copy_world.pack(side=tk.LEFT, padx=(0, 8))
+
+        ttk.Label(row1, text="History Seed:", font=("Segoe UI", 9, "bold")).pack(side=tk.LEFT, padx=(4, 2))
+        self.history_var = tk.StringVar(value=str(DEFAULT_SEED_PAIR.history))
+        self.chronicle_var = self.history_var  # backward-compatible alias
+        self.history_entry = ttk.Entry(row1, textvariable=self.history_var, width=15)
+        self.chronicle_entry = self.history_entry  # backward-compatible alias
+        self.history_entry.pack(side=tk.LEFT, padx=(0, 8))
+
+        ttk.Label(row1, text="Code:", font=("Segoe UI", 9, "bold")).pack(side=tk.LEFT, padx=(4, 2))
+        self.code_var = tk.StringVar(value=DEFAULT_SEED_PAIR.encode())
+        self.code_entry = ttk.Entry(row1, textvariable=self.code_var, width=28)
+        self.code_entry.pack(side=tk.LEFT, padx=(0, 4))
+        self.code_entry.bind("<Return>", lambda e: self._on_load_code())
+
+        self.btn_copy_code = ttk.Button(row1, text="📋 Copy Full Code", width=16, command=self._on_copy_code)
+        self.btn_copy_code.pack(side=tk.LEFT, padx=(0, 2))
+
+        self.btn_load_code = ttk.Button(row1, text="📥 Load", width=7, command=self._on_load_code)
+        self.btn_load_code.pack(side=tk.LEFT, padx=(0, 4))
+
+        # Row 2: Duration, Toggles, Run, File Ops
+        row2 = ttk.Frame(toolbar, style="Toolbar.TFrame")
+        row2.pack(side=tk.TOP, fill=tk.X)
+
+        self.btn_randomize_both = ttk.Button(row2, text="🎲 Randomize both", command=self._on_randomize_both)
+        self.btn_randomize_both.pack(side=tk.LEFT, padx=(4, 4))
+        self.btn_random_world = self.btn_randomize_both  # alias
+
+        self.btn_same_map = ttk.Button(row2, text="🗺 Same map, new history", command=self._on_same_map_new_history)
+        self.btn_same_map.pack(side=tk.LEFT, padx=(0, 4))
+
+        self.btn_replay_exact = ttk.Button(row2, text="🔁 Replay exact", command=self._on_replay_exact)
+        self.btn_replay_exact.pack(side=tk.LEFT, padx=(0, 8))
+
+        ttk.Label(row2, text="Years:", font=("Segoe UI", 9, "bold")).pack(side=tk.LEFT, padx=(4, 2))
         self.years_var = tk.StringVar(value="100")
-        self.years_entry = ttk.Entry(toolbar, textvariable=self.years_var, width=5)
-        self.years_entry.pack(side=tk.LEFT, padx=(0, 10))
+        self.years_entry = ttk.Entry(row2, textvariable=self.years_var, width=5)
+        self.years_entry.pack(side=tk.LEFT, padx=(0, 8))
 
-        # Toggles
         self.toggle_religion = tk.BooleanVar(value=True)
-        self.chk_religion = ttk.Checkbutton(toolbar, text="Religion", variable=self.toggle_religion)
+        self.chk_religion = ttk.Checkbutton(row2, text="Religion", variable=self.toggle_religion)
         self.chk_religion.pack(side=tk.LEFT, padx=(0, 6))
 
         self.toggle_lore = tk.BooleanVar(value=True)
-        self.chk_lore = ttk.Checkbutton(toolbar, text="Lore & Books", variable=self.toggle_lore)
-        self.chk_lore.pack(side=tk.LEFT, padx=(0, 12))
+        self.chk_lore = ttk.Checkbutton(row2, text="Lore & Books", variable=self.toggle_lore)
+        self.chk_lore.pack(side=tk.LEFT, padx=(0, 8))
 
-        # Run Button
-        self.btn_run = ttk.Button(toolbar, text="▶ Run Simulation", command=self._on_run_click)
-        self.btn_run.pack(side=tk.LEFT, padx=(0, 12))
+        self.btn_run = ttk.Button(row2, text="▶ Run Simulation", command=self._on_run_click)
+        self.btn_run.pack(side=tk.LEFT, padx=(0, 10))
 
-        # Progress bar
-        self.progress_bar = ttk.Progressbar(toolbar, orient=tk.HORIZONTAL, length=120, mode="determinate")
+        self.progress_bar = ttk.Progressbar(row2, orient=tk.HORIZONTAL, length=120, mode="determinate")
         self.progress_bar.pack(side=tk.LEFT, padx=(0, 12))
 
-        # Separator
-        ttk.Separator(toolbar, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=8)
+        ttk.Separator(row2, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=8)
 
-        # File Operations
-        self.btn_open = ttk.Button(toolbar, text="📂 Open Run...", command=self._on_open_file)
+        self.btn_open = ttk.Button(row2, text="📂 Open Run...", command=self._on_open_file)
         self.btn_open.pack(side=tk.LEFT, padx=(0, 4))
 
-        self.btn_save = ttk.Button(toolbar, text="💾 Save Run...", command=self._on_save_file)
+        self.btn_save = ttk.Button(row2, text="💾 Save Run...", command=self._on_save_file)
         self.btn_save.pack(side=tk.LEFT, padx=(0, 4))
 
-        # Export dropdown
-        self.btn_export = ttk.Menubutton(toolbar, text="📄 Export Story ▾")
+        self.btn_export = ttk.Menubutton(row2, text="📄 Export Story ▾")
         export_menu = tk.Menu(self.btn_export, tearoff=0)
         export_menu.add_command(label="Export Chronicle as Plain Text (.txt)...", command=self._on_export_text)
         export_menu.add_command(label="Export Chronicle as HTML Document (.html)...", command=self._on_export_html)
@@ -142,8 +174,9 @@ class StoryViewerApp:
         self.notebook = ttk.Notebook(self.root)
         self.notebook.pack(side=tk.TOP, fill=tk.BOTH, expand=True, padx=4, pady=4)
 
-        # Create 8 tabs
+        # Create 9 tabs
         self.tab_story = ttk.Frame(self.notebook)
+        self.tab_map = ttk.Frame(self.notebook)
         self.tab_why = ttk.Frame(self.notebook)
         self.tab_threads = ttk.Frame(self.notebook)
         self.tab_people = ttk.Frame(self.notebook)
@@ -153,6 +186,7 @@ class StoryViewerApp:
         self.tab_changes = ttk.Frame(self.notebook)
 
         self.notebook.add(self.tab_story, text=" 📜 Story ")
+        self.notebook.add(self.tab_map, text=" 🗺 Map ")
         self.notebook.add(self.tab_why, text=" 🔍 Why (Causality) ")
         self.notebook.add(self.tab_threads, text=" ⚔ Threads ")
         self.notebook.add(self.tab_people, text=" 👤 People & Truth ")
@@ -162,6 +196,7 @@ class StoryViewerApp:
         self.notebook.add(self.tab_changes, text=" ℹ Changes ")
 
         self._build_story_tab()
+        self._build_map_tab()
         self._build_why_tab()
         self._build_threads_tab()
         self._build_people_tab()
@@ -274,6 +309,199 @@ class StoryViewerApp:
                 self.root.after(2000, lambda: self.story_text.tag_remove("highlight", "1.0", tk.END))
         except ValueError:
             pass
+
+    # -------------------------------------------------------------------------
+    # TAB: MAP (Procedural Geography & Settlements)
+    # -------------------------------------------------------------------------
+    def _build_map_tab(self):
+        paned = ttk.PanedWindow(self.tab_map, orient=tk.HORIZONTAL)
+        paned.pack(fill=tk.BOTH, expand=True, padx=4, pady=4)
+
+        # Left pane: Map Canvas
+        left_frame = ttk.Frame(paned, padding=4)
+        paned.add(left_frame, weight=3)
+
+        hdr_frame = ttk.Frame(left_frame)
+        hdr_frame.pack(fill=tk.X, pady=(0, 4))
+        ttk.Label(hdr_frame, text="World Map (200x200 Terrain Canvas):", style="Header.TLabel").pack(side=tk.LEFT)
+        self.map_legend = ttk.Label(hdr_frame, text="● Plain (Breadbasket)  ● Mountain (Ore)  ● River (Trade)  ● Forest (Wood)", font=("Segoe UI", 9, "italic"))
+        self.map_legend.pack(side=tk.RIGHT)
+
+        self.map_canvas = tk.Canvas(left_frame, background="#17202A", highlightthickness=1, highlightbackground="#34495E")
+        self.map_canvas.pack(fill=tk.BOTH, expand=True)
+        self.map_canvas.bind("<Configure>", lambda e: self._redraw_map())
+
+        # Right pane: Site Inspector
+        right_frame = ttk.Frame(paned, padding=6)
+        paned.add(right_frame, weight=2)
+
+        ttk.Label(right_frame, text="Settlement Site Inspection:", style="Header.TLabel").pack(anchor=tk.W, pady=(0, 4))
+
+        self.map_details_text = scrolledtext.ScrolledText(
+            right_frame,
+            wrap=tk.WORD,
+            font=("Segoe UI", 10),
+            padx=10,
+            pady=10,
+            background="#FFFFFF",
+            relief=tk.FLAT,
+        )
+        self.map_details_text.pack(fill=tk.BOTH, expand=True)
+
+        self.map_details_text.tag_configure("site_title", font=("Segoe UI", 13, "bold"), foreground="#1B2631")
+        self.map_details_text.tag_configure("site_type_badge", font=("Segoe UI", 10, "bold"), foreground="#2980B9")
+        self.map_details_text.tag_configure("sec_hdr", font=("Segoe UI", 10, "bold"), foreground="#2C3E50", spacing1=8, spacing3=2)
+        self.map_details_text.tag_configure("bar_full", foreground="#27AE60", font=("Consolas", 10, "bold"))
+        self.map_details_text.tag_configure("bar_label", font=("Segoe UI", 9, "bold"), foreground="#34495E")
+        self.map_details_text.tag_configure("stat_line", font=("Segoe UI", 10))
+
+    def _redraw_map(self):
+        if not self.run_data:
+            return
+        self.map_canvas.delete("all")
+        cw = self.map_canvas.winfo_width()
+        ch = self.map_canvas.winfo_height()
+        if cw < 50 or ch < 50:
+            return
+
+        pad = 40.0
+        w_size = 200.0
+        scale = min((cw - 2 * pad) / w_size, (ch - 2 * pad) / w_size)
+        ox = (cw - w_size * scale) / 2.0
+        oy = (ch - w_size * scale) / 2.0
+
+        # Draw border
+        self.map_canvas.create_rectangle(ox, oy, ox + w_size * scale, oy + w_size * scale, outline="#34495E", width=2)
+
+        # Draw grid lines & coordinate labels
+        for g in range(25, 200, 25):
+            gx = ox + g * scale
+            gy = oy + g * scale
+            self.map_canvas.create_line(gx, oy, gx, oy + w_size * scale, fill="#1C2833", dash=(2, 4))
+            self.map_canvas.create_line(ox, gy, ox + w_size * scale, gy, fill="#1C2833", dash=(2, 4))
+            self.map_canvas.create_text(gx, oy - 10, text=str(g), fill="#566573", font=("Segoe UI", 8))
+            self.map_canvas.create_text(ox - 14, gy, text=str(g), fill="#566573", font=("Segoe UI", 8))
+
+        # Settlement sites
+        ws = self.run_data.world_spec or {}
+        sites = ws.get("settlements", [])
+        if not sites and self.run_data.settlements:
+            # Fallback from settlement dict
+            sites = [
+                {
+                    "id": sid,
+                    "name": s.get("name", sid),
+                    "x": s.get("pos", [50, 50])[0],
+                    "y": s.get("pos", [50, 50])[1],
+                    "site_type": "plain",
+                    "farmland": s.get("farmland", 1.0),
+                    "forest": 1.0,
+                    "ore_richness": s.get("ore_richness", 1.0),
+                    "defensibility": s.get("defensibility", 1.0),
+                    "water_access": 0.5,
+                }
+                for sid, s in self.run_data.settlements.items()
+            ]
+
+        type_colors = {
+            "plain": ("#F39C12", "#FAD7A0"),
+            "mountain": ("#7F8C8D", "#D5D8DC"),
+            "river": ("#2980B9", "#AED6F1"),
+            "forest": ("#27AE60", "#A9DFBF"),
+        }
+
+        for site in sites:
+            sid = site["id"]
+            sx = ox + site["x"] * scale
+            sy = oy + site["y"] * scale
+            s_type = site.get("site_type", "plain")
+            fill_c, ring_c = type_colors.get(s_type, ("#E74C3C", "#F5B7B1"))
+
+            is_selected = (self.selected_map_site_id == sid)
+            radius = 14 if is_selected else 11
+
+            # Outer ring for selected
+            if is_selected:
+                self.map_canvas.create_oval(
+                    sx - radius - 5, sy - radius - 5, sx + radius + 5, sy + radius + 5,
+                    outline="#F1C40F", width=2, tags=("site", f"site_{sid}")
+                )
+
+            # Circle node
+            self.map_canvas.create_oval(
+                sx - radius, sy - radius, sx + radius, sy + radius,
+                fill=fill_c, outline=ring_c, width=2, tags=("site", f"site_{sid}")
+            )
+
+            # Name and coords text
+            s_name = site["name"]
+            curr_s = self.run_data.settlements.get(sid, {})
+            pop = curr_s.get("population", 0)
+            self.map_canvas.create_text(
+                sx, sy + radius + 10,
+                text=f"{s_name}\n({site['x']}, {site['y']}) • {pop} pop",
+                fill="#FDFEFE",
+                font=("Segoe UI", 9, "bold"),
+                justify=tk.CENTER,
+                tags=("site", f"site_{sid}")
+            )
+
+            # Click binding
+            self.map_canvas.tag_bind(f"site_{sid}", "<Button-1>", lambda e, s_ident=sid: self._inspect_site(s_ident))
+            self.map_canvas.tag_bind(f"site_{sid}", "<Enter>", lambda e: self.map_canvas.config(cursor="hand2"))
+            self.map_canvas.tag_bind(f"site_{sid}", "<Leave>", lambda e: self.map_canvas.config(cursor=""))
+
+    def _inspect_site(self, site_id: str):
+        self.selected_map_site_id = site_id
+        self._redraw_map()
+
+        if not self.run_data:
+            return
+        ws = self.run_data.world_spec or {}
+        site_spec = next((s for s in ws.get("settlements", []) if s["id"] == site_id), None)
+        curr_s = self.run_data.settlements.get(site_id, {})
+
+        self.map_details_text.delete("1.0", tk.END)
+
+        name = curr_s.get("name") or (site_spec.get("name") if site_spec else site_id)
+        s_type = (site_spec.get("site_type") if site_spec else "village").capitalize()
+        self.map_details_text.insert(tk.END, f"{name}\n", "site_title")
+        self.map_details_text.insert(tk.END, f"Archetype: {s_type} Settlement\n", "site_type_badge")
+        pos = curr_s.get("pos") or ([site_spec["x"], site_spec["y"]] if site_spec else [0, 0])
+        self.map_details_text.insert(tk.END, f"Map Coordinates: ({pos[0]}, {pos[1]})\n\n", "stat_line")
+
+        # Natural Endowments
+        self.map_details_text.insert(tk.END, "◄ Natural Economic Endowments (Geography):\n", "sec_hdr")
+        def render_bar(label: str, val: float, max_v: float = 2.0):
+            bars = int(round((val / max_v) * 16))
+            bar_str = "[" + "█" * bars + "░" * (16 - bars) + "]"
+            self.map_details_text.insert(tk.END, f"  • {label:14s}: ", "bar_label")
+            self.map_details_text.insert(tk.END, f"{bar_str} {val:.2f}\n", "bar_full")
+
+        if site_spec:
+            render_bar("Farmland", site_spec.get("farmland", 1.0))
+            render_bar("Forest / Timber", site_spec.get("forest", 1.0))
+            render_bar("Ore Richness", site_spec.get("ore_richness", 1.0))
+            render_bar("Defensibility", site_spec.get("defensibility", 1.0))
+            render_bar("Water Access", site_spec.get("water_access", 0.5), max_v=1.0)
+        else:
+            render_bar("Farmland", curr_s.get("farmland", 1.0))
+            render_bar("Ore Richness", curr_s.get("ore_richness", 1.0))
+            render_bar("Defensibility", curr_s.get("defensibility", 1.0))
+
+        # Current Status
+        self.map_details_text.insert(tk.END, "\n► Current Colonial Status (Year End):\n", "sec_hdr")
+        pop = curr_s.get("population", len([c for c in self.run_data.characters.values() if c.get("settlement_id") == site_id and c.get("alive")]))
+        self.map_details_text.insert(tk.END, f"  • Living Citizens   : {pop}\n", "stat_line")
+        self.map_details_text.insert(tk.END, f"  • Food In Storage   : {curr_s.get('food', 0)} units\n", "stat_line")
+        self.map_details_text.insert(tk.END, f"  • Wood Stock        : {curr_s.get('wood', 0)} units\n", "stat_line")
+        self.map_details_text.insert(tk.END, f"  • Ore Stock         : {curr_s.get('ore', 0)} units\n", "stat_line")
+        self.map_details_text.insert(tk.END, f"  • Municipal Wealth  : {curr_s.get('wealth', 0)} gold\n", "stat_line")
+        stab = curr_s.get("stability", 1.0)
+        self.map_details_text.insert(tk.END, f"  • Civic Stability   : {int(stab * 100)}%\n", "stat_line")
+        leader_id = curr_s.get("leader_id")
+        leader_name = format_character_name(leader_id, self.run_data.characters) if leader_id else "None"
+        self.map_details_text.insert(tk.END, f"  • Designated Chief  : {leader_name}\n", "stat_line")
 
     # -------------------------------------------------------------------------
     # TAB 2: WHY (CAUSALITY)
@@ -995,16 +1223,16 @@ class StoryViewerApp:
         txt.insert(tk.END, f"Build Commit: {BUILD_COMMIT} | Build Date: {BUILD_TIME} | Schema: v{SCHEMA_VERSION}\n\n")
 
         txt.insert(tk.END, "What changed in this build (Plain-English Summary):\n", "h2")
-        txt.insert(tk.END, "1. Reconciled all event numbers and population figures so birth, death, and census accounts match reality exactly.\n", "bullet")
-        txt.insert(tk.END, "2. Hardened determinism so running any seed yields identical output regardless of process memory or hashing salts.\n", "bullet")
-        txt.insert(tk.END, "3. Eliminated repetitive festival and routine conversion spam so genuine feuds and raids stand out prominently.\n", "bullet")
-        txt.insert(tk.END, "4. Re-anchored book creation in author beliefs, ensuring books reflect subjective character biases rather than omniscient truth.\n", "bullet")
-        txt.insert(tk.END, "5. Built this standalone Story Viewer application to explore causal roots, feuds, books, and beliefs with one click.\n\n", "bullet")
+        txt.insert(tk.END, "1. Split world creation into two independent seeds: World Seed for geography and Chronicle Seed for people and history.\n", "bullet")
+        txt.insert(tk.END, "2. Procedural World Generator v0 now places 3 to 7 settlements with guaranteed 100% economic viability and minimum spacing.\n", "bullet")
+        txt.insert(tk.END, "3. Procedural Cast Generator creates biologically sound starting families with fertile couples and strict kin-avoidance.\n", "bullet")
+        txt.insert(tk.END, "4. Added interactive Map Tab to inspect settlement locations, terrain archetypes, and natural resource endowments.\n", "bullet")
+        txt.insert(tk.END, "5. Typo-safe Crockford Base32 seed codes with check digits allow one-click sharing and replay of exact procedural worlds.\n\n", "bullet")
 
         txt.insert(tk.END, "3 Things to look for in the viewer:\n", "h2")
-        txt.insert(tk.END, "1. In the Story tab, look for indented '↳ because: [...]' lines explaining the causal grievances behind violence.\n", "bullet")
-        txt.insert(tk.END, "2. In the People tab, check the 'Truth vs. Belief Audit' to see how false rumors spark deadly grudges.\n", "bullet")
-        txt.insert(tk.END, "3. In the World tab, inspect the event share table and population graph over 100 years of civilization.\n\n", "bullet")
+        txt.insert(tk.END, "1. Click '👥 Same Map, New People' to watch completely different characters and feuds emerge across the identical landscape.\n", "bullet")
+        txt.insert(tk.END, "2. Switch to the 🗺 Map tab and click any settlement circle to inspect its natural farmland, timber, ore, and defense endowments.\n", "bullet")
+        txt.insert(tk.END, "3. Copy or paste Crockford Base32 seed codes in the toolbar to load and reproduce custom worlds effortlessly.\n\n", "bullet")
 
         txt.insert(tk.END, "Standing Rule Compliance:\n", "h2")
         txt.insert(tk.END, "• The viewer is an independent, read-only presentation layer in `viewer/`.\n", "bullet")
@@ -1015,18 +1243,76 @@ class StoryViewerApp:
     # ACTIONS & SIMULATION RUNNER
     # =========================================================================
 
-    def _on_random_seed(self):
-        new_seed = random.randint(100, 9999)
-        self.seed_var.set(str(new_seed))
+    def _on_copy_world_seed(self):
+        w_str = self.world_var.get().strip()
+        if w_str:
+            self.root.clipboard_clear()
+            self.root.clipboard_append(w_str)
+            self.status_label.config(text=f"Copied World Seed to clipboard: {w_str}")
+
+    def _on_randomize_both(self):
+        pair = new_game()
+        self.world_var.set(str(pair.world))
+        self.history_var.set(str(pair.history))
+        self.code_var.set(pair.encode())
+        years = int(self.years_var.get().strip() or 100)
+        self._start_simulation(pair, years)
+
+    def _on_new_world(self):
+        self._on_randomize_both()
+
+    def _on_same_map_new_history(self):
+        w_val = parse_world_seed(self.world_var.get())
+        new_hist = new_game().history
+        pair = SeedPair(world=w_val, history=new_hist)
+        self.world_var.set(str(pair.world))
+        self.history_var.set(str(pair.history))
+        self.code_var.set(pair.encode())
+        years = int(self.years_var.get().strip() or 100)
+        self._start_simulation(pair, years)
+
+    def _on_same_map_new_people(self):
+        self._on_same_map_new_history()
+
+    def _on_replay_exact(self):
+        self._on_run_click()
+
+    def _on_load_code(self):
+        code_str = self.code_var.get().strip()
+        try:
+            pair = SeedPair.decode(code_str)
+            self.world_var.set(str(pair.world))
+            self.history_var.set(str(pair.history))
+            self.code_var.set(pair.encode())
+            years = int(self.years_var.get().strip() or 100)
+            self._start_simulation(pair, years)
+        except Exception as ex:
+            messagebox.showerror("Invalid Seed Code", f"Could not decode seed code:\n{ex}")
+
+    def _on_copy_code(self):
+        code = self.code_var.get().strip()
+        if code:
+            self.root.clipboard_clear()
+            self.root.clipboard_append(code)
+            self.status_label.config(text=f"Copied full code to clipboard: {code}")
 
     def _on_run_click(self):
         if self.is_simulating:
             return
-        try:
-            seed = int(self.seed_var.get().strip())
-        except ValueError:
-            messagebox.showerror("Invalid Input", "Seed must be an integer.")
-            return
+        w_input = self.world_var.get().strip()
+        h_input = self.history_var.get().strip()
+        code_input = self.code_var.get().strip()
+
+        if code_input and not w_input and not h_input:
+            try:
+                pair = SeedPair.decode(code_input)
+            except Exception as ex:
+                messagebox.showerror("Invalid Seed Code", f"Could not decode seed code:\n{ex}")
+                return
+        else:
+            w_val = parse_world_seed(w_input)
+            h_val = parse_history_seed(h_input)
+            pair = SeedPair(world=w_val, history=h_val)
 
         try:
             years = int(self.years_var.get().strip())
@@ -1037,13 +1323,18 @@ class StoryViewerApp:
             messagebox.showerror("Invalid Input", "Years must be an integer.")
             return
 
-        self._start_simulation(seed, years)
+        self.world_var.set(str(pair.world))
+        self.history_var.set(str(pair.history))
+        self.code_var.set(pair.encode())
+        self._start_simulation(pair, years)
 
-    def _start_simulation(self, seed: int, years: int):
+    def _start_simulation(self, seed: SeedPair | int, years: int):
         self.is_simulating = True
         self.btn_run.config(state=tk.DISABLED)
-        self.btn_random.config(state=tk.DISABLED)
-        self.status_label.config(text=f"Simulating Seed {seed} for {years} years...")
+        self.btn_random_world.config(state=tk.DISABLED)
+        self.btn_same_map.config(state=tk.DISABLED)
+        seed_label = seed.encode() if isinstance(seed, SeedPair) else str(seed)
+        self.status_label.config(text=f"Simulating World [{seed_label[:14]}...] for {years} years...")
         self.progress_bar.config(value=0, maximum=years)
 
         enable_rel = self.toggle_religion.get()
@@ -1051,7 +1342,6 @@ class StoryViewerApp:
 
         def worker():
             try:
-                # Import simulation inside worker to maintain isolation
                 from minemesis.systems.simulation import Simulation
 
                 sim = Simulation(
@@ -1060,7 +1350,6 @@ class StoryViewerApp:
                     enable_lore=enable_lore,
                 )
 
-                # Run step by step to update progress
                 total_ticks = years * 12
                 for tick_idx in range(total_ticks):
                     if len(sim.living_characters) == 0:
@@ -1070,7 +1359,6 @@ class StoryViewerApp:
                         completed_years = (tick_idx + 1) // 12
                         self.root.after(0, self._update_sim_progress, completed_years, years)
 
-                # Capture RunData
                 build_info = {
                     "tag": BUILD_TAG,
                     "commit": BUILD_COMMIT,
@@ -1091,16 +1379,19 @@ class StoryViewerApp:
     def _on_simulation_complete(self, run_data: RunData):
         self.is_simulating = False
         self.btn_run.config(state=tk.NORMAL)
-        self.btn_random.config(state=tk.NORMAL)
+        self.btn_random_world.config(state=tk.NORMAL)
+        self.btn_same_map.config(state=tk.NORMAL)
         self.progress_bar.config(value=self.progress_bar["maximum"])
-        self.status_label.config(text=f"Simulation complete: Seed {run_data.seed} ({len(run_data.events)} events logged)")
+        seed_display = run_data.pair_code or str(run_data.seed)
+        self.status_label.config(text=f"Simulation complete: {seed_display} ({len(run_data.events)} events logged)")
 
         self.set_run_data(run_data)
 
     def _on_simulation_error(self, err_msg: str):
         self.is_simulating = False
         self.btn_run.config(state=tk.NORMAL)
-        self.btn_random.config(state=tk.NORMAL)
+        self.btn_random_world.config(state=tk.NORMAL)
+        self.btn_same_map.config(state=tk.NORMAL)
         self.status_label.config(text="Simulation failed.")
         messagebox.showerror("Simulation Error", f"An error occurred during simulation:\n{err_msg}")
 
@@ -1111,6 +1402,12 @@ class StoryViewerApp:
     def set_run_data(self, run_data: RunData):
         self.run_data = run_data
         self.event_log_proxy = run_data.get_event_log_proxy()
+
+        if run_data.seed_pair:
+            self.world_var.set(str(run_data.seed_pair[0]))
+            self.history_var.set(str(run_data.seed_pair[1]))
+        if run_data.pair_code:
+            self.code_var.set(run_data.pair_code)
 
         # Update settlement dropdown in story tab
         s_names = ["All Settlements"] + [format_settlement_name(sid, run_data.settlements) for sid in sorted(run_data.settlements.keys())]
@@ -1132,6 +1429,7 @@ class StoryViewerApp:
 
         # Refresh all views
         self._apply_story_filters()
+        self._redraw_map()
         self._populate_why_tab()
         self._populate_threads_tab()
         self._populate_people_tab()

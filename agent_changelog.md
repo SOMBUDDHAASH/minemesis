@@ -248,6 +248,63 @@ Diff of implemented `CAUSE_GRAMMAR` against brief Table 4.1:
   - Showcase runs pre-generated for seeds `[42, 2029, 2030, 2043, 2011]` into `releases/m0.5.2/`.
   - CLI flags `--version` and `--selftest` verified directly on compiled `.exe`.
 
+---
+
+## [Milestone 0.5.3] - 2026-10-25: Randomized Worlds, History Seed Split, and Name Domain Isolation
+
+### Step 1. Independent Dual Seed Architecture (`SeedPair`)
+- **Terminology Standardization**:
+  - Formally adopted **History Seed** (renaming legacy "chronicle seed") across all code, CLI, viewer, reports, and changelogs.
+- **Decoupled Two-Seed Design**:
+  - **World Seed (Minecraft-style)**: Governs terrain, settlement placement, site coordinates, and natural economic endowments. Accepts raw integers or arbitrary text strings (hashed to 64-bit uint using platform-independent SHA-256 digest). Blank input draws fresh entropy.
+  - **History Seed (Dwarf Fortress-style)**: Governs starting cast, family structures, personality traits, initial faiths, and all dynamic historical decisions. Blank input draws fresh entropy.
+  - Re-running the same World Seed with a fresh History Seed (`"Same map, new history"`) produces the identical geography with completely different families, faiths, feuds, and historical timelines.
+  - Re-running the exact `SeedPair` produces 100% byte-identical histories.
+- **Crockford Base32 Typo-Safe Codes**:
+  - Implemented `SeedPair.encode()` / `SeedPair.decode()` with format `WXXXX-XXXX-XXXXX:HYYYY-YYYY-YYYYY:V{version}:{check}`.
+  - Includes Modulo 37 check character with error detection. Supports backwards-compatible decoding of legacy `W...:C...:K` codes and typo-tolerant string inputs.
+- **Entropy Confinement**:
+  - Entropy is strictly confined to `new_game()` via `secrets.token_bytes(16)`.
+  - Zero calls to standard `random`, `hash()`, `os.urandom`, `time`, or `uuid` anywhere in simulation subsystems (verified by AST scan in `test_entropy_confinement.py`).
+
+### Step 2. Procedural World Generator v0 (`V0WorldGenerator`)
+- **Procedural Settlement Placement**:
+  - Replaced hard-coded 3-settlement map (`Oakhaven`, `Riverbend`, `Ironpeak`) with procedural generation producing 3 to 7 settlements on a 200x200 map.
+  - Enforces minimum inter-settlement distance of 30 units (Euclidean) and 100% economic viability across all generated sites.
+  - Deterministic 2D integer value noise with smoothstep interpolation generates natural resource endowments: Farmland, Forest/Timber, Ore Richness, Water Access, and Defensibility.
+- **Isolated Name Key Domain**:
+  - Settlement name generation uses isolated `name:place_prefix` and `name:place_suffix` key domains with `name_salt`.
+
+### Step 3. Procedural Cast Generator (`CastGenerator`)
+- **Demographic Calibration**:
+  - Starting population scales with site farmland: 20 to 36 citizens per settlement.
+  - Guarantees $\ge 4$ fertile couples (aged 22 to 40) per settlement.
+  - Surnames rotate across 8 distinct family lineages per settlement to guarantee non-kin initial pairings.
+  - Elders (aged 50 to 65) and unmarried young adults (aged 16 to 25) added to form realistic multi-generational villages.
+  - Professions assigned by site economic profile (e.g. miners/smiths at high ore sites, woodcutters/herbalists at high forest sites).
+- **Structural Kinship & Family IDs**:
+  - Introduced `Character.family_id` to decouple family lineages from text surname strings.
+  - Marriage incest checks, feud kinship checks, grief memory formation, and legal/journal reactions use structural family identities rather than English surname equality, preventing spurious cross-settlement name collisions.
+
+### Step 4. Name Key Domain Isolation
+- **Domain Independence**:
+  - All character and settlement names are keyed strictly under `name:` prefixes with a dedicated `name_salt`.
+  - Verified by `test_name_domain_isolation.py`: Simulating 20 years with `name_salt=0` vs `name_salt=777` on the same `SeedPair` produces a 100% byte-identical event structure (total event count, ticks, types, causes, intents, scales, locations, and participant IDs) with completely different names.
+  - Negative control proves that keying simulation event outcomes or family checks off character name strings causes causal divergence.
+
+### Step 5. Story Viewer 9th Tab: Interactive Map View & Seed UX
+- **Seed Toolbar UX**:
+  - Added dedicated World Seed and History Seed entry fields with text parsing support.
+  - Added one-click action buttons: `📋 Copy World`, `📋 Copy Full Code`, `📥 Load`, `🎲 Randomize both`, `🗺 Same map, new history`, and `🔁 Replay exact`.
+- **Map Tab (9th Tab)**:
+  - 200x200 canvas map renderer with color-coded settlement nodes by archetype (Agricultural, Mining, Forestry, Riparian).
+  - Click-to-inspect settlement panel displaying natural economic endowments (ASCII bars), living population, food/wood/ore stocks, and municipal wealth.
+
+### Step 6. Verification and Standalone Binary
+- **Full Test Suite**: 117 tests passing (100% pass rate across unit, integration, causality, boundary, and determinism suites).
+- **Stratified Showcases**: Generated 5 showcase histories across settlement counts 3 through 7 (`reports/m053_showcase_{3..7}sets.txt`), with 100% demographic conservation identity holding across all runs.
+- **Compiled Executable**: Standalone binary `releases/MinemesisViewer-m0.5.3.exe` built via PyInstaller. Self-test `--selftest` verified directly on compiled binary.
+
 
 
 

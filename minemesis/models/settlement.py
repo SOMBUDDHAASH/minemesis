@@ -48,6 +48,7 @@ class Settlement:
     forest: float = 1.0         # Wood output multiplier
     ore_richness: float = 1.0   # Ore output multiplier
     defensibility: float = 1.0  # Reduces raid plunder/casualties
+    water_access: float = 0.5   # Water / river / coastal access indicator
 
     # Internal civic state
     stability: float = 1.0      # Reduced by SuccessionCrisis; increases raid risk
@@ -55,6 +56,7 @@ class Settlement:
     active_famine_event_id: Optional[int] = None
     active_famine_start_tick: Optional[int] = None
     adequate_food_ticks: int = 12
+    last_famine_end_tick: int = -100
 
     def distance_to(self, other: Settlement) -> float:
         return ((self.x - other.x) ** 2 + (self.y - other.y) ** 2) ** 0.5

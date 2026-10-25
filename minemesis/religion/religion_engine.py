@@ -191,6 +191,7 @@ class ReligionEngine:
                 folk_counter=self.folk_counter,
                 custom_counter=self.custom_counter,
                 rng=self.rng,
+                settlement=s_obj,
             )
 
         if characters:

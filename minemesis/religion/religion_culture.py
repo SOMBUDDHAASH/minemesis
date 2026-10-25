@@ -55,10 +55,17 @@ def initialize_settlement_culture(
     folk_counter: list[int],
     custom_counter: list[int],
     rng: KeyedRNG,
+    settlement: Any = None,
 ) -> CulturalProfile:
-    """Initializes a rich cultural profile for a settlement."""
-    # Base social values on 0.0 - 1.0 spectrum
-    if "iron" in settlement_id.lower() or "peak" in settlement_id.lower():
+    """Initializes a rich cultural profile derived from settlement economic endowment and rng."""
+    ore = getattr(settlement, "ore_richness", 1.0) if settlement else 1.0
+    farm = getattr(settlement, "farmland", 1.0) if settlement else 1.0
+    defn = getattr(settlement, "defensibility", 1.0) if settlement else 1.0
+    water = getattr(settlement, "water_access", 0.5) if settlement else 0.5
+    forest = getattr(settlement, "forest", 1.0) if settlement else 1.0
+
+    # Derive social values from economic & geographic profile
+    if ore >= 1.25 or defn >= 1.20 or "iron" in settlement_id.lower() or "peak" in settlement_id.lower():
         social_values = {
             "family_loyalty": round(rng.uniform(0.70, 0.85), 2),
             "honor": round(rng.uniform(0.80, 0.95), 2),
@@ -67,7 +74,7 @@ def initialize_settlement_culture(
             "warrior_tradition": round(rng.uniform(0.80, 0.95), 2),
             "collectivism": round(rng.uniform(0.60, 0.80), 2),
         }
-    elif "river" in settlement_id.lower() or "bend" in settlement_id.lower():
+    elif water >= 0.60 or "river" in settlement_id.lower() or "bend" in settlement_id.lower():
         social_values = {
             "family_loyalty": round(rng.uniform(0.65, 0.80), 2),
             "honor": round(rng.uniform(0.50, 0.70), 2),
@@ -76,7 +83,7 @@ def initialize_settlement_culture(
             "pilgrimage_sanctity": round(rng.uniform(0.75, 0.95), 2),
             "collectivism": round(rng.uniform(0.70, 0.85), 2),
         }
-    else:  # Oakhaven
+    else:  # Agrarian / Woodland / Plain
         social_values = {
             "family_loyalty": round(rng.uniform(0.80, 0.95), 2),
             "honor": round(rng.uniform(0.60, 0.75), 2),
@@ -86,11 +93,28 @@ def initialize_settlement_culture(
             "collectivism": round(rng.uniform(0.75, 0.90), 2),
         }
 
-    # Folk traditions
+    # Folk traditions dynamically generated from profile
     folk_list: list[FolkTradition] = []
-    trad_templates = DEFAULT_SETTLEMENT_FOLK_TRADITIONS.get(settlement_id, [
-        (f"Guardian Spirit of {settlement_name}", FolkTraditionType.VILLAGE_SPIRIT, "Local patron spirit watching over homes."),
-    ])
+    if ore >= 1.25 or defn >= 1.20:
+        trad_templates = [
+            (f"The Mountain Sentinel of {settlement_name}", FolkTraditionType.MOUNTAIN_LEGEND, f"Mythic guardian spirit petrified into the heights of {settlement_name}."),
+            (f"Spirits of the Deep Ore", FolkTraditionType.VILLAGE_SPIRIT, "Underground voices honoring courageous miners and warriors."),
+        ]
+    elif water >= 0.60:
+        trad_templates = [
+            (f"The Current Guardian of {settlement_name}", FolkTraditionType.RIVER_GUARDIAN, f"Protective river spirit watching over the waters of {settlement_name}."),
+            (f"Sprite of the Shallows", FolkTraditionType.VILLAGE_SPIRIT, "Playful local spirit believed to guide fish to the nets."),
+        ]
+    elif forest >= 1.20:
+        trad_templates = [
+            (f"The Sacred Tree Spirit of {settlement_name}", FolkTraditionType.SACRED_TREE, f"Ancient spirit guardian dwelling within the woods of {settlement_name}."),
+            (f"Ancestor Veneration of the Hearth", FolkTraditionType.ANCESTOR_HERO, "Traditional remembrance of the first founders who cleared the hearth."),
+        ]
+    else:
+        trad_templates = [
+            (f"Guardian Spirit of {settlement_name}", FolkTraditionType.VILLAGE_SPIRIT, f"Generous village spirit watching over the homes of {settlement_name}."),
+            (f"Ancestor Veneration of the Hearth", FolkTraditionType.ANCESTOR_HERO, "Traditional remembrance of the first forebears who built the village."),
+        ]
     for name, f_type, desc in trad_templates:
         f_idx = folk_counter[0]
         folk_counter[0] += 1

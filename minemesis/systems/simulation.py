@@ -17,6 +17,7 @@ from minemesis.core.types import EventType
 from minemesis.models.belief import Belief
 from minemesis.models.character import Character
 from minemesis.models.memory import Memory
+from minemesis.core.seed import SeedPair
 from minemesis.models.relationship import Relationship, compute_relationship
 from minemesis.models.settlement import Settlement, TradeRoute
 from minemesis.systems.conflict import ActiveFeud, process_conflicts_and_economy
@@ -25,19 +26,46 @@ from minemesis.systems.life_cycle import process_life_cycle
 from minemesis.systems.memory_system import form_memories_from_belief
 from minemesis.systems.perception import perceive_event
 from minemesis.systems.world_gen import generate_world
+from minemesis.systems.world_spec import WorldSpec
 
 
 class Simulation:
     def __init__(
         self,
-        seed: int = 42,
+        seed: int | SeedPair | None = None,
+        world_seed: Optional[int] = None,
+        history_seed: Optional[int] = None,
+        chronicle_seed: Optional[int] = None,
         enable_religion: Optional[bool] = None,
         enable_lore: Optional[bool] = None,
+        world_provider: Optional[Any] = None,
+        name_salt: int = 0,
     ) -> None:
-        self.seed = seed
+        h_seed = history_seed if history_seed is not None else chronicle_seed
+        self.legacy_seed: Optional[int] = seed if isinstance(seed, int) else None
+        if isinstance(seed, SeedPair):
+            self.seed_pair = seed
+        elif world_seed is not None and h_seed is not None:
+            self.seed_pair = SeedPair(world=world_seed, history=h_seed)
+        elif seed is not None:
+            self.seed_pair = SeedPair.from_legacy(seed)
+        elif world_seed is not None:
+            self.seed_pair = SeedPair(world=world_seed, history=keyed_hash_int(world_seed, "default_history", 0, 0))
+        elif h_seed is not None:
+            self.seed_pair = SeedPair(world=keyed_hash_int(h_seed, "default_world", 0, 0), history=h_seed)
+        else:
+            self.seed_pair = SeedPair.from_legacy(42)
+
+        self.name_salt = name_salt
+        self.world_seed = self.seed_pair.world
+        self.history_seed = self.seed_pair.history
+        self.chronicle_seed = self.seed_pair.history  # backwards compatible alias
+        self.seed = self.legacy_seed if self.legacy_seed is not None else self.history_seed
         self.tick = 0
         self.event_log = EventLog()
-        self.settlements, self.characters = generate_world(seed)
+        self.settlements, self.characters, self.world_spec = generate_world(
+            self.seed_pair, world_provider=world_provider, name_salt=name_salt
+        )
         
         # Continuous state (Section 4.2)
         self.trade_routes: dict[tuple[str, str], TradeRoute] = {}
@@ -297,6 +325,7 @@ class Simulation:
             tick=self.tick,
             seed=self.seed,
             char_counter=self.char_counter,
+            name_salt=self.name_salt,
         )
         self._register_and_perceive_events(events_start)
 
