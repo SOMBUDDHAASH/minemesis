@@ -71,6 +71,15 @@ def test_name_domain_isolation_preserves_event_structure():
             elif p1.startswith("set_") or p2.startswith("set_"):
                 assert p1 == p2, f"Settlement ID mismatch in event #{e1.id}: {p1} != {p2}"
 
+        # 3. Payload non-name structural fields match 100%
+        # Filter out text name fields that legitimately vary with name_salt
+        is_text_key = lambda k: k == "name" or k.endswith("_name") or k in {
+            "perspective_bias", "affected_titles", "narrative", "objective_truth", "deeds", "title", "description"
+        }
+        filtered_p1 = {k: v for k, v in e1.payload.items() if not is_text_key(k)}
+        filtered_p2 = {k: v for k, v in e2.payload.items() if not is_text_key(k)}
+        assert filtered_p1 == filtered_p2, f"Payload structural mismatch in event #{e1.id}: {filtered_p1} != {filtered_p2}"
+
 
 def test_negative_control_name_leakage_diverges_events():
     """

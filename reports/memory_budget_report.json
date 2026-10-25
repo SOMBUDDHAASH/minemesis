@@ -1,0 +1,95 @@
+{
+  "status": "PASS",
+  "targets": {
+    "max_ram_ceiling_gb": {
+      "threshold": 6.0,
+      "actual": 0.2634,
+      "passed": true
+    },
+    "target_ram_gb": {
+      "threshold": 2.0,
+      "actual": 0.2634,
+      "passed": true
+    },
+    "runtime_100y_avg_sec": {
+      "threshold": 180.0,
+      "actual": 132.55,
+      "passed": true
+    },
+    "belief_reduction_pct": {
+      "threshold": 90.0,
+      "actual": 98.75,
+      "passed": true
+    }
+  },
+  "runs": [
+    {
+      "seed": 42,
+      "years": 100,
+      "settlements": 10,
+      "runtime_seconds": 23.45,
+      "initial_rss_mb": 25.1,
+      "peak_rss_mb": 72.61,
+      "final_rss_mb": 72.61,
+      "peak_rss_gb": 0.0709,
+      "living_population": 2252,
+      "total_historical_characters": 3904,
+      "total_events": 12909,
+      "active_beliefs": 16857,
+      "active_memories": 14182,
+      "historical_archive_size": 788,
+      "belief_reduction_pct": 99.41
+    },
+    {
+      "seed": 101,
+      "years": 100,
+      "settlements": 31,
+      "runtime_seconds": 205.14,
+      "initial_rss_mb": 42.34,
+      "peak_rss_mb": 182.23,
+      "final_rss_mb": 182.23,
+      "peak_rss_gb": 0.178,
+      "living_population": 6993,
+      "total_historical_characters": 11912,
+      "total_events": 46643,
+      "active_beliefs": 46108,
+      "active_memories": 38320,
+      "historical_archive_size": 2518,
+      "belief_reduction_pct": 98.38
+    },
+    {
+      "seed": 777,
+      "years": 100,
+      "settlements": 30,
+      "runtime_seconds": 169.07,
+      "initial_rss_mb": 51.54,
+      "peak_rss_mb": 166.66,
+      "final_rss_mb": 166.66,
+      "peak_rss_gb": 0.1628,
+      "living_population": 6103,
+      "total_historical_characters": 10743,
+      "total_events": 40641,
+      "active_beliefs": 43944,
+      "active_memories": 36106,
+      "historical_archive_size": 2322,
+      "belief_reduction_pct": 98.46
+    },
+    {
+      "seed": 42,
+      "years": 500,
+      "settlements": 10,
+      "runtime_seconds": 2494.2,
+      "initial_rss_mb": 23.84,
+      "peak_rss_mb": 269.7,
+      "final_rss_mb": 269.7,
+      "peak_rss_gb": 0.2634,
+      "living_population": 4397,
+      "total_historical_characters": 43614,
+      "total_events": 120812,
+      "active_beliefs": 50470,
+      "active_memories": 44268,
+      "historical_archive_size": 36310,
+      "belief_reduction_pct": 98.23
+    }
+  ]
+}

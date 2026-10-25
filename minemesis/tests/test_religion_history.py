@@ -536,7 +536,7 @@ def test_religious_analytics_and_100_year_unscripted_history():
     report = sim.generate_religious_analytics()
     assert report is not None
     assert report.largest_religion is not None
-    assert len(report.settlement_diversity_indices) == 3
+    assert len(report.settlement_diversity_indices) == len(sim.settlements)
 
     # Format chronicle and summary
     summary_md = format_religious_analytics_summary(report)

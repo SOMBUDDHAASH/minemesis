@@ -50,101 +50,152 @@ def process_life_cycle(
                 if not spouse or not spouse.alive:
                     char.spouse_id = None
 
-    # 2. Check Marriages
-    singles_m = [c for c in characters.values() if c.alive and c.spouse_id is None and c.sex == "M" and c.age_years >= 18]
-    singles_f = [c for c in characters.values() if c.alive and c.spouse_id is None and c.sex == "F" and c.age_years >= 18]
+    # 2. Check Marriages (M0.5.4: Bucketed by settlement & diplomatic ties)
+    singles_m_by_s: dict[str, list[Character]] = {}
+    singles_f_by_s: dict[str, list[Character]] = {}
+    for c in characters.values():
+        if c.alive and c.spouse_id is None and c.age_years >= 18:
+            if c.sex == "M":
+                singles_m_by_s.setdefault(c.settlement_id, []).append(c)
+            elif c.sex == "F":
+                singles_f_by_s.setdefault(c.settlement_id, []).append(c)
 
-    singles_m.sort(key=lambda c: c.id)
-    singles_f.sort(key=lambda c: c.id)
+    for s_id in singles_m_by_s:
+        singles_m_by_s[s_id].sort(key=lambda c: c.id)
+    for s_id in singles_f_by_s:
+        singles_f_by_s[s_id].sort(key=lambda c: c.id)
 
-    for m in singles_m:
-        if m.spouse_id is not None:
-            continue
-        for f in singles_f:
-            if f.spouse_id is not None:
+    # Candidate settlement pairings: Intra-settlement first, then diplomatic pairs
+    settlement_pairs: list[tuple[str, str]] = [(s_id, s_id) for s_id in sorted(settlements.keys())]
+
+    # Add active trade route pairs
+    for r_pair in sorted(active_trade_route_events.keys()):
+        if r_pair not in settlement_pairs:
+            settlement_pairs.append(r_pair)
+
+    # Add recent peace pairs (within 12 ticks)
+    for past_evt in reversed(event_log.all_events()[-30:]):
+        if past_evt.type == EventType.PEACE and (tick - past_evt.tick) <= 12:
+            p1 = past_evt.participants_dict.get("initiator")
+            p2 = past_evt.participants_dict.get("target")
+            if p1 and p2 and p1 != p2:
+                pair = tuple(sorted([p1, p2]))
+                if pair not in settlement_pairs:
+                    settlement_pairs.append(pair)
+
+    def attempt_marriage(m: Character, f: Character) -> bool:
+        if m.spouse_id is not None or f.spouse_id is not None:
+            return False
+        m_fam = getattr(m, "family_id", "") or m.last_name
+        f_fam = getattr(f, "family_id", "") or f.last_name
+        if m_fam == f_fam and (m.father_id is not None or f.father_id is not None):
+            return False
+        if f.id in m.children_ids or m.id in f.children_ids:
+            return False
+
+        roll = keyed_float(seed, "marriage_roll", f"{m.id}_{f.id}", tick)
+        threshold = 0.05 if m.settlement_id == f.settlement_id else 0.025
+        if roll >= threshold:
+            return False
+
+        rel_mf = get_relationship(m.id, f.id)
+        rel_fm = get_relationship(f.id, m.id)
+
+        if rel_mf.hatred < 15.0 and rel_fm.hatred < 15.0:
+            causes: list[int] = []
+            is_alliance = False
+            route_key = tuple(sorted([m.settlement_id, f.settlement_id]))
+
+            if m.settlement_id != f.settlement_id:
+                # Genuine alliance condition: check for a recent Peace between these two settlements (within 12 ticks)
+                for past_evt in reversed(event_log.all_events()[-30:]):
+                    if past_evt.type == EventType.PEACE and (tick - past_evt.tick) <= 12:
+                        p_parties = {past_evt.participants_dict.get("initiator"), past_evt.participants_dict.get("target")}
+                        if p_parties == {m.settlement_id, f.settlement_id}:
+                            causes.append(past_evt.id)
+                            is_alliance = True
+                            break
+
+                # Or cite opening of diplomatic trade route (within 24 ticks per Directive 11)
+                if not causes and route_key in active_trade_route_events:
+                    tr_id = active_trade_route_events[route_key]
+                    tr_evt = event_log.get(tr_id)
+                    if tr_evt and (tick - tr_evt.tick) <= 24:
+                        causes.append(tr_id)
+
+            relocation_info: dict[str, str] | None = None
+            s_m = settlements[m.settlement_id]
+            s_f = settlements[f.settlement_id]
+
+            if s_m.id != s_f.id:
+                chosen = s_m
+                leaving = s_f
+                moving_char = f
+                relocation_info = {
+                    "moved_char_id": moving_char.id,
+                    "from_settlement_id": leaving.id,
+                    "to_settlement_id": chosen.id,
+                }
+
+            evt = event_log.append(
+                tick=tick,
+                location=m.settlement_id,
+                event_type=EventType.MARRIAGE,
+                participants={"spouse1": m.id, "spouse2": f.id},
+                causes=causes,
+                intent=Intent.INTENTIONAL,
+                scale=Scale.INDIVIDUAL,
+                payload={
+                    "description": f"Marriage of {m.full_name} and {f.full_name}" + (" (Alliance Marriage)" if is_alliance else ""),
+                    "spouse1_name": m.full_name,
+                    "spouse2_name": f.full_name,
+                    "is_alliance": is_alliance,
+                    "relocation": relocation_info,
+                },
+            )
+            m.spouse_id = f.id
+            f.spouse_id = m.id
+
+            if relocation_info is not None:
+                if f.id in s_f.member_ids:
+                    s_f.member_ids.remove(f.id)
+                f.settlement_id = s_m.id
+                s_m.member_ids.append(f.id)
+
+            marriage_key = tuple(sorted([m.id, f.id]))
+            marriage_events[marriage_key] = evt.id
+            return True
+        return False
+
+    for s_a, s_b in settlement_pairs:
+        m_list = list(singles_m_by_s.get(s_a, []))
+        f_list = list(singles_f_by_s.get(s_b, []))
+        for m in m_list:
+            if m.spouse_id is not None:
                 continue
-            m_fam = getattr(m, "family_id", "") or m.last_name
-            f_fam = getattr(f, "family_id", "") or f.last_name
-            if m_fam == f_fam and (m.father_id is not None or f.father_id is not None):
-                continue
-            if f.id in m.children_ids or m.id in f.children_ids:
-                continue
+            for f in f_list:
+                if f.spouse_id is not None:
+                    continue
+                if attempt_marriage(m, f):
+                    break
+        if s_a != s_b:
+            m_list2 = list(singles_m_by_s.get(s_b, []))
+            f_list2 = list(singles_f_by_s.get(s_a, []))
+            for m in m_list2:
+                if m.spouse_id is not None:
+                    continue
+                for f in f_list2:
+                    if f.spouse_id is not None:
+                        continue
+                    if attempt_marriage(m, f):
+                        break
 
-            roll = keyed_float(seed, "marriage_roll", f"{m.id}_{f.id}", tick)
-            threshold = 0.05 if m.settlement_id == f.settlement_id else 0.025
-            if roll >= threshold:
-                continue
+    # 3. Check Births (M0.5.4: Carrying capacity & resource dampening)
+    living_pop_by_s: dict[str, int] = {}
+    for c in characters.values():
+        if c.alive:
+            living_pop_by_s[c.settlement_id] = living_pop_by_s.get(c.settlement_id, 0) + 1
 
-            rel_mf = get_relationship(m.id, f.id)
-            rel_fm = get_relationship(f.id, m.id)
-
-            if rel_mf.hatred < 15.0 and rel_fm.hatred < 15.0:
-                causes: list[int] = []
-                is_alliance = False
-                route_key = tuple(sorted([m.settlement_id, f.settlement_id]))
-
-                if m.settlement_id != f.settlement_id:
-                    # Genuine alliance condition: check for a recent Peace between these two settlements (within 12 ticks)
-                    for past_evt in reversed(event_log.all_events()[-30:]):
-                        if past_evt.type == EventType.PEACE and (tick - past_evt.tick) <= 12:
-                            p_parties = {past_evt.participants_dict.get("initiator"), past_evt.participants_dict.get("target")}
-                            if p_parties == {m.settlement_id, f.settlement_id}:
-                                causes.append(past_evt.id)
-                                is_alliance = True
-                                break
-
-                    # Or cite opening of diplomatic trade route (within 24 ticks per Directive 11)
-                    if not causes and route_key in active_trade_route_events:
-                        tr_id = active_trade_route_events[route_key]
-                        tr_evt = event_log.get(tr_id)
-                        if tr_evt and (tick - tr_evt.tick) <= 24:
-                            causes.append(tr_id)
-
-                relocation_info: dict[str, str] | None = None
-                s_m = settlements[m.settlement_id]
-                s_f = settlements[f.settlement_id]
-
-                # Standard marriage relocation follows a fixed rule (patrilocal) and is recorded in payload
-                if s_m.id != s_f.id:
-                    chosen = s_m
-                    leaving = s_f
-                    moving_char = f
-                    relocation_info = {
-                        "moved_char_id": moving_char.id,
-                        "from_settlement_id": leaving.id,
-                        "to_settlement_id": chosen.id,
-                    }
-
-                evt = event_log.append(
-                    tick=tick,
-                    location=m.settlement_id,
-                    event_type=EventType.MARRIAGE,
-                    participants={"spouse1": m.id, "spouse2": f.id},
-                    causes=causes,
-                    intent=Intent.INTENTIONAL,
-                    scale=Scale.INDIVIDUAL,
-                    payload={
-                        "description": f"Marriage of {m.full_name} and {f.full_name}" + (" (Alliance Marriage)" if is_alliance else ""),
-                        "spouse1_name": m.full_name,
-                        "spouse2_name": f.full_name,
-                        "is_alliance": is_alliance,
-                        "relocation": relocation_info,
-                    },
-                )
-                m.spouse_id = f.id
-                f.spouse_id = m.id
-
-                if relocation_info is not None:
-                    if f.id in s_f.member_ids:
-                        s_f.member_ids.remove(f.id)
-                    f.settlement_id = s_m.id
-                    s_m.member_ids.append(f.id)
-
-                marriage_key = tuple(sorted([m.id, f.id]))
-                marriage_events[marriage_key] = evt.id
-                break
-
-    # 3. Check Births
     wives = [c for c in characters.values() if c.alive and c.sex == "F" and c.spouse_id is not None and 18 <= c.age_years <= 44]
     wives.sort(key=lambda c: c.id)
 
@@ -156,8 +207,20 @@ def process_life_cycle(
         if len(wife.children_ids) >= 4:
             continue
 
+        s = settlements.get(wife.settlement_id)
+        birth_prob = 0.020
+        if s:
+            k_s = max(50, int(130 * s.farmland * (s.water_access + 0.5)))
+            local_pop = living_pop_by_s.get(wife.settlement_id, 1)
+            if local_pop > k_s:
+                ratio = local_pop / k_s
+                birth_prob *= max(0.08, 1.0 / (ratio * ratio))
+            if s.food < local_pop * 0.50:
+                birth_prob *= 0.50
+
         birth_roll = keyed_float(seed, "birth_roll", wife.id, tick)
-        if birth_roll < 0.020:
+        if birth_roll < birth_prob:
+            living_pop_by_s[wife.settlement_id] = living_pop_by_s.get(wife.settlement_id, 0) + 1
             marriage_key = tuple(sorted([wife.id, husband.id]))
             marriage_evt_id = marriage_events.get(marriage_key)
             causes = [marriage_evt_id] if marriage_evt_id is not None else []

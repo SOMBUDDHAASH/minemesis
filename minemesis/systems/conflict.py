@@ -90,8 +90,16 @@ def process_conflicts_and_economy(
         if pop == 0:
             continue
 
+        # Carrying capacity & land saturation (Milestone 0.5.4)
+        k_settlement = max(50, int(130 * s.farmland * (s.water_access + 0.5)))
+        if pop > k_settlement:
+            saturation = k_settlement / (k_settlement + (pop - k_settlement) * 1.05)
+        else:
+            saturation = 1.0
+
+        effective_farmland = s.farmland * saturation
         noise = 0.90 + 0.20 * keyed_float(seed, "food_noise", s_id, tick)
-        food_produced = int(pop * s.farmland * season_mult * 1.15 * noise)
+        food_produced = int(pop * effective_farmland * season_mult * 1.08 * noise)
         s.food += food_produced
 
         food_consumed = max(1, int(pop * 1.0))
@@ -102,21 +110,19 @@ def process_conflicts_and_economy(
         wealth_produced = int(workers * s.ore_richness * 0.35) + int(workers * s.forest * 0.15)
         s.wealth += wealth_produced
 
-        # Storage cap & spoilage (Section 3c)
-        # Cap scales with population: ~3 years of consumption (36 ticks * 1 food) + 150 buffer
-        storage_cap = pop * 36 + 150
+        # Storage cap & spoilage (M0.5.4: realistic 14-month historical granary capacity)
+        storage_cap = pop * 14 + 100
         if s.food > storage_cap:
             excess = s.food - storage_cap
-            spoilage = int(excess * 0.15)  # 15% monthly spoilage on excess
+            spoilage = int(excess * 0.20)
             s.food -= spoilage
 
-        critical_food_threshold = max(2, int(pop * 0.15))
-        if s.food < 0:
-            s.food = 0
+        critical_food_threshold = max(5, int(pop * 0.50))
+        if s.food <= critical_food_threshold:
             s.consecutive_starvation_ticks += 1
-        elif s.food <= critical_food_threshold:
-            s.consecutive_starvation_ticks += 1
-        else:
+            if s.food < 0:
+                s.food = 0
+        elif s.food >= max(10, int(pop * 1.50)):
             s.consecutive_starvation_ticks = max(0, s.consecutive_starvation_ticks - 1)
 
         # Directive 9: Wealth sink (maintenance costs & municipal upkeep)
@@ -142,8 +148,6 @@ def process_conflicts_and_economy(
                         other_s.wealth += cost
                         s.food += needed
                         other_s.food -= needed
-                        if s.food > critical_food_threshold:
-                            s.consecutive_starvation_ticks = max(0, s.consecutive_starvation_ticks - 1)
                         if s.food >= max(20, int(pop * 0.50)):
                             break
 
@@ -162,13 +166,14 @@ def process_conflicts_and_economy(
         if s.active_famine_event_id is None:
             if s.consecutive_starvation_ticks >= 2 and (tick - s.last_famine_end_tick >= 12):
                 famine_roll = keyed_float(seed, "famine_event", s_id, tick)
-                if famine_roll < 0.20:
-                    causes: list[int] = []
-                    for past_evt in reversed(event_log.all_events()[-25:]):
-                        if past_evt.type == EventType.RAID and past_evt.location == s.id:
-                            causes.append(past_evt.id)
-                            break
+                causes: list[int] = []
+                for past_evt in reversed(event_log.all_events()[-25:]):
+                    if past_evt.type == EventType.RAID and past_evt.location == s.id:
+                        causes.append(past_evt.id)
+                        break
 
+                threshold = 0.50 if causes else 0.30
+                if famine_roll < threshold:
                     famine_evt = event_log.append(
                         tick=tick,
                         location=s.id,

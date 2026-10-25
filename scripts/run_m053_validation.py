@@ -23,8 +23,10 @@ import argparse
 import gc
 import json
 import math
+import multiprocessing
 import os
 import sys
+import time
 from collections import Counter, defaultdict
 from typing import Any, Sequence
 
@@ -81,6 +83,7 @@ def compute_distribution(vals: list[float | int]) -> dict[str, float]:
 
 def audit_pair(pair: SeedPair, years: int = 100, export_showcase_path: str | None = None) -> dict[str, Any]:
     """Runs a single simulation run, extracts metrics, and frees simulation memory."""
+    t0 = time.time()
     print(f"  Starting audit for {pair.encode()}...", flush=True)
     sim = Simulation(seed=pair, enable_religion=True, enable_lore=True)
     initial_living = len(sim.living_characters)
@@ -188,6 +191,7 @@ def audit_pair(pair: SeedPair, years: int = 100, export_showcase_path: str | Non
         "longest_distinct_types": l_distinct,
         "event_counts": event_counts,
         "peak_rss_mb": peak_rss_mb,
+        "wall_time_sec": round(time.time() - t0, 2),
     }
 
     if export_showcase_path:
@@ -245,26 +249,45 @@ def _load_jsonl(path: str) -> list[dict[str, Any]]:
     return records
 
 
-def run_cohort_streaming(pairs: list[SeedPair], label: str, filename_slug: str) -> list[dict[str, Any]]:
-    """Executes a cohort with streaming JSONL persistence and resume capability."""
+def _audit_pair_worker(pair: SeedPair) -> dict[str, Any]:
+    """Top-level worker function for multiprocessing pool."""
+    return audit_pair(pair)
+
+
+def run_cohort_streaming(
+    pairs: list[SeedPair],
+    label: str,
+    filename_slug: str,
+    workers: int = 1,
+    limit: int | None = None,
+) -> list[dict[str, Any]]:
+    """Executes a cohort with streaming JSONL persistence, resume capability, and fresh process isolation."""
     os.makedirs("reports", exist_ok=True)
     jsonl_path = f"reports/m053_{filename_slug}_runs.jsonl"
+
+    if limit is not None:
+        pairs = pairs[:limit]
+
     done = _done_codes(jsonl_path)
 
-    print(f"\n--- Running {label} ({len(pairs)} pairs requested, {len(done)} already done) ---")
+    print(f"\n--- Running {label} ({len(pairs)} pairs requested, {len(done)} already done) ---", flush=True)
     todo = [p for p in pairs if p.encode() not in done]
 
     if todo:
-        with open(jsonl_path, "a", encoding="utf-8") as f:
-            for idx, pair in enumerate(todo, 1):
-                rec = audit_pair(pair)
-                f.write(json.dumps(rec) + "\n")
-                f.flush()
-                if idx % 10 == 0 or idx == len(todo):
-                    print(
-                        f"  Processed {idx:3d}/{len(todo)} new | Reconciled: {rec['reconciled']} "
-                        f"| Survived: {rec['survived']} | Pop: {rec['final_living']} | Peak RSS: {rec['peak_rss_mb']} MB"
-                    )
+        print(f"  Dispatching {len(todo)} pairs to {workers} worker process(es) with maxtasksperchild=1...", flush=True)
+        with multiprocessing.Pool(processes=workers, maxtasksperchild=1) as pool:
+            mapper = pool.imap_unordered if workers > 1 else pool.imap
+            for idx, rec in enumerate(mapper(_audit_pair_worker, todo), 1):
+                with open(jsonl_path, "a", encoding="utf-8") as f:
+                    f.write(json.dumps(rec) + "\n")
+                    f.flush()
+                print(
+                    f"  [{idx:3d}/{len(todo)}] Done {rec['pair_code']} | Sets: {rec['settlement_count']} "
+                    f"| Pop: {rec['final_living']} | Reconciled: {rec['reconciled']} | Survived: {rec['survived']} "
+                    f"| Feuds: {rec['feuds']} | Depth: {rec['conflict_causal_depth']} "
+                    f"| RSS: {rec['peak_rss_mb']} MB | Time: {rec.get('wall_time_sec', 0.0)}s",
+                    flush=True,
+                )
 
     return _load_jsonl(jsonl_path)
 
@@ -405,6 +428,8 @@ def print_comparison_table(holdout_summary: dict[str, Any]) -> None:
 def main():
     parser = argparse.ArgumentParser(description="Minemesis Milestone 0.5.3 Multi-Pair Validation Suite")
     parser.add_argument("--count", type=int, default=100, help="Number of pairs per cohort (default 100)")
+    parser.add_argument("--limit", type=int, default=None, help="Limit number of pairs to run per cohort (smoke test)")
+    parser.add_argument("--cohort", choices=["both", "training", "holdout_d"], default="both", help="Which cohort to run (default: both)")
     parser.add_argument("--single", action="store_true", help="Run exactly 1 instance to verify functionality")
     parser.add_argument("--workers", type=int, default=2, help="Worker processes (default 2)")
     parser.add_argument("--skip-showcase", action="store_true", help="Skip exporting showcase story files")
@@ -460,8 +485,25 @@ def main():
         for i in range(num_pairs)
     ]
 
-    train_records = run_cohort_streaming(training_pairs, f"Training Cohort ({num_pairs} pairs)", "training")
-    holdout_records = run_cohort_streaming(holdout_d_pairs, f"Hold-out D Cohort ({num_pairs} pairs)", "holdout_d")
+    train_records = []
+    if args.cohort in ("both", "training"):
+        train_records = run_cohort_streaming(
+            training_pairs,
+            f"Training Cohort ({num_pairs} pairs)",
+            "training",
+            workers=args.workers,
+            limit=args.limit,
+        )
+
+    holdout_records = []
+    if args.cohort in ("both", "holdout_d"):
+        holdout_records = run_cohort_streaming(
+            holdout_d_pairs,
+            f"Hold-out D Cohort ({num_pairs} pairs)",
+            "holdout_d",
+            workers=args.workers,
+            limit=args.limit,
+        )
 
     train_summary = summarize_cohort(train_records, "Training Cohort")
     holdout_summary = summarize_cohort(holdout_records, "Hold-out D Cohort")

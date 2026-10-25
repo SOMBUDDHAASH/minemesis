@@ -10,7 +10,8 @@ Adheres strictly to agent.md Architecture Freeze v1.0 and Milestone 0.5:
 """
 
 from __future__ import annotations
-from typing import Callable, Optional, Set
+import gc
+from typing import Any, Callable, Optional, Set
 from minemesis.core.event_log import Event, EventLog
 from minemesis.core.invariants import InvariantViolationError, validate_event_actors_alive
 from minemesis.core.types import EventType
@@ -20,6 +21,8 @@ from minemesis.models.memory import Memory
 from minemesis.core.seed import SeedPair
 from minemesis.models.relationship import Relationship, compute_relationship
 from minemesis.models.settlement import Settlement, TradeRoute
+from minemesis.core.knowledge import KnowledgeEngine, KnowledgeOwnerType, KnowledgeTargetType
+from minemesis.core.relationship_cache import RelationshipCache
 from minemesis.systems.conflict import ActiveFeud, process_conflicts_and_economy
 from minemesis.systems.gossip import propagate_gossip
 from minemesis.systems.life_cycle import process_life_cycle
@@ -85,6 +88,11 @@ class Simulation:
         self.collapsed_settlements: set[str] = set()
         self.resolved_grievance_event_ids: set[int] = set()
         
+        # Epistemic & Performance Systems (Milestone 0.5.4)
+        self.knowledge_engine = KnowledgeEngine()
+        self.relationship_cache = RelationshipCache(default_ttl_ticks=12)
+        self.historical_archive: dict[str, dict[str, Any]] = {}
+
         # Monotonic counters
         self.char_counter = [len(self.characters)]
         self.belief_counter = [0]
@@ -176,12 +184,17 @@ class Simulation:
 
     def get_relationship(self, source_id: str, target_id: str) -> Relationship:
         """
-        Dynamically computes the relationship view between two characters from active memories.
+        Dynamically computes the relationship view between two characters from active memories
+        and collective knowledge consensus, cached in RelationshipCache.
         Authoritative source of truth is NEVER relationships.
         Excludes memories stemming from superseded beliefs (Section 4.4).
         """
         if source_id not in self.characters or target_id not in self.characters:
             return Relationship(source_id, target_id, 0.0, 0.0, 0.0, 0.0, 0.0)
+
+        cached = self.relationship_cache.get(source_id, target_id, self.tick)
+        if cached is not None:
+            return cached
 
         source = self.characters[source_id]
         target = self.characters[target_id]
@@ -209,6 +222,12 @@ class Simulation:
             superseded_memory_ids=self.superseded_memory_ids,
         )
 
+        trust = base_rel.trust
+        fear = base_rel.fear
+        respect = base_rel.respect
+        hatred = base_rel.hatred
+        loyalty = base_rel.loyalty
+
         if self.religion_engine and self.religion_engine.enabled:
             faith_a = self.religion_engine.get_character_faith(source_id)
             faith_b = self.religion_engine.get_character_faith(target_id)
@@ -223,18 +242,37 @@ class Simulation:
                     rel_b=rel_b,
                     all_religions=self.religion_engine.religions,
                 )
-                if t_off != 0.0 or h_off != 0.0 or f_off != 0.0:
-                    return Relationship(
-                        source_id=source_id,
-                        target_id=target_id,
-                        trust=max(-100.0, min(100.0, base_rel.trust + t_off)),
-                        fear=max(0.0, min(100.0, base_rel.fear + f_off)),
-                        respect=base_rel.respect,
-                        hatred=max(0.0, min(100.0, base_rel.hatred + h_off)),
-                        loyalty=base_rel.loyalty,
-                    )
+                trust += t_off
+                hatred += h_off
+                fear += f_off
 
-        return base_rel
+        # Collective Knowledge modifier (M0.5.4)
+        if self.knowledge_engine:
+            s_fam = getattr(source, "family_id", "") or source.last_name
+            t_fam = getattr(target, "family_id", "") or target.last_name
+            k_trust, k_hatred, k_respect = self.knowledge_engine.get_reputation_offset(
+                observer_settlement_id=source.settlement_id,
+                observer_family_id=s_fam,
+                target_char_id=target.id,
+                target_family_id=t_fam,
+                target_settlement_id=target.settlement_id,
+            )
+            trust += k_trust
+            hatred += k_hatred
+            respect += k_respect
+
+        final_rel = Relationship(
+            source_id=source_id,
+            target_id=target_id,
+            trust=max(-100.0, min(100.0, trust)),
+            fear=max(0.0, min(100.0, fear)),
+            respect=max(-100.0, min(100.0, respect)),
+            hatred=max(0.0, min(100.0, hatred)),
+            loyalty=loyalty,
+        )
+
+        self.relationship_cache.put(source_id, target_id, final_rel, self.tick)
+        return final_rel
 
     def _register_and_perceive_events(self, events_before: int) -> None:
         """
@@ -268,6 +306,7 @@ class Simulation:
                 get_relationship=self.get_relationship,
                 seed=self.seed,
                 belief_counter=self.belief_counter,
+                knowledge_engine=self.knowledge_engine,
             )
             for b in new_beliefs:
                 # Milestone R1.1: Religion Interpretation Filter
@@ -300,6 +339,9 @@ class Simulation:
                 self.memories.extend(new_mems)
                 for m in new_mems:
                     self.memories_by_observer.setdefault(m.observer_id, []).append(m)
+
+                # Invalidate cached relationships for observer
+                self.relationship_cache.invalidate_character(b.believer_id)
 
     def step_month(self) -> None:
         """
@@ -356,6 +398,7 @@ class Simulation:
             self.memories.extend(gossip_mems)
             for m in gossip_mems:
                 self.memories_by_observer.setdefault(m.observer_id, []).append(m)
+            self.relationship_cache.invalidate_character(b.believer_id)
 
         # -------------------------------------------------------------
         # Step 3: Conflict, Scarcity, Trade Routes, Leadership, Peace
@@ -442,9 +485,75 @@ class Simulation:
             self._register_and_perceive_events(lore_start)
 
         # -------------------------------------------------------------
+        # Step 5b: Periodic Epistemic and Memory Lifecycle Compaction (M0.5.4)
+        # -------------------------------------------------------------
+        if self.tick > 0 and self.tick % 120 == 0:
+            self.compact_history()
+
+        # -------------------------------------------------------------
         # Step 6: Advance Simulation Tick
         # -------------------------------------------------------------
         self.tick += 1
+
+    def compact_history(self) -> None:
+        """
+        Tiered Epistemic and Memory Lifecycle Compaction (Milestone 0.5.4).
+        - Tier 0: Living characters retain full state.
+        - Tier 1: Recent dead (< 20 years) retained for active feuds/inheritance.
+        - Tier 2: Historical dead (> 20 years) archived into compact HistoricalPerson dicts,
+                  releasing individual Belief and Memory dict allocations.
+        - Prunes decayed insignificant memories (intensity < 0.10) for characters not in feuds.
+        - Reclaims heap memory via gc.collect().
+        """
+        protected_char_ids = set()
+        for f in self.active_feuds:
+            protected_char_ids.add(f.instigator_char_id)
+            protected_char_ids.add(f.target_char_id)
+        for s in self.settlements.values():
+            if s.leader_id:
+                protected_char_ids.add(s.leader_id)
+
+        # 1. Tier 2 Dead Character Compaction (> 240 ticks / 20 years dead)
+        for c_id, char in list(self.characters.items()):
+            if not char.alive and char.death_tick is not None:
+                if (self.tick - char.death_tick) > 240 and c_id not in protected_char_ids:
+                    if c_id not in self.historical_archive:
+                        self.historical_archive[c_id] = {
+                            "id": char.id,
+                            "name": char.full_name,
+                            "death_tick": char.death_tick,
+                            "settlement_id": char.settlement_id,
+                            "family_id": getattr(char, "family_id", "") or char.last_name,
+                            "father_id": char.father_id,
+                            "mother_id": char.mother_id,
+                            "spouse_id": char.spouse_id,
+                            "children_ids": list(char.children_ids),
+                        }
+                    # Free individual belief and memory dict entries
+                    if c_id in self.beliefs_by_character:
+                        self.beliefs_by_character[c_id].clear()
+                        del self.beliefs_by_character[c_id]
+                    if c_id in self.memories_by_observer:
+                        del self.memories_by_observer[c_id]
+                    self.relationship_cache.invalidate_character(c_id)
+
+        # 2. Prune decayed emotional memories for living characters
+        for c_id, mem_list in list(self.memories_by_observer.items()):
+            if c_id not in protected_char_ids and len(mem_list) > 20:
+                retained = []
+                for m in mem_list:
+                    cur_int = m.current_intensity(self.tick)
+                    if cur_int >= 0.10 or (self.tick - m.tick_formed) <= 60:
+                        retained.append(m)
+                self.memories_by_observer[c_id] = retained
+
+        # 3. Clean relationship cache of expired entries
+        now = self.tick
+        expired = [k for k, v in self.relationship_cache._cache.items() if v[1] < now]
+        for k in expired:
+            del self.relationship_cache._cache[k]
+
+        gc.collect()
 
     def run_years(self, years: int) -> None:
         """

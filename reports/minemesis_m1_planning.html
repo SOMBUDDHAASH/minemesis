@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Project Minemesis - Milestone 1 Technical Specification &amp; Implementation Blueprint</title>
+<style>
+  @page {
+    size: A4;
+    margin: 9mm 11mm 9mm 11mm;
+  }
+  
+  *, *:before, *:after {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #1e293b;
+    line-height: 1.34;
+    font-size: 7.9pt;
+    background: #ffffff;
+    margin: 0;
+    padding: 0;
+  }
+
+  .page {
+    page-break-after: always;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    padding-bottom: 8px;
+  }
+
+  .page:last-child {
+    page-break-after: avoid;
+  }
+
+  .header {
+    border-bottom: 1.5px solid #0284c7;
+    padding-bottom: 4px;
+    margin-bottom: 7px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .header-left {
+    font-weight: 800;
+    font-size: 8.5pt;
+    color: #0369a1;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .header-right {
+    font-size: 7.0pt;
+    color: #64748b;
+    font-weight: 600;
+  }
+
+  .footer {
+    border-top: 1px solid #cbd5e1;
+    padding-top: 4px;
+    margin-top: 6px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 6.8pt;
+    color: #64748b;
+  }
+
+  h1 {
+    font-size: 15pt;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 3px 0;
+    line-height: 1.15;
+  }
+
+  h2 {
+    font-size: 9.8pt;
+    font-weight: 700;
+    color: #0369a1;
+    margin: 7px 0 3px 0;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 2px;
+  }
+
+  h3 {
+    font-size: 8.4pt;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 5px 0 2px 0;
+  }
+
+  p {
+    margin: 0 0 4.5px 0;
+  }
+
+  ul, ol {
+    margin: 0 0 4.5px 0;
+    padding-left: 15px;
+  }
+
+  li {
+    margin-bottom: 2px;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 1px 4.5px;
+    border-radius: 3px;
+    font-size: 6.6pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .badge-blue { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+  .badge-green { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+  .badge-amber { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+  .badge-purple { background: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff; }
+  .badge-red { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+
+  .card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    padding: 6px 8px;
+    margin-bottom: 5px;
+  }
+
+  .callout {
+    border-left: 3px solid #0284c7;
+    background: #f0f9ff;
+    padding: 5px 7px;
+    margin-bottom: 5px;
+    font-size: 7.4pt;
+  }
+
+  .callout-amber {
+    border-left: 3px solid #d97706;
+    background: #fffbeb;
+  }
+
+  .callout-green {
+    border-left: 3px solid #16a34a;
+    background: #f0fdf4;
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+    margin-bottom: 5px;
+  }
+
+  .grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 5px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 5px;
+    font-size: 7.2pt;
+  }
+
+  th, td {
+    padding: 3px 5px;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  th {
+    background: #f1f5f9;
+    font-weight: 700;
+    color: #334155;
+    border-top: 1px solid #cbd5e1;
+  }
+
+  code {
+    font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font-size: 7.1pt;
+    background: #f1f5f9;
+    padding: 0.5px 2.5px;
+    border-radius: 2px;
+    color: #0f172a;
+    border: 1px solid #e2e8f0;
+  }
+
+  pre {
+    font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font-size: 6.8pt;
+    background: #0f172a;
+    color: #f8fafc;
+    padding: 5px 7px;
+    border-radius: 4px;
+    margin: 0 0 5px 0;
+    line-height: 1.25;
+    overflow-x: hidden;
+    white-space: pre-wrap;
+  }
+
+  .lead {
+    font-size: 8.2pt;
+    color: #334155;
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+</style>
+</head>
+<body>
+
+<!-- PAGE 1: CHARTER & EXECUTIVE SUMMARY -->
+<div class="page">
+  <div>
+    <div class="header">
+      <div class="header-left">PROJECT MINEMESIS &bull; ARCHITECTURAL BLUEPRINT</div>
+      <div class="header-right">MILESTONE 1 TECHNICAL CHARTER</div>
+    </div>
+
+    <div style="margin-bottom: 8px;">
+      <span class="badge badge-blue">Milestone 1 Specification</span>
+      <span class="badge badge-purple">Kinship, Dynasties &amp; Epistemology</span>
+      <span class="badge badge-green">Ready For Review</span>
+    </div>
+
+    <h1>Milestone 1: Kinship Consequences &amp; Epistemic Propagation</h1>
+    <p class="lead">
+      Comprehensive technical audit, architectural roadmap, and implementation specification transitioning Minemesis from isolated individual decision-makers to structured familial dynasties, multi-generational feuds, and network-propagated truth revelation.
+    </p>
+
+    <div class="callout callout-green">
+      <strong>Core Thesis &amp; Architectural Objective (brief.md Section 5):</strong><br>
+      <em>"One death produces different reactions across a family, and corrections spread through families."</em><br>
+      In Milestone 0.5, drama was driven by isolated individual instigators. Milestone 1 transforms human social networks into living dynasties: kin defend each other, children inherit grievances from parents, blood feuds outlive original participants, and truth revelation cascades through family bonds.
+    </div>
+
+    <h2>1. Executive Summary &amp; Audit Baseline</h2>
+    <p>
+      Before initiating Milestone 1 code changes, a comprehensive codebase audit was conducted against the canonical specification in <code>brief.md</code> Section 5. The simulation has successfully achieved strict demographic reconciliation (living = initial + births - deaths), deterministic keyed hashing, V0 procedural world generation (10&ndash;35 settlements), and complete memory leak isolation.
+    </p>
+    
+    <div class="grid-2">
+      <div class="card">
+        <h3>Existing Foundation (What is Already Built)</h3>
+        <ul>
+          <li><strong>Individual Family Pointers:</strong> <code>Character</code> stores <code>spouse_id</code>, <code>father_id</code>, <code>mother_id</code>, <code>children_ids</code>, and <code>family_id</code>.</li>
+          <li><strong>Cast Generation Tree Seeding:</strong> <code>cast_gen.py</code> builds initial elders, couples, and child linkages across 9 naming traditions.</li>
+          <li><strong>Incest Prevention:</strong> <code>life_cycle.py</code> enforces nuclear incest checks on marriages.</li>
+          <li><strong>Ad-Hoc Kin Reactions:</strong> <code>memory_system.py</code> increases grief/anger when a parent, child, or spouse dies.</li>
+          <li><strong>Chief Succession Children Check:</strong> <code>conflict.py</code> inspects children when electing successor chiefs.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Crucial Missing Capabilities (What Must Be Built)</h3>
+        <ul>
+          <li><strong>Formal Kinship Degree Metric:</strong> No generalized <code>kin_degree(a, b)</code> function exists. Extended kin (grandparents, uncles, aunts, cousins, in-laws) are completely unindexed.</li>
+          <li><strong>Reaction Fan-Out Architecture:</strong> Reactions currently evaluate globally or per-witness, triggering the 2.8M belief explosion. Need bounded Degree 1 &amp; 2 fan-out + aggregate village belief.</li>
+          <li><strong>Kin-Involved Revenge:</strong> Only the single feud instigator can seek revenge. Family members cannot avenge kin.</li>
+          <li><strong>Multi-Generational Grudges:</strong> Children do not inherit grudges from deceased parents; feuds die with the instigator.</li>
+          <li><strong>Family Belief-Correction Cascade:</strong> Truth revelation currently updates only the instigator. Kin do not receive truth updates.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>2. Milestone 1 Architectural Target Pillars</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Subsystem</th>
+          <th>Milestone 0.5 Status</th>
+          <th>Milestone 1 Requirement</th>
+          <th>Architectural Impact</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Kinship Graph</strong></td>
+          <td>Only direct pointers (`father_id`, `mother_id`)</td>
+          <td>Formal <code>kin_degree(a, b)</code> supporting Degrees 1 and 2</td>
+          <td>Enables extended family queries, succession laws, and kin solidarity</td>
+        </tr>
+        <tr>
+          <td><strong>Reaction Fan-Out</strong></td>
+          <td>Per-individual perception loop (unbounded)</td>
+          <td>Fan-out to Degree 1&ndash;2 kin + close friends + 1 aggregate village belief</td>
+          <td>Caps belief proliferation; provides role-specific emotional reactions</td>
+        </tr>
+        <tr>
+          <td><strong>Dynastic Grudges</strong></td>
+          <td>Instigator-only vendettas; feud dies with instigator</td>
+          <td>Inherited parental grievances; multi-generational vendetta transmission</td>
+          <td>Enables epic, multi-generational family conflicts spanning 50+ years</td>
+        </tr>
+        <tr>
+          <td><strong>Kin Revenge</strong></td>
+          <td>Only individual instigator can kill</td>
+          <td>Kin (sons, brothers, fathers) can execute vengeance for slain kin</td>
+          <td>Produces realistic revenge dynamics without script hacks</td>
+        </tr>
+        <tr>
+          <td><strong>Belief Correction</strong></td>
+          <td>Instigator-only truth revelation</td>
+          <td>Cascading <code>TOLD</code> correction propagation across family &amp; allies</td>
+          <td>Enables realistic family reconciliation and treaty acceptance</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="footer">
+    <span>Project Minemesis &bull; Milestone 1 Technical Charter &bull; Version 1.0</span>
+    <span>Page 1 of 8</span>
+  </div>
+</div>
+
+<!-- PAGE 2: ARCHITECTURAL GAP ANALYSIS -->
+<div class="page">
+  <div>
+    <div class="header">
+      <div class="header-left">PROJECT MINEMESIS &bull; ARCHITECTURAL BLUEPRINT</div>
+      <div class="header-right">CODEBASE AUDIT &amp; GAP ANALYSIS</div>
+    </div>
+
+    <h2>3. Comprehensive Codebase Gap Analysis</h2>
+    <p class="lead">
+      Systematic audit of existing modules across <code>minemesis/</code> identifying existing primitives, partial implementations, and absent systems required for Milestone 1.
+    </p>
+
+    <div class="card">
+      <h3>Audit Summary Matrix: Milestone 1 Component Breakdown</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Module File</th>
+            <th>Existing Primitives (M0.5.3)</th>
+            <th>Missing Architectural Requirements</th>
+            <th>Action Required</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>minemesis/core/kinship.py</code></td>
+            <td><em>File does not exist.</em></td>
+            <td>Generalized <code>kin_degree(a, b)</code>, <code>get_kin_type(a, b)</code>, Degree 1 &amp; 2 graph traversal, in-law detection.</td>
+            <td><span class="badge badge-green">Create New Module</span></td>
+          </tr>
+          <tr>
+            <td><code>minemesis/models/character.py</code></td>
+            <td>Has <code>father_id</code>, <code>mother_id</code>, <code>spouse_id</code>, <code>children_ids</code>, <code>family_id</code>.</td>
+            <td>Kinship query helper methods, dynasty lineage markers, dynastic reputation tracking.</td>
+            <td><span class="badge badge-blue">Enhance Schema</span></td>
+          </tr>
+          <tr>
+            <td><code>minemesis/systems/perception.py</code></td>
+            <td>Perceives per-individual; checks witness location; applies suspicion bias.</td>
+            <td>Fan-out dispatch: Degree 1 &amp; 2 kin + friends + aggregate settlement belief; reaction caps.</td>
+            <td><span class="badge badge-amber">Refactor Pipeline</span></td>
+          </tr>
+          <tr>
+            <td><code>minemesis/systems/memory_system.py</code></td>
+            <td>Direct parent/child/spouse grief and anger scaling.</td>
+            <td>Role-specific emotion profiles (spouse=grief, child=anger, sibling=hatred, rival=relief).</td>
+            <td><span class="badge badge-blue">Extend Rules</span></td>
+          </tr>
+          <tr>
+            <td><code>minemesis/systems/conflict.py</code></td>
+            <td>Individual-only feud declaration; instigator-only revenge killings.</td>
+            <td>Family feuds (<code>FamilyFeud</code>); kin revenge execution; multi-generational grudge inheritance.</td>
+            <td><span class="badge badge-amber">Extend System</span></td>
+          </tr>
+          <tr>
+            <td><code>minemesis/systems/gossip.py</code></td>
+            <td>Sampled intra-settlement rumor sharing.</td>
+            <td>Priority family belief propagation; truth correction transmission across kin network.</td>
+            <td><span class="badge badge-blue">Enhance Priority</span></td>
+          </tr>
+          <tr>
+            <td><code>minemesis/analytics.py</code></td>
+            <td>50-seed batch metrics for feuds, raids, famines, DAG depth.</td>
+            <td>Metrics for reactions/death, family feuds, inherited grudges, kin revenge count.</td>
+            <td><span class="badge badge-blue">Add Metrics</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>4. Detailed Deep-Dive on Existing Code Primitives</h2>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>1. Existing Demographic Seeding (<code>cast_gen.py</code>)</h3>
+        <p>
+          In Milestone 0.5.3, <code>CastGen</code> already generates structured family units rather than an unlinked soup of villagers.
+        </p>
+        <pre># cast_gen.py lines 191-210
+father_id = id_mapping.get(c_dict["father_temp_id"])
+children_ids = [id_mapping[k] for k in c_dict["children_temp_ids"]]
+char = Character(
+    id=c_id,
+    first_name=c_dict["first_name"],
+    last_name=c_dict["last_name"],
+    settlement_id=c_dict["settlement_id"],
+    age_ticks=c_dict["age_ticks"],
+    sex=c_dict["sex"],
+    spouse_id=id_mapping.get(c_dict["spouse_temp_id"]),
+    father_id=father_id,
+    children_ids=children_ids,
+    family_id=c_dict.get("family_id", ""),
+)</pre>
+        <p>
+          <strong>Status:</strong> Sound foundation. The initial genealogical tree is properly instantiated with biological parents, spouses, and children.
+        </p>
+      </div>
+
+      <div class="card">
+        <h3>2. Existing Ad-Hoc Kinship Checks (<code>simulation.py</code>)</h3>
+        <p>
+          Currently, relationship computations query immediate family through explicit boolean logic:
+        </p>
+        <pre># simulation.py lines 189-195
+is_child = target.id in source.children_ids
+is_parent = target.id in (source.father_id, source.mother_id)
+is_sibling = (
+    (source.father_id and source.father_id == target.father_id)
+    or (source.mother_id and source.mother_id == target.mother_id)
+)
+is_family = is_child or is_parent or is_sibling</pre>
+        <p>
+          <strong>Gap:</strong> This logic is repeated across <code>simulation.py</code>, <code>memory_system.py</code>, and <code>conflict.py</code>. It completely misses grandparents, uncles, aunts, nephews, nieces, cousins, and in-laws.
+        </p>
+      </div>
+    </div>
+
+    <div class="callout callout-amber">
+      <strong>Key Finding from Architecture Audit:</strong><br>
+      The lack of a formal kinship module and reaction caps in Milestone 0.5 caused the <strong>Belief Explosion</strong> (2.8M beliefs per 100-year run). Building the Milestone 1 Reaction Fan-Out with aggregate settlement beliefs directly solves the top memory bottleneck identified in <code>ARCHITECTURE_REVIEW.md</code>.
+    </div>
+  </div>
+  <div class="footer">
+    <span>Project Minemesis &bull; Milestone 1 Technical Charter &bull; Version 1.0</span>
+    <span>Page 2 of 8</span>
+  </div>
+</div>
+
+<!-- PAGE 3: SUBSYSTEM 1 - KINSHIP GRAPH -->
+<div class="page">
+  <div>
+    <div class="header">
+      <div class="header-left">PROJECT MINEMESIS &bull; ARCHITECTURAL BLUEPRINT</div>
+      <div class="header-right">SUBSYSTEM 1: KINSHIP GRAPH</div>
+    </div>
+
+    <h2>5. Subsystem 1: The Formal Kinship Graph (<code>minemesis/core/kinship.py</code>)</h2>
+    <p class="lead">
+      A dedicated, high-performance kinship calculation engine providing exact degree classification, relationship typing, and genealogical traversal without maintaining heavy cyclic object graphs.
+    </p>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>Kinship Classification Matrix</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Degree</th>
+              <th>Kinship Category</th>
+              <th>Structural Derivation Path</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="badge badge-green">Degree 1</span></td>
+              <td><strong>Parent</strong></td>
+              <td><code>b.id in (a.father_id, a.mother_id)</code></td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-green">Degree 1</span></td>
+              <td><strong>Child</strong></td>
+              <td><code>b.id in a.children_ids</code></td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-green">Degree 1</span></td>
+              <td><strong>Sibling</strong></td>
+              <td>Share &ge; 1 biological parent (father or mother)</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-green">Degree 1</span></td>
+              <td><strong>Spouse</strong></td>
+              <td><code>a.spouse_id == b.id</code></td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-blue">Degree 2</span></td>
+              <td><strong>Grandparent</strong></td>
+              <td>Parent of a parent (2 hops upward)</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-blue">Degree 2</span></td>
+              <td><strong>Grandchild</strong></td>
+              <td>Child of a child (2 hops downward)</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-blue">Degree 2</span></td>
+              <td><strong>Uncle / Aunt</strong></td>
+              <td>Sibling of a parent</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-blue">Degree 2</span></td>
+              <td><strong>Nephew / Niece</strong></td>
+              <td>Child of a sibling</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-blue">Degree 2</span></td>
+              <td><strong>First Cousin</strong></td>
+              <td>Child of an uncle or aunt</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-blue">Degree 2</span></td>
+              <td><strong>In-Law</strong></td>
+              <td>Spouse of sibling, sibling of spouse, spouse of child, parent of spouse</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-amber">Degree &ge; 3</span></td>
+              <td><strong>Distant Kin</strong></td>
+              <td>Common ancestor &gt; 2 hops or same clan surname</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>Proposed Architecture &amp; Function Signature</h3>
+        <pre># minemesis/core/kinship.py
+from enum import IntEnum, Enum
+from typing import Mapping, Optional
+from minemesis.models.character import Character
+
+class KinDegree(IntEnum):
+    DEGREE_1 = 1
+    DEGREE_2 = 2
+    DEGREE_3_PLUS = 3
+    UNRELATED = 99
+
+class KinRelation(str, Enum):
+    PARENT = "Parent"
+    CHILD = "Child"
+    SIBLING = "Sibling"
+    SPOUSE = "Spouse"
+    GRANDPARENT = "Grandparent"
+    GRANDCHILD = "Grandchild"
+    UNCLE_AUNT = "UncleAunt"
+    NEPHEW_NIECE = "NephewNiece"
+    COUSIN = "Cousin"
+    IN_LAW = "InLaw"
+    DISTANT_KIN = "DistantKin"
+    UNRELATED = "Unrelated"
+
+def kin_degree(
+    a_id: str,
+    b_id: str,
+    characters: Mapping[str, Character],
+) -> int:
+    # Returns exact kinship degree (1, 2, or 99)
+    ...
+
+def get_kin_relation(
+    a_id: str,
+    b_id: str,
+    characters: Mapping[str, Character],
+) -> KinRelation:
+    # Returns specific biological/legal relation
+    ...</pre>
+      </div>
+    </div>
+
+    <h2>6. Algorithmic Efficiency &amp; Zero Pointer Cycles</h2>
+    <p>
+      In accordance with <code>brief.md</code> Section 5.1: <em>"Keep explicit parent and spouse pointers for named characters. They are cheap and make revenge and inheritance queries trivial."</em>
+    </p>
+    <ul>
+      <li><strong>String-Keyed Traversal:</strong> Kinship lookups strictly use string identifiers (e.g. <code>"char_12"</code>) into the top-level <code>characters: dict[str, Character]</code> table. No circular Python object references are created.</li>
+      <li><strong>Bounded Search Depth:</strong> <code>kin_degree</code> checks only up to 2 genealogical hops. Because parent counts are strictly bounded (2 biological parents) and child counts are capped, Degree 1 and 2 queries evaluate in bounded O(1) time (&le; 24 dictionary lookups).</li>
+      <li><strong>Memoized Query Cache:</strong> A lightweight LRU or tick-invalidated cache <code>_kin_cache: dict[tuple[str, str], int]</code> will be maintained to guarantee that frequent monthly relationship updates incur zero CPU overhead.</li>
+    </ul>
+
+    <div class="callout callout-green">
+      <strong>Acceptance Invariant (test_kin_degree.py):</strong><br>
+      Must verify 100% precision across complete synthetic family trees: parent-child = 1, sibling = 1, spouse = 1, grandparent-grandchild = 2, uncle/aunt-nephew/niece = 2, first cousins = 2, in-laws = 2, and second cousins = 99 (Degree 3+).
+    </div>
+  </div>
+  <div class="footer">
+    <span>Project Minemesis &bull; Milestone 1 Technical Charter &bull; Version 1.0</span>
+    <span>Page 3 of 8</span>
+  </div>
+</div>
+
+<!-- PAGE 4: SUBSYSTEM 2 - REACTION FAN-OUT -->
+<div class="page">
+  <div>
+    <div class="header">
+      <div class="header-left">PROJECT MINEMESIS &bull; ARCHITECTURAL BLUEPRINT</div>
+      <div class="header-right">SUBSYSTEM 2: REACTION FAN-OUT</div>
+    </div>
+
+    <h2>7. Subsystem 2: Reaction Fan-Out &amp; Role-Specific Emotion Modulation</h2>
+    <p class="lead">
+      Transforms event perception from an unindexed broadcast to a structured sociological fan-out. Caps discrete memory creation while producing rich, observer-specific psychological reactions.
+    </p>
+
+    <div class="card">
+      <h3>The Three-Tiered Reaction Fan-Out Architecture</h3>
+      <pre>
+                                  [ NOTABLE EVENT OCCURS (e.g. DEATH) ]
+                                                    │
+        ┌───────────────────────────────────────────┼───────────────────────────────────────────┐
+        ▼                                           ▼                                           ▼
+[ TIER 1: KIN WITHIN DEGREE 1 &amp; 2 ]      [ TIER 2: CLOSE FRIENDS &amp; RIVALS ]          [ TIER 3: SETTLEMENT AGGREGATE ]
+- Evaluates kin_degree(deceased, c) &le; 2  - Friends with Trust &gt; 40.0 (Capped at 3)   - ONE aggregate belief for settlement
+- High-intensity individual reactions    - Rivals with Hatred &gt; 40.0 (Capped at 2)   - Background citizens share this record
+- Observer-specific emotional roles       - Observer-specific emotional reactions     - ZERO individual memory allocations
+      </pre>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>Role-Specific Emotion Modulation Matrix</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Observer Role</th>
+              <th>Primary Emotion</th>
+              <th>Secondary Emotion</th>
+              <th>Base Intensity</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Spouse</strong></td>
+              <td><span class="badge badge-purple">Grief</span></td>
+              <td>Despair / Fear</td>
+              <td>85.0 &ndash; 100.0</td>
+            </tr>
+            <tr>
+              <td><strong>Child</strong></td>
+              <td><span class="badge badge-red">Anger</span></td>
+              <td>Grief / Revenge Drive</td>
+              <td>75.0 &ndash; 95.0</td>
+            </tr>
+            <tr>
+              <td><strong>Parent</strong></td>
+              <td><span class="badge badge-purple">Grief</span></td>
+              <td>Anger</td>
+              <td>80.0 &ndash; 95.0</td>
+            </tr>
+            <tr>
+              <td><strong>Sibling</strong></td>
+              <td><span class="badge badge-amber">Hatred</span></td>
+              <td>Suspicion</td>
+              <td>65.0 &ndash; 85.0</td>
+            </tr>
+            <tr>
+              <td><strong>Grandparent / Grandchild</strong></td>
+              <td><span class="badge badge-purple">Grief</span></td>
+              <td>Sadness</td>
+              <td>50.0 &ndash; 70.0</td>
+            </tr>
+            <tr>
+              <td><strong>Uncle / Aunt / Nephew / Niece</strong></td>
+              <td><span class="badge badge-amber">Suspicion</span></td>
+              <td>Grief</td>
+              <td>45.0 &ndash; 65.0</td>
+            </tr>
+            <tr>
+              <td><strong>First Cousin / In-Law</strong></td>
+              <td><span class="badge badge-amber">Suspicion</span></td>
+              <td>Hatred</td>
+              <td>40.0 &ndash; 60.0</td>
+            </tr>
+            <tr>
+              <td><strong>Rival / Enemy</strong></td>
+              <td><span class="badge badge-green">Relief</span></td>
+              <td>Respect / Contempt</td>
+              <td>60.0 &ndash; 90.0</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>Cognitive Trait Modulation &amp; Decay Parameters</h3>
+        <p>
+          Individual personality traits modulate reaction intensity and longevity:
+        </p>
+        <ul>
+          <li><strong>Suspicion (0.0 to 1.0):</strong> High suspicion scales Anger and Hatred by up to +25%, and biases the interpretation of accidental deaths toward deliberate murder.</li>
+          <li><strong>Forgiveness (0.0 to 1.0):</strong> High forgiveness accelerates memory decay, allowing anger to dissipate faster.</li>
+          <li><strong>Keyed RNG Jitter:</strong> Adds small deterministic variance (&plusmn; 5.0) via <code>keyed_float</code> to ensure family members do not react identically.</li>
+        </ul>
+        <div class="callout callout-green">
+          <strong>Memory Decay Equation:</strong><br>
+          Intensity(t) = Initial &times; (1.0 - DecayRate &times; (1.0 + Forgiveness))^ElapsedTicks
+        </div>
+      </div>
+    </div>
+
+    <h2>8. Solving the Belief Explosion: Aggregate Settlement Beliefs</h2>
+    <p>
+      In Milestone 0.5, when a character died, all 300+ villagers in a settlement formed identical <code>Belief</code> and <code>Memory</code> records, creating 2.8 million objects.
+    </p>
+    <ul>
+      <li><strong>The Milestone 1 Solution:</strong> Only Tier 1 kin and Tier 2 close associates (capped at a strict maximum of <strong>10 individuals per event</strong>) form individual subjective beliefs and memories.</li>
+      <li><strong>Settlement Public Knowledge:</strong> Background residents read from a single shared settlement record: <code>Settlement.public_beliefs: dict[int, AggregateBelief]</code>. This cuts memory allocations by <strong>over 85%</strong>, solving the primary RAM bottleneck identified in the architecture audit.</li>
+    </ul>
+  </div>
+  <div class="footer">
+    <span>Project Minemesis &bull; Milestone 1 Technical Charter &bull; Version 1.0</span>
+    <span>Page 4 of 8</span>
+  </div>
+</div>
+
+<!-- PAGE 5: SUBSYSTEM 3 - FAMILY FEUDS & MULTIGEN GRUDGES -->
+<div class="page">
+  <div>
+    <div class="header">
+      <div class="header-left">PROJECT MINEMESIS &bull; ARCHITECTURAL BLUEPRINT</div>
+      <div class="header-right">SUBSYSTEM 3: DYNASTIC CONFLICT</div>
+    </div>
+
+    <h2>9. Subsystem 3: Family Feuds, Multi-Generational Grudges &amp; Kin Revenge</h2>
+    <p class="lead">
+      Expands the conflict engine from isolated character grudges to dynastic blood vendettas. Allows grudges to pass down ancestral lines and enables living kin to avenge fallen relatives.
+    </p>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>Family Standing Derived View (Not Stored)</h3>
+        <p>
+          In accordance with <code>brief.md</code> Section 5.3: <em>"Family standing is a derived view built from events involving members. It is not stored."</em>
+        </p>
+        <pre># Dynamic derivation helper
+def compute_family_standing(
+    family_id: str,
+    settlement_id: str,
+    characters: Mapping[str, Character],
+    event_log: EventLog,
+) -> float:
+    # Computes prestige/standing of a family dynamically:
+    # + Positive events (ChiefChanged, HolySiteElevated, Books)
+    # - Negative events (Crimes, SuccessionCrises, Collapses)
+    standing = 50.0
+    ...
+    return max(0.0, min(100.0, standing))</pre>
+      </div>
+
+      <div class="card">
+        <h3>Dynastic Conflict Structure (FamilyFeud)</h3>
+        <p>
+          When an offence involves members of two prominent families, the feud escalates from individual grievance to family vendetta:
+        </p>
+        <pre>@dataclass
+class FamilyFeud:
+    id: int                       # Feud Event ID
+    instigator_family_id: str     # Aggrieved clan
+    target_family_id: str         # Accused clan
+    settlement_a: str             # Instigator site
+    settlement_b: str             # Target site
+    root_cause_event_id: int      # Slaying event
+    is_wrongful: bool             # Distorted belief
+    active: bool = True
+    generation: int = 1           # Grudge generation
+    active_avenger_ids: set[str]  # Kin seeking blood</pre>
+      </div>
+    </div>
+
+    <h2>10. Multi-Generational Grudge Transmission Engine</h2>
+    <p>
+      How grudges outlive their original instigators across simulated decades:
+    </p>
+    <div class="grid-2">
+      <div class="card">
+        <h3>1. Transmission at Adulthood or Parent Death</h3>
+        <p>
+          When a child reaches adulthood (age 16) or when a parent dies holding an active hatred grudge:
+        </p>
+        <ul>
+          <li>The child receives an inherited belief with <code>source=TOLD</code> (told by father/mother).</li>
+          <li>Confidence is attenuated: ChildConfidence = ParentConfidence &times; 0.70.</li>
+          <li>Hatred memory is formed with reduced initial intensity: ChildHatred = ParentHatred &times; 0.60.</li>
+          <li>Decay rate is doubled (2x) so inherited grudges fade unless reinforced by fresh conflict.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>2. Kin Revenge Execution</h3>
+        <p>
+          In Milestone 0.5, only the single instigator could kill. In Milestone 1, any eligible adult kin in Degree 1 (son, daughter, brother, father) can execute vengeance:
+        </p>
+        <ul>
+          <li><strong>Avenger Selection:</strong> When revenge tick fires, the system checks living kin holding hatred &ge; 40.0.</li>
+          <li><strong>Priority:</strong> Eldest adult son &rarr; brother &rarr; father &rarr; spouse.</li>
+          <li><strong>Causal Chain:</strong> Revenge killing cites both the original murder event AND the parent feud event.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Emergent Multi-Generational Narrative Sequence</h3>
+      <pre>
+Year 12: Corin Blackwood accidentally kills Rowan Ironwood during a hunting accident.
+Year 12: Rowan's wife Eleni grieves; Rowan's 14-year-old son Gareth forms Anger (90.0) believing it was murder.
+Year 14: Gareth reaches adulthood, declares a Blood Feud against Corin Blackwood.
+Year 19: Gareth attempts revenge but is killed by Corin in self-defense.
+Year 19: Gareth's younger brother Torin inherits the grudge (attenuated hatred: 54.0, generation: 2).
+Year 31: Torin assassinates Corin Blackwood's son Lucan in revenge.
+Year 31: The vendetta has now spanned TWO GENERATIONS and outlived both original participants!
+      </pre>
+    </div>
+  </div>
+  <div class="footer">
+    <span>Project Minemesis &bull; Milestone 1 Technical Charter &bull; Version 1.0</span>
+    <span>Page 5 of 8</span>
+  </div>
+</div>
+
+<!-- PAGE 6: SUBSYSTEM 4 - BELIEF CORRECTION PROPAGATION -->
+<div class="page">
+  <div>
+    <div class="header">
+      <div class="header-left">PROJECT MINEMESIS &bull; ARCHITECTURAL BLUEPRINT</div>
+      <div class="header-right">SUBSYSTEM 4: TRUTH PROPAGATION</div>
+    </div>
+
+    <h2>11. Subsystem 4: Epistemic Belief-Correction Propagation</h2>
+    <p class="lead">
+      Establishes a rigorous, bidirectional truth-discovery and reconciliation pipeline. When proof of innocence emerges, corrections cascade through familial networks, enabling authentic peace treaties.
+    </p>
+
+    <div class="card">
+      <h3>The End-to-End Belief Correction Pipeline</h3>
+      <pre>
+  [ TRUTH DISCOVERED ] ──> Witness testimony, physical evidence, or confession emits REVELATION event
+           │
+           ▼
+[ INSTIGATOR RE-APPRAISAL ] ──> Belief updated (supersedes_belief_id set); Accidental intent recognized
+           │                    Emotional Re-Appraisal: REGRET (60-90) &amp; RELIEF (70-100) formed
+           ▼
+[ FAMILY CASCADE ] ───────────> Instigator shares truth with Degree 1 kin via priority TOLD beliefs
+           │                    Kin receive corrective belief; re-appraisal begins
+           ▼
+[ ASYMMETRIC RE-APPRAISAL ] ──> Sibling with Forgiveness=0.8 accepts truth in 2 ticks
+           │                    Brother with Suspicion=0.9 doubts rumor; requires 12 ticks
+           ▼
+[ RECONCILIATION &amp; PEACE ] ───> Inter-family Hatred drops below 15.0; PEACE treaty ratified
+      </pre>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>1. Family Truth Transmission Algorithm</h3>
+        <p>
+          When an individual's belief is superseded by a <code>REVELATION</code> event:
+        </p>
+        <ol>
+          <li>The character flags their old belief with <code>supersedes_belief_id</code>.</li>
+          <li>Forms personal <code>REGRET</code>, <code>RELIEF</code>, and <code>RESPECT</code> memories.</li>
+          <li><strong>Immediate Family Broadcast:</strong> Queues priority communication ticks to all living Degree 1 kin (spouse, children, siblings, parents).</li>
+          <li>Kin receive a new Belief with <code>source=TOLD</code>, <code>source_character_id=instigator.id</code>, citing the <code>REVELATION</code> event.</li>
+        </ol>
+      </div>
+
+      <div class="card">
+        <h3>2. Observer-Specific Re-Appraisal Speeds</h3>
+        <p>
+          Family members do not reconcile in lockstep. Cognitive traits determine how fast they abandon hatred:
+        </p>
+        <ul>
+          <li><strong>High Forgiveness (&ge; 0.7):</strong> Immediately re-appraises; forms high <code>RELIEF</code> and zero hatred within 1&ndash;2 months.</li>
+          <li><strong>Average Citizen (0.4 &ndash; 0.6):</strong> Fades hatred over 6&ndash;12 months as confidence in the correction strengthens.</li>
+          <li><strong>High Suspicion (&ge; 0.7):</strong> Suspects the confession is a trick or bribe; retains skepticism for up to 24 months until verified by secondary witnesses.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>12. Peace Treaty Mechanics &amp; Grievance Closure</h2>
+    <p>
+      In Milestone 1, a peace treaty is not merely a random roll when a feud timer expires. It requires verified social consensus:
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>Peace Pathway</th>
+          <th>Prerequisite Epistemic Condition</th>
+          <th>Causal DAG Edge Signature</th>
+          <th>Resulting Dynastic State</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Truth Revelation Peace</strong></td>
+          <td>Corrective belief accepted by &ge; 75% of living Degree 1 family members; hatred &lt; 15.0.</td>
+          <td><code>Peace.causes = [Revelation.id, Feud.id]</code></td>
+          <td>Wrongful feud expunged; mutual trust restored; trade routes reopen.</td>
+        </tr>
+        <tr>
+          <td><strong>Negotiated Exhaustion Peace</strong></td>
+          <td>Resource exhaustion, famine, or casualties exceed tolerance; both chiefs agree to truce.</td>
+          <td><code>Peace.causes = [Feud.id, Raid.id, Famine.id]</code></td>
+          <td>Cold peace; underlying grievance remains unresolved; trade resumed under caution.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-green">
+      <strong>Epistemic Invariant:</strong><br>
+      Once a grievance is closed via a <code>PEACE</code> event citing <code>REVELATION</code>, that specific historical death event can <strong>never again trigger a blood feud</strong> across any descendants.
+    </div>
+  </div>
+  <div class="footer">
+    <span>Project Minemesis &bull; Milestone 1 Technical Charter &bull; Version 1.0</span>
+    <span>Page 6 of 8</span>
+  </div>
+</div>
+
+<!-- PAGE 7: TEST SUITE & VALIDATION INVARIANTS -->
+<div class="page">
+  <div>
+    <div class="header">
+      <div class="header-left">PROJECT MINEMESIS &bull; ARCHITECTURAL BLUEPRINT</div>
+      <div class="header-right">TEST SUITE &amp; VERIFICATION GATES</div>
+    </div>
+
+    <h2>13. Dedicated Milestone 1 Automated Test Suite</h2>
+    <p class="lead">
+      8 rigorous automated test suites enforcing all mathematical, psychological, genealogical, and causal grammar invariants of Milestone 1.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Test Name</th>
+          <th>Target File</th>
+          <th>Assertion / Invariant Verified</th>
+          <th>Failure Condition</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>test_kin_degree_classification</code></td>
+          <td><code>test_kinship.py</code></td>
+          <td>Parent/child/sibling/spouse = 1; grandparent/grandchild/uncle/aunt/nephew/niece/cousin/in-law = 2; unrelated = 99.</td>
+          <td>Incorrect degree assignment on synthetic tree</td>
+        </tr>
+        <tr>
+          <td><code>test_reaction_fanout_cap</code></td>
+          <td><code>test_reaction_fanout.py</code></td>
+          <td>Single death event never triggers more than 10 individual belief allocations; village shares 1 aggregate belief.</td>
+          <td>Reaction count &gt; 10 or belief explosion</td>
+        </tr>
+        <tr>
+          <td><code>test_role_specific_emotions</code></td>
+          <td><code>test_reaction_fanout.py</code></td>
+          <td>Spouse forms Grief (&ge; 80); Child forms Anger (&ge; 75); Sibling forms Hatred; Rival forms Relief.</td>
+          <td>Uniform or inverted emotional reactions</td>
+        </tr>
+        <tr>
+          <td><code>test_family_feud_escalation</code></td>
+          <td><code>test_family_feuds.py</code></td>
+          <td>Inter-family murder escalates to <code>FamilyFeud</code> with clan members acquiring attenuated <code>TOLD</code> beliefs.</td>
+          <td>Feud remains strictly individual</td>
+        </tr>
+        <tr>
+          <td><code>test_kin_revenge_execution</code></td>
+          <td><code>test_kin_revenge.py</code></td>
+          <td>Adult son or brother executes revenge killing when father is slain, citing both murder and feud.</td>
+          <td>Revenge executed only by instigator</td>
+        </tr>
+        <tr>
+          <td><code>test_multigen_grudge_survival</code></td>
+          <td><code>test_multigen_grudges.py</code></td>
+          <td>Grudge persists into Generation 2 after original instigator's death; child executes revenge 15+ years later.</td>
+          <td>Feud terminates upon instigator death</td>
+        </tr>
+        <tr>
+          <td><code>test_belief_correction_cascade</code></td>
+          <td><code>test_belief_correction.py</code></td>
+          <td>Truth revelation updates instigator, cascades to Degree 1 kin, triggers re-appraisal, and enables Peace.</td>
+          <td>Kin retain false belief after revelation</td>
+        </tr>
+        <tr>
+          <td><code>test_milestone1_determinism</code></td>
+          <td><code>test_determinism.py</code></td>
+          <td>Two simulations run with same <code>SeedPair</code> produce byte-identical EventLogs across separate processes.</td>
+          <td>Any event ID, tick, or hash mismatch</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>14. Batch Analytics Additions (50-Seed &amp; 100-Seed Cohorts)</h2>
+    <p>
+      The validation runner (<code>scripts/run_m053_validation.py</code> / <code>analytics.py</code>) will be upgraded to compute and track four new canonical metrics:
+    </p>
+    <div class="grid-2">
+      <div class="card">
+        <h3>New Dynastic Metrics Tracked</h3>
+        <ul>
+          <li><strong>Reactions Per Death (Distribution):</strong> Mean, median, and max individual reactions per death event (target: median 3.0 &ndash; 6.0, max &le; 10).</li>
+          <li><strong>Family Feuds Count:</strong> Number of feuds that successfully escalated to clan/family level.</li>
+          <li><strong>Multi-Generation Grudges Count:</strong> Number of feuds surviving past the death of Generation 1 participants.</li>
+          <li><strong>Kin Revenge Share:</strong> Percentage of revenge killings executed by kin (sons, brothers) vs original instigators.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Regression &amp; Safety Gates</h3>
+        <ul>
+          <li><strong>Demographic Conservation:</strong> Living population must strictly equal Initial + Births - Deaths (Discrepancy = 0).</li>
+          <li><strong>Zero Dead Actors:</strong> Invariant check asserting no dead actor ever initiates marriages, feuds, or revenge.</li>
+          <li><strong>RAM Ceiling:</strong> Peak working set must remain &le; 3.5 GB across 100-year runs due to aggregate village belief pruning.</li>
+          <li><strong>Execution Budget:</strong> 100-year simulation of 24 settlements must run in under 3 minutes per pair.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout callout-amber">
+      <strong>Standing Rule Enforcement:</strong><br>
+      At the conclusion of Milestone 1, the Windows Story Viewer executable (<code>releases/MinemesisViewer-latest.exe</code> and <code>releases/MinemesisViewer-m1.0.exe</code>) must be re-compiled, verified via <code>--selftest</code>, and accompanied by <code>RELEASE_NOTES_m1.0.md</code>.
+    </div>
+  </div>
+  <div class="footer">
+    <span>Project Minemesis &bull; Milestone 1 Technical Charter &bull; Version 1.0</span>
+    <span>Page 7 of 8</span>
+  </div>
+</div>
+
+<!-- PAGE 8: ROADMAP & APPROVAL GATE -->
+<div class="page">
+  <div>
+    <div class="header">
+      <div class="header-left">PROJECT MINEMESIS &bull; ARCHITECTURAL BLUEPRINT</div>
+      <div class="header-right">IMPLEMENTATION SCHEDULE &amp; APPROVAL GATE</div>
+    </div>
+
+    <h2>15. Step-by-Step Implementation Roadmap</h2>
+    <p class="lead">
+      Sequential, modular execution schedule designed to preserve test integrity, maintain determinism, and prevent regressions at every stage.
+    </p>
+
+    <div class="card">
+      <h3>Phase Breakdown &amp; Execution Order</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Phase</th>
+            <th>Task Description</th>
+            <th>Primary Deliverables</th>
+            <th>Exit Criteria</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Phase 1</strong></td>
+            <td><strong>Kinship Graph Core Module</strong></td>
+            <td><code>minemesis/core/kinship.py</code> with <code>kin_degree</code> and <code>get_kin_relation</code>.</td>
+            <td><code>test_kin_degree.py</code> passes 100%.</td>
+          </tr>
+          <tr>
+            <td><strong>Phase 2</strong></td>
+            <td><strong>Reaction Fan-Out &amp; Aggregate Beliefs</strong></td>
+            <td>Refactor <code>perception.py</code> and <code>memory_system.py</code> for Degree 1&ndash;2 kin and village aggregate.</td>
+            <td><code>test_reaction_fanout.py</code> passes; RAM drops by &gt; 50%.</td>
+          </tr>
+          <tr>
+            <td><strong>Phase 3</strong></td>
+            <td><strong>Dynastic Feuds &amp; Kin Revenge</strong></td>
+            <td>Implement <code>FamilyFeud</code>, kin revenge executor, and multi-gen inheritance in <code>conflict.py</code>.</td>
+            <td><code>test_family_feuds.py</code> and <code>test_kin_revenge.py</code> pass.</td>
+          </tr>
+          <tr>
+            <td><strong>Phase 4</strong></td>
+            <td><strong>Epistemic Correction Propagation</strong></td>
+            <td>Build truth-cascade pipeline via <code>gossip.py</code> and asymmetric re-appraisal in <code>conflict.py</code>.</td>
+            <td><code>test_belief_correction.py</code> passes end-to-end.</td>
+          </tr>
+          <tr>
+            <td><strong>Phase 5</strong></td>
+            <td><strong>Batch Verification &amp; Metric Audit</strong></td>
+            <td>Upgrade <code>analytics.py</code>; run 50-seed validation; verify demographic conservation.</td>
+            <td>All 18+ test suites pass; 0 demographic leaks.</td>
+          </tr>
+          <tr>
+            <td><strong>Phase 6</strong></td>
+            <td><strong>Story Viewer Packaging (Standing Rule)</strong></td>
+            <td>Add Kinship/Dynasty tree view to GUI; rebuild <code>MinemesisViewer-latest.exe</code>; write release notes.</td>
+            <td>Viewer self-test passes; binary packaged in <code>releases/</code>.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>16. Formal Approval Gate</h2>
+    <p>
+      In strict compliance with the user's instructions: <strong>All code implementation is currently paused.</strong>
+      The technical blueprint above is submitted for operator review and feedback.
+    </p>
+
+    <div class="card" style="background: #f0fdf4; border: 1.5px solid #22c55e;">
+      <h3 style="color: #15803d; margin-top: 0;">Items Submitted for User Review &amp; Sign-Off</h3>
+      <ol style="margin-bottom: 0;">
+        <li><strong>Kinship Scope Approval:</strong> Confirm that limiting individual reaction fan-out to <strong>Degree 1 and Degree 2 kin</strong> (while giving background villagers a single aggregate belief) aligns with design vision.</li>
+        <li><strong>Multi-Gen Grudge Attenuation:</strong> Confirm the planned 30% confidence drop and 40% hatred attenuation per generation transition.</li>
+        <li><strong>Kin Revenge Priority:</strong> Confirm the avenger priority order: Adult Son &rarr; Brother &rarr; Father &rarr; Spouse.</li>
+        <li><strong>Standing Rule Protocol:</strong> Confirm the plan to rebuild and test the Windows Story Viewer binary upon milestone completion.</li>
+      </ol>
+    </div>
+
+    <div style="text-align: center; margin-top: 15px; padding: 10px; background: #f8fafc; border: 1px dashed #94a3b8; border-radius: 4px;">
+      <p style="font-weight: 700; color: #0369a1; margin: 0 0 2px 0;">PROJECT MINEMESIS &bull; ADVANCED AGENTIC HISTORICAL SIMULATION</p>
+      <p style="font-size: 7.0pt; color: #64748b; margin: 0;">Awaiting operator authorization to begin Phase 1 implementation.</p>
+    </div>
+  </div>
+  <div class="footer">
+    <span>Project Minemesis &bull; Milestone 1 Technical Charter &bull; Version 1.0</span>
+    <span>Page 8 of 8</span>
+  </div>
+</div>
+
+</body>
+</html>
