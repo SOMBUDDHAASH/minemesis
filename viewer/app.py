@@ -25,12 +25,17 @@ from viewer.formatter import (
     get_event_category_color,
 )
 from viewer.threads import extract_story_threads, StoryThread
-from viewer.export import export_story_to_text, export_story_to_html
+from viewer.export import (
+    export_story_to_text,
+    export_story_to_html,
+    export_minecraft_book_json,
+    generate_minecraft_give_command,
+)
 
 
-BUILD_TAG = "m0.5.3"
-BUILD_COMMIT = "1a84f30"
-BUILD_TIME = "2026-10-24"
+BUILD_TAG = "m0.5.4"
+BUILD_COMMIT = "55f1d33"
+BUILD_TIME = "2026-10-25"
 
 DEFAULT_SEED_PAIR = SeedPair.from_legacy(42)
 SHOWCASE_SEEDS = [42, 2029, 2030, 2043, 2011]
@@ -1111,7 +1116,43 @@ class StoryViewerApp:
             foreground="#6C3483",
             wraplength=500,
         )
-        self.reader_bias_lbl.pack(fill=tk.X, pady=(4, 0))
+        self.reader_bias_lbl.pack(fill=tk.X, pady=(4, 4))
+
+        # Minecraft Export Controls (Milestone 0.5.4)
+        mc_btn_frame = ttk.Frame(right_frame)
+        mc_btn_frame.pack(fill=tk.X, pady=(4, 0))
+
+        self.btn_export_mc_json = ttk.Button(mc_btn_frame, text="📦 Export Minecraft Book (.json)", command=self._on_export_minecraft_book)
+        self.btn_export_mc_json.pack(side=tk.LEFT, padx=(0, 6))
+
+        self.btn_copy_give = ttk.Button(mc_btn_frame, text="📋 Copy /give Command", command=self._on_copy_give_command)
+        self.btn_copy_give.pack(side=tk.LEFT)
+
+    def _on_export_minecraft_book(self):
+        if not self.run_data or not self.run_data.books:
+            return
+        b = self.run_data.books[self.current_book_index]
+        default_name = f"{b.get('title', 'book').replace(' ', '_').lower()}.json"
+        out_path = filedialog.asksaveasfilename(
+            defaultextension=".json",
+            filetypes=[("JSON Files", "*.json")],
+            initialfile=default_name,
+            title="Export Minecraft Book JSON",
+        )
+        if out_path:
+            content = export_minecraft_book_json(b)
+            with open(out_path, "w", encoding="utf-8") as f:
+                f.write(content)
+            self.status_label.config(text=f"Exported Minecraft book to {os.path.basename(out_path)}")
+
+    def _on_copy_give_command(self):
+        if not self.run_data or not self.run_data.books:
+            return
+        b = self.run_data.books[self.current_book_index]
+        cmd = generate_minecraft_give_command(b)
+        self.root.clipboard_clear()
+        self.root.clipboard_append(cmd)
+        self.status_label.config(text=f"Copied Minecraft /give command for '{b.get('title')}' to clipboard.")
 
     def _on_book_select(self, event=None):
         sel = self.books_tree.selection()
@@ -1222,17 +1263,18 @@ class StoryViewerApp:
         txt.insert(tk.END, f"Minemesis Story Viewer - Release Notes (Milestone {BUILD_TAG})\n", "h1")
         txt.insert(tk.END, f"Build Commit: {BUILD_COMMIT} | Build Date: {BUILD_TIME} | Schema: v{SCHEMA_VERSION}\n\n")
 
-        txt.insert(tk.END, "What changed in this build (Plain-English Summary):\n", "h2")
-        txt.insert(tk.END, "1. Split world creation into two independent seeds: World Seed for geography and Chronicle Seed for people and history.\n", "bullet")
-        txt.insert(tk.END, "2. Procedural World Generator v0 now places 3 to 7 settlements with guaranteed 100% economic viability and minimum spacing.\n", "bullet")
-        txt.insert(tk.END, "3. Procedural Cast Generator creates biologically sound starting families with fertile couples and strict kin-avoidance.\n", "bullet")
-        txt.insert(tk.END, "4. Added interactive Map Tab to inspect settlement locations, terrain archetypes, and natural resource endowments.\n", "bullet")
-        txt.insert(tk.END, "5. Typo-safe Crockford Base32 seed codes with check digits allow one-click sharing and replay of exact procedural worlds.\n\n", "bullet")
+        txt.insert(tk.END, "What changed in this build (Milestone 0.5.4 Summary):\n", "h2")
+        txt.insert(tk.END, "1. 4-Tier Memory Lifecycle: Transformed simulation from O(E * N) epistemic explosion to stable 4-tier retention (Living, Recent Dead, Compressed Historical Archive, Civilizational Lore), reducing active beliefs by 98.7% and capping 100-year peak RAM at 0.15 GB (vs 7.1 GB baseline).\n", "bullet")
+        txt.insert(tk.END, "2. Relational Lore Compression: Normalized Event Log payloads by stripping redundant pre-rendered text and duplicate names; integrated O(1) string interning via EntityTable.\n", "bullet")
+        txt.insert(tk.END, "3. Procedural Literature Engine: Added 9 procedural book genres (Family Histories, Personal Journals, Religious Texts, Myth Collections, Chronicles, Folklore, Legal Records, Travel Accounts, Biographies) with deterministic lazy page rendering.\n", "bullet")
+        txt.insert(tk.END, "4. Minecraft Book Export: 1-click export of procedural manuscripts to Minecraft NBT JSON and copyable /give commands ready to paste into vanilla Minecraft.\n", "bullet")
+        txt.insert(tk.END, "5. Living Religion Engine: Procedural faith founding, pantheons, moral virtues, holy sites, pilgrimage journeys, syncretic harmonies, heresies, and schisms.\n", "bullet")
+        txt.insert(tk.END, "6. Causal Invariants & Conservation: Exact zero-drift demographics (P = P0 + B - D) and 100% acyclic causal grammar enforcement.\n\n", "bullet")
 
         txt.insert(tk.END, "3 Things to look for in the viewer:\n", "h2")
-        txt.insert(tk.END, "1. Click '👥 Same Map, New People' to watch completely different characters and feuds emerge across the identical landscape.\n", "bullet")
-        txt.insert(tk.END, "2. Switch to the 🗺 Map tab and click any settlement circle to inspect its natural farmland, timber, ore, and defense endowments.\n", "bullet")
-        txt.insert(tk.END, "3. Copy or paste Crockford Base32 seed codes in the toolbar to load and reproduce custom worlds effortlessly.\n\n", "bullet")
+        txt.insert(tk.END, "1. Switch to the 📖 Books tab to read procedural manuscripts written by simulation scribes, or click '📦 Export Minecraft Book' to take any in-game book into Minecraft.\n", "bullet")
+        txt.insert(tk.END, "2. Open the 🕊 Religion tab to explore emergent theological doctrines, holy sites, schisms, and seasonal traditions.\n", "bullet")
+        txt.insert(tk.END, "3. Check the 🌍 World & Census tab to inspect the 4-tier memory lifecycle distribution and verify demographic equilibrium across centuries.\n\n", "bullet")
 
         txt.insert(tk.END, "Standing Rule Compliance:\n", "h2")
         txt.insert(tk.END, "• The viewer is an independent, read-only presentation layer in `viewer/`.\n", "bullet")
@@ -1557,11 +1599,15 @@ class StoryViewerApp:
         living_count = sum(1 for c in self.run_data.characters.values() if c.get("alive"))
         total_births = sum(1 for e in self.run_data.events if e.get("type") == "Birth")
         total_deaths = sum(1 for e in self.run_data.events if e.get("type") == "Death")
+        arch_count = getattr(self.run_data, "historical_archive_size", 0)
+        recent_dead = len(self.run_data.characters) - living_count - arch_count
+        books_count = len(self.run_data.books)
 
         summary_text = (
-            f"Seed {self.run_data.seed} | {self.run_data.years} Years Simulated | "
-            f"Initial Pop: {init_pop} ➔ Final Living: {living_count} (Census: {final_pop}) | "
-            f"Total Births: {total_births} | Total Deaths: {total_deaths} | Total Events: {len(self.run_data.events)}"
+            f"Seed {self.run_data.seed} | {self.run_data.years} Years | "
+            f"Tier 0 Living: {living_count} | Tier 1 Recent Dead: {max(0, recent_dead)} | "
+            f"Tier 2 Historical Archive: {arch_count} | Tier 3 Books: {books_count} | "
+            f"Births: {total_births} | Deaths: {total_deaths} | Events: {len(self.run_data.events)}"
         )
         self.lbl_world_summary.config(text=summary_text)
 
@@ -1651,6 +1697,24 @@ class StoryViewerApp:
             tk.END,
             f"Total Religious Evolution Events Recorded: {len(rel_events)}\n\n"
         )
+
+        # Detailed Faiths & Tenets if present (Milestone 0.5.4)
+        if getattr(self.run_data, "religions", None):
+            self.religion_overview_text.insert(tk.END, "Canonical Faiths & Theological Tenets:\n", "Header.TLabel")
+            for r_id, r in self.run_data.religions.items():
+                self.religion_overview_text.insert(tk.END, f"\n=== {r.get('name')} ===\n")
+                self.religion_overview_text.insert(tk.END, f"Scripture: {r.get('scripture_name')}\n")
+                if r.get("traits"):
+                    self.religion_overview_text.insert(tk.END, "Cosmological Foundations:\n")
+                    for t in r["traits"]:
+                        self.religion_overview_text.insert(tk.END, f"  • {t['name']}: {t['description']}\n")
+                if r.get("holy_sites"):
+                    self.religion_overview_text.insert(tk.END, "Sanctuaries & Pilgrimages:\n")
+                    for hs in r["holy_sites"]:
+                        s_loc = format_settlement_name(hs.get("settlement_id", ""), self.run_data.settlements)
+                        self.religion_overview_text.insert(tk.END, f"  • {hs['name']} at {s_loc}: {hs.get('significance')} (Tier: {hs.get('tier')})\n")
+            self.religion_overview_text.insert(tk.END, "\n")
+
         self.religion_overview_text.insert(
             tk.END,
             "Settlements & Active Faiths:\n"

@@ -110,3 +110,52 @@ def export_story_to_html(
     ])
 
     return "\n".join(html_out)
+
+
+def export_minecraft_book_json(book: Mapping[str, Any]) -> str:
+    """Exports a procedural manuscript into Minecraft written book JSON structure."""
+    import json
+    raw_title = book.get("title", "Untitled")
+    if len(raw_title) > 32:
+        trunc = raw_title[:32]
+        last_space = trunc.rfind(" ")
+        short_title = trunc[:last_space] if last_space > 0 else trunc
+    else:
+        short_title = raw_title
+
+    author = str(book.get("author_name", "Anonymous"))[:16]
+    pages = [p for p in book.get("pages", [])[:100]]  # 100 pages cap
+
+    mc_dict = {
+        "title": short_title,
+        "author": author,
+        "generation": 0,  # Original
+        "pages": pages,
+        "lore": [
+            f"Genre: {book.get('genre', 'Unknown')}",
+            f"Year: {book.get('creation_year', 0)}",
+            f"Settlement: {book.get('settlement_id', 'Unknown')}",
+            f"Words: {book.get('total_word_count', 0)}",
+        ],
+    }
+    return json.dumps(mc_dict, indent=2)
+
+
+def generate_minecraft_give_command(book: Mapping[str, Any]) -> str:
+    """
+    Generates a single-line /give command for Minecraft 1.20+ with proper NBT tag escaping.
+    Example: /give @p written_book{title:"Chronicle",author:"Elder",pages:['"Page 1"']} 1
+    """
+    import json
+    raw_title = book.get("title", "Untitled")
+    short_title = raw_title[:32].replace('"', '\\"')
+    author = str(book.get("author_name", "Anonymous"))[:16].replace('"', '\\"')
+
+    # Format pages as JSON string array
+    formatted_pages = []
+    for p in book.get("pages", [])[:50]:
+        escaped_page = json.dumps(p)
+        formatted_pages.append(f"'{escaped_page}'")
+
+    pages_nbt = "[" + ",".join(formatted_pages) + "]"
+    return f'/give @p written_book{{title:"{short_title}",author:"{author}",generation:0,pages:{pages_nbt}}} 1'

@@ -151,3 +151,36 @@ def test_negative_control_raw_id_detector():
     bad_sentence = "At set_ironwood, char_42 declared a blood feud against char_99."
     leaks = RAW_ID_REGEX.findall(bad_sentence)
     assert leaks == ["set_ironwood", "char_42", "char_99"], "Negative control failed: detector did not catch raw IDs"
+
+
+def test_minecraft_book_export_and_give_command():
+    """Validates Minecraft NBT JSON format and /give command synthesis."""
+    import json
+    from viewer.export import export_minecraft_book_json, generate_minecraft_give_command
+
+    book = {
+        "title": "The Great Annals of Ironwood",
+        "author_name": "Alden Thorne",
+        "genre": "HistoricalChronicle",
+        "creation_year": 24,
+        "settlement_id": "set_ironwood",
+        "total_word_count": 280,
+        "pages": [
+            "# Annals of Ironwood\nRecorded in Year 24.",
+            "Chapter 2: The Harvest\nGranaries were filled.",
+        ],
+    }
+
+    mc_json = export_minecraft_book_json(book)
+    parsed = json.loads(mc_json)
+    assert parsed["title"] == "The Great Annals of Ironwood"
+    assert parsed["author"] == "Alden Thorne"
+    assert parsed["generation"] == 0
+    assert len(parsed["pages"]) == 2
+    assert "HistoricalChronicle" in parsed["lore"][0]
+
+    cmd = generate_minecraft_give_command(book)
+    assert cmd.startswith("/give @p written_book{")
+    assert 'title:"The Great Annals of Ironwood"' in cmd
+    assert 'author:"Alden Thorne"' in cmd
+    assert "Annals of Ironwood" in cmd

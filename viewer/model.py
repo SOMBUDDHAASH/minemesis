@@ -102,6 +102,11 @@ class RunData:
     pair_code: str = ""
     world_spec: dict[str, Any] = field(default_factory=dict)
     generator_version: str = "v0"
+    religions: dict[str, dict[str, Any]] = field(default_factory=dict)
+    cultural_profiles: dict[str, dict[str, Any]] = field(default_factory=dict)
+    historical_archive_size: int = 0
+    active_beliefs_count: int = 0
+    compacted_beliefs_count: int = 0
 
     def get_event_log_proxy(self) -> EventLogProxy:
         proxies = []
@@ -133,6 +138,11 @@ class RunData:
             "pair_code": self.pair_code,
             "world_spec": self.world_spec,
             "generator_version": self.generator_version,
+            "religions": self.religions,
+            "cultural_profiles": self.cultural_profiles,
+            "historical_archive_size": self.historical_archive_size,
+            "active_beliefs_count": self.active_beliefs_count,
+            "compacted_beliefs_count": self.compacted_beliefs_count,
             "years": self.years,
             "toggles": self.toggles,
             "events": self.events,
@@ -170,6 +180,11 @@ class RunData:
             pair_code=data.get("pair_code", ""),
             world_spec=data.get("world_spec", {}),
             generator_version=data.get("generator_version", "v0"),
+            religions=data.get("religions", {}),
+            cultural_profiles=data.get("cultural_profiles", {}),
+            historical_archive_size=int(data.get("historical_archive_size", 0)),
+            active_beliefs_count=int(data.get("active_beliefs_count", 0)),
+            compacted_beliefs_count=int(data.get("compacted_beliefs_count", 0)),
         )
 
     @classmethod
@@ -189,7 +204,7 @@ class RunData:
         # 1. Events
         ev_dicts = [e.to_dict() for e in sim.event_log.all_events()]
 
-        # 2. Characters
+        # 2. Characters (Tier 0 Living + Tier 1 Recent Dead)
         char_dicts = {}
         for c_id, c in sim.characters.items():
             char_dicts[c_id] = {
@@ -210,6 +225,31 @@ class RunData:
                 "suspicion": c.suspicion,
                 "forgiveness": c.forgiveness,
             }
+
+        # 2b. Historical Citizens (Tier 2 compacted archive)
+        if hasattr(sim, "historical_archive"):
+            for c_id, arch in sim.historical_archive.items():
+                if c_id not in char_dicts:
+                    char_dicts[c_id] = {
+                        "id": arch.id,
+                        "first_name": arch.first_name,
+                        "last_name": arch.last_name,
+                        "full_name": arch.full_name,
+                        "settlement_id": arch.settlement_id,
+                        "age_ticks": arch.age_years * 12,
+                        "age_years": arch.age_years,
+                        "sex": arch.sex,
+                        "alive": False,
+                        "death_tick": arch.death_tick,
+                        "spouse_id": arch.spouse_id,
+                        "father_id": arch.father_id,
+                        "mother_id": arch.mother_id,
+                        "children_ids": list(arch.children_ids),
+                        "suspicion": 0.5,
+                        "forgiveness": 0.5,
+                        "is_historical_archive": True,
+                        "notable_role": arch.notable_role,
+                    }
 
         # 3. Settlements
         settle_dicts = {}
@@ -288,6 +328,50 @@ class RunData:
             "lore": bool(sim.lore_engine and sim.lore_engine.enabled),
         }
 
+        # 8. Religions & Cultural Profiles
+        religion_dicts = {}
+        cultural_dicts = {}
+        if getattr(sim, "religion_engine", None) and sim.religion_engine.enabled:
+            for r_id, r in getattr(sim.religion_engine, "religions", {}).items():
+                sites = []
+                for s in getattr(r, "holy_sites", []):
+                    sites.append({
+                        "id": s.id,
+                        "name": s.name,
+                        "settlement_id": s.settlement_id,
+                        "significance": s.significance,
+                        "tier": s.tier.value if hasattr(s.tier, "value") else str(s.tier),
+                    })
+                traits = []
+                for t_id, t in getattr(r, "traits", {}).items():
+                    traits.append({
+                        "id": t_id,
+                        "name": getattr(t, "name", t_id),
+                        "description": getattr(t, "description", ""),
+                    })
+                religion_dicts[r_id] = {
+                    "id": r.id,
+                    "name": r.name,
+                    "scripture_name": getattr(r, "scripture_name", f"The Sacred Precepts of {r.name}"),
+                    "founder_name": getattr(r, "founder_name", "Ancient Elders"),
+                    "holy_sites": sites,
+                    "traits": traits,
+                }
+            for s_id, cp in getattr(sim.religion_engine, "cultural_profiles", {}).items():
+                cultural_dicts[s_id] = {
+                    "settlement_id": s_id,
+                    "primary_religion_id": getattr(cp, "primary_religion_id", None),
+                    "traditions": [
+                        {"name": t.name, "type": t.tradition_type.value if hasattr(t.tradition_type, "value") else str(t.tradition_type), "significance": t.significance}
+                        for t in getattr(cp, "folk_traditions", [])
+                    ]
+                }
+
+        # 9. 4-Tier Memory & Epistemic Statistics
+        historical_size = len(getattr(sim, "historical_archive", {}))
+        active_beliefs = sum(len(b) for b in sim.beliefs_by_character.values())
+        compacted_beliefs = getattr(sim, "compacted_beliefs_total", 0)
+
         # SeedPair and WorldSpec capture
         seed_pair_dict = {}
         pair_code = ""
@@ -318,4 +402,9 @@ class RunData:
             pair_code=pair_code,
             world_spec=world_spec_dict,
             generator_version=gen_ver,
+            religions=religion_dicts,
+            cultural_profiles=cultural_dicts,
+            historical_archive_size=historical_size,
+            active_beliefs_count=active_beliefs,
+            compacted_beliefs_count=compacted_beliefs,
         )
