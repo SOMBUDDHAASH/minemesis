@@ -94,5 +94,34 @@ python -m viewer
 
 ---
 
+## 8. Milestone T0: Continental Geography & Catchment Explorer (Minutes 11 - 12)
+1. Click the **Map** tab (Tab 2, right beside Home).
+2. The viewer renders the full **300x300 continent**:
+   - Distinct biome palette (Grasslands, Emerald Forests, Spruce Taiga, Murky Swamps, Golden Deserts, Slate Mountains, Snowy Peaks).
+   - Natural relief hillshading highlighting high elevations and mountain ridges.
+   - Downhill river network in bright azure blue flowing from highland headwaters to sea level.
+   - A* road network rendered as golden lines connecting settlements along minimal travel-cost paths.
+   - Settlement markers with circular badges and name labels.
+3. Interactive exploration:
+   - Click **[+] Zoom In** (up to 4x) to examine regional topography.
+   - Hover mouse across the terrain: notice the status bar updates in real time with coordinates `X:xxx Y:yyy`, Biome name, Elevation in meters, River flow rate, and Travel Cost index.
+   - Select a settlement from the dropdown or click its marker: the right Inspector displays its **12-Tile Catchment Breakdown** (Farmland %, Forest %, Ore Richness, Fish Potential, Stone Abundance, Defensibility Score).
+   - Enter a new **World Seed** (e.g. `100`, `777`, `2024`) and click **"Generate / View"** to explore entirely new continents generated in seconds!
+
+---
+
+## 9. Milestone T1: Voxel Translator Proof & Minecraft Java Exporter (Minute 13)
+1. In the **Map** tab's right inspector, select any settlement (e.g. `Deepwick` or `Riverford`).
+2. Click **"Export Settlement Region (400x400)"**:
+   - The engine translates the macro tile data into a 3D block-level voxel world (1 tile = 8x8 blocks).
+   - Generates bedrock (y=0..2), deepslate (y=3..16), stone, subterranean 3D cave hollows, ore veins (Coal, Iron, Gold), surface soil, procedural oak trees, and settlement structures.
+   - Exports directly to Minecraft Java Edition 1.20 / 1.21 Anvil format (`.mca`) and generates `level.dat`.
+   - The file is saved to `releases/exports/minecraft_region_<id>/region/r.0.0.mca`.
+3. Standalone Voxel Game Engine:
+   - Uses `translators.voxel.VoxelGameEngine` with 3D player movement, gravity, AABB collision against solid voxels, and 3D DDA raycasting.
+   - Player block placements/excavations are recorded as lightweight **Chunk Deltas** and evaluated by `ConstructionAnalyzer` to award settlement defensibility without spamming the event log.
+
+---
+
 ## Walkthrough Summary
-You have verified that all 6 milestones are integrated, fully functional, and running with unprecedented memory efficiency (~108 MB peak RSS).
+You have verified that all milestones (M1 to M6, T0, T1) are integrated, fully functional, and running with unprecedented memory efficiency (~108 MB peak RSS).
