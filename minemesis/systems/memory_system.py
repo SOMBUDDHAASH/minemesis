@@ -14,6 +14,15 @@ from minemesis.models.belief import Belief
 from minemesis.models.character import Character
 from minemesis.models.memory import Memory
 from minemesis.models.relationship import Relationship
+from minemesis.core.kinship import get_full_siblings, get_half_siblings, kin_degree, get_kin_relation
+
+
+class _DictStoreAdapter:
+    def __init__(self, chars: dict[str, Character]):
+        self.chars = chars
+
+    def get_person(self, person_id: str) -> Optional[Character]:
+        return self.chars.get(person_id)
 
 
 def form_memories_from_belief(
@@ -26,8 +35,10 @@ def form_memories_from_belief(
     """
     Evaluates a subjective belief from the perspective of the believer and generates emotional memories.
     If belief supersedes an earlier belief, forms re-appraisal memories scaled by prior_hatred.
+    Modulates intensity and decay by character traits (suspicion, forgiveness).
     """
-    believer = characters.get(belief.believer_id)
+    store = characters if hasattr(characters, "get_person") else _DictStoreAdapter(characters)
+    believer = store.get_person(belief.believer_id)
     if not believer or not believer.alive:
         return []
 
@@ -38,6 +49,10 @@ def form_memories_from_belief(
     b_intent = belief.believed_intent
     actor_id = belief.believed_actor
     target_id = belief.believed_target
+
+    # Personality modulation factors
+    susp = believer.suspicion
+    forg = believer.forgiveness
 
     # 1. Re-appraisal when an earlier false belief is superseded (Section 4.4)
     if belief.supersedes_belief_id is not None and b_intent == Intent.ACCIDENTAL:
@@ -52,7 +67,7 @@ def form_memories_from_belief(
                     target_entity_id=accused_id,
                     emotion=Emotion.REGRET,
                     initial_intensity=regret_intensity,
-                    decay_rate=0.005,
+                    decay_rate=0.005 * (1.0 + forg),
                     tick_formed=tick,
                     source_belief_id=belief.belief_id,
                 )
@@ -66,7 +81,7 @@ def form_memories_from_belief(
                     target_entity_id=accused_id,
                     emotion=Emotion.RELIEF,
                     initial_intensity=70.0,
-                    decay_rate=0.01,
+                    decay_rate=0.01 * (1.0 + forg),
                     tick_formed=tick,
                     source_belief_id=belief.belief_id,
                 )
@@ -80,7 +95,7 @@ def form_memories_from_belief(
                     target_entity_id=accused_id,
                     emotion=Emotion.RESPECT,
                     initial_intensity=45.0,
-                    decay_rate=0.008,
+                    decay_rate=0.008 * (1.0 + forg),
                     tick_formed=tick,
                     source_belief_id=belief.belief_id,
                 )
@@ -90,47 +105,162 @@ def form_memories_from_belief(
 
     # 2. Standard belief reactions
     if b_type == EventType.DEATH:
-        victim = characters.get(target_id) if target_id else None
-        
-        is_child = victim and victim.id in believer.children_ids
-        is_parent = victim and victim.id in (believer.father_id, believer.mother_id)
-        is_spouse = victim and victim.id == believer.spouse_id
-        v_fam = getattr(victim, "family_id", "") or (victim.last_name if victim else "")
-        b_fam = getattr(believer, "family_id", "") or believer.last_name
-        is_kin = is_child or is_parent or is_spouse or (bool(v_fam) and v_fam == b_fam)
+        victim = store.get_person(target_id) if target_id else None
 
-        if is_kin:
+        # Check Rival reaction: relief on death of rival
+        if prior_hatred >= 40.0:
             memories.append(
                 Memory(
                     id=mem_id,
                     observer_id=believer.id,
                     belief_event_ref=belief.event_ref,
                     target_entity_id=target_id,
-                    emotion=Emotion.GRIEF,
-                    initial_intensity=90.0,
-                    decay_rate=0.005,
+                    emotion=Emotion.RELIEF,
+                    initial_intensity=65.0,
+                    decay_rate=0.01 * (1.0 + forg),
                     tick_formed=tick,
                     source_belief_id=belief.belief_id,
                 )
             )
             mem_id += 1
 
-            if b_intent == Intent.INTENTIONAL and actor_id and actor_id != believer.id:
+        if victim:
+            # Kinship evaluation
+            rel_label = get_kin_relation(store, believer.id, victim.id)
+            deg = kin_degree(store, believer.id, victim.id)
+
+            is_spouse = (rel_label == "Spouse")
+            is_child = (rel_label == "Parent")  # believer is child of victim
+            is_parent = (rel_label == "Child")  # believer is parent of victim
+            is_sibling = (rel_label in ("Sibling", "Half-Sibling"))
+            v_fam = getattr(victim, "family_id", "") or victim.last_name
+            b_fam = getattr(believer, "family_id", "") or believer.last_name
+            same_clan = bool(v_fam) and (v_fam == b_fam)
+
+            # A. Grief memory formation
+            grief_intensity = 0.0
+            grief_decay = 0.005 * (1.0 + forg)
+
+            if is_spouse:
+                grief_intensity = 95.0
+                grief_decay = 0.004 * (1.0 + forg * 0.8)
+            elif is_child or is_parent:
+                grief_intensity = 90.0
+                grief_decay = 0.005 * (1.0 + forg)
+            elif is_sibling:
+                grief_intensity = 85.0
+                grief_decay = 0.006 * (1.0 + forg)
+            elif deg == 2:
+                grief_intensity = 60.0
+                grief_decay = 0.008 * (1.0 + forg)
+            elif same_clan:
+                grief_intensity = 40.0
+                grief_decay = 0.010 * (1.0 + forg)
+
+            if grief_intensity > 0.0:
                 memories.append(
                     Memory(
                         id=mem_id,
                         observer_id=believer.id,
                         belief_event_ref=belief.event_ref,
-                        target_entity_id=actor_id,
-                        emotion=Emotion.HATRED,
-                        initial_intensity=95.0,
-                        decay_rate=0.003,
+                        target_entity_id=target_id,
+                        emotion=Emotion.GRIEF,
+                        initial_intensity=grief_intensity,
+                        decay_rate=grief_decay,
                         tick_formed=tick,
                         source_belief_id=belief.belief_id,
                     )
                 )
                 mem_id += 1
-            elif b_intent == Intent.ACCIDENTAL and actor_id and actor_id != believer.id:
+
+            # B. Grievance memory towards killer (intentional death)
+            if b_intent in (Intent.INTENTIONAL, Intent.MILITARY_ACTION) and actor_id and actor_id != believer.id:
+                decay_mod = max(0.001, 0.003 * (1.0 + forg - susp * 0.4))
+
+                if is_child:
+                    # Child: anger (intensity 90.0 towards actor) and hatred
+                    anger_int = min(100.0, 90.0 * (0.8 + 0.4 * susp))
+                    memories.append(
+                        Memory(
+                            id=mem_id,
+                            observer_id=believer.id,
+                            belief_event_ref=belief.event_ref,
+                            target_entity_id=actor_id,
+                            emotion=Emotion.ANGER,
+                            initial_intensity=anger_int,
+                            decay_rate=decay_mod * 1.5,
+                            tick_formed=tick,
+                            source_belief_id=belief.belief_id,
+                        )
+                    )
+                    mem_id += 1
+                    hatred_int = min(100.0, 90.0 * (0.8 + 0.4 * susp))
+                    memories.append(
+                        Memory(
+                            id=mem_id,
+                            observer_id=believer.id,
+                            belief_event_ref=belief.event_ref,
+                            target_entity_id=actor_id,
+                            emotion=Emotion.HATRED,
+                            initial_intensity=hatred_int,
+                            decay_rate=decay_mod,
+                            tick_formed=tick,
+                            source_belief_id=belief.belief_id,
+                        )
+                    )
+                    mem_id += 1
+                elif is_sibling:
+                    # Sibling: hatred (intensity 95.0 towards actor)
+                    hatred_int = min(100.0, 95.0 * (0.8 + 0.4 * susp))
+                    memories.append(
+                        Memory(
+                            id=mem_id,
+                            observer_id=believer.id,
+                            belief_event_ref=belief.event_ref,
+                            target_entity_id=actor_id,
+                            emotion=Emotion.HATRED,
+                            initial_intensity=hatred_int,
+                            decay_rate=decay_mod,
+                            tick_formed=tick,
+                            source_belief_id=belief.belief_id,
+                        )
+                    )
+                    mem_id += 1
+                elif is_spouse or is_parent:
+                    hatred_int = min(100.0, 95.0 * (0.8 + 0.4 * susp))
+                    memories.append(
+                        Memory(
+                            id=mem_id,
+                            observer_id=believer.id,
+                            belief_event_ref=belief.event_ref,
+                            target_entity_id=actor_id,
+                            emotion=Emotion.HATRED,
+                            initial_intensity=hatred_int,
+                            decay_rate=decay_mod,
+                            tick_formed=tick,
+                            source_belief_id=belief.belief_id,
+                        )
+                    )
+                    mem_id += 1
+                elif deg == 2 or same_clan:
+                    base_h = 70.0 if deg == 2 else 50.0
+                    hatred_int = min(100.0, base_h * (0.8 + 0.4 * susp))
+                    memories.append(
+                        Memory(
+                            id=mem_id,
+                            observer_id=believer.id,
+                            belief_event_ref=belief.event_ref,
+                            target_entity_id=actor_id,
+                            emotion=Emotion.HATRED,
+                            initial_intensity=hatred_int,
+                            decay_rate=decay_mod * 1.5,
+                            tick_formed=tick,
+                            source_belief_id=belief.belief_id,
+                        )
+                    )
+                    mem_id += 1
+
+            elif b_intent == Intent.ACCIDENTAL and actor_id and actor_id != believer.id and (deg in (1, 2) or same_clan):
                 memories.append(
                     Memory(
                         id=mem_id,
@@ -139,7 +269,7 @@ def form_memories_from_belief(
                         target_entity_id=actor_id,
                         emotion=Emotion.GRIEF,
                         initial_intensity=20.0,
-                        decay_rate=0.02,
+                        decay_rate=0.02 * (1.0 + forg),
                         tick_formed=tick,
                         source_belief_id=belief.belief_id,
                     )

@@ -84,6 +84,7 @@ class BeliefSource(str, Enum):
     WITNESSED = "Witnessed"
     TOLD = "Told"
     INFERRED = "Inferred"
+    TOLD_BY_PARENT = "told by parent"
 
 
 class Emotion(str, Enum):

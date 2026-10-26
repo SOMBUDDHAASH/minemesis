@@ -53,25 +53,49 @@ def perceive_event(
         if p_id and p_id in characters and characters[p_id].alive:
             witness_set.add(p_id)
 
-    # 2. Immediate Kin (Degree 1) of primary participants at event location
+    # 2. Reaction fan-out (Milestone 1): Degree 1 & 2 kin, up to 3 friends, up to 2 rivals
     primary_participants = [p_id for p_id in (actor_id, target_id) if p_id and p_id in characters]
     for p_id in primary_participants:
         p_char = characters[p_id]
-        kin_candidates: list[str] = []
-        if p_char.spouse_id:
-            kin_candidates.append(p_char.spouse_id)
-        if p_char.father_id:
-            kin_candidates.append(p_char.father_id)
-        if p_char.mother_id:
-            kin_candidates.append(p_char.mother_id)
-        kin_candidates.extend(p_char.children_ids)
 
-        for k_id in kin_candidates:
-            if k_id in characters and characters[k_id].alive:
-                k_char = characters[k_id]
-                # Include kin if they share location or are direct kin
-                if k_char.settlement_id == event.location or k_char.settlement_id == p_char.settlement_id:
+        # A. Degree 1 and Degree 2 kin
+        from minemesis.core.kinship import get_kin_network
+        kin_dict = get_kin_network(characters, p_id, max_degree=2) if hasattr(characters, "get_person") else {}
+        if not kin_dict:
+            # Fallback direct kin check if characters is raw dict
+            deg1_cand = []
+            if p_char.spouse_id:
+                deg1_cand.append(p_char.spouse_id)
+            if p_char.father_id:
+                deg1_cand.append(p_char.father_id)
+            if p_char.mother_id:
+                deg1_cand.append(p_char.mother_id)
+            deg1_cand.extend(p_char.children_ids)
+            for k in deg1_cand:
+                if k in characters and characters[k].alive:
+                    witness_set.add(k)
+        else:
+            for k_id in kin_dict.keys():
+                if k_id in characters and characters[k_id].alive:
                     witness_set.add(k_id)
+
+        # B. Up to 3 friends and 2 rivals of the participant
+        candidates = [c for c in characters.values() if c.alive and c.id != p_id and c.settlement_id == p_char.settlement_id]
+        friends = []
+        rivals = []
+        for cand in candidates:
+            rel = get_relationship(cand.id, p_id)
+            if rel.trust >= 10.0 or rel.loyalty >= 10.0:
+                friends.append((rel.trust + rel.loyalty, cand.id))
+            elif rel.hatred >= 15.0:
+                rivals.append((rel.hatred, cand.id))
+
+        friends.sort(reverse=True)
+        rivals.sort(reverse=True)
+        for _, f_id in friends[:3]:
+            witness_set.add(f_id)
+        for _, r_id in rivals[:2]:
+            witness_set.add(r_id)
 
     # 3. Sort deterministically and cap at max_individual_witnesses (default 10)
     sorted_witnesses = sorted(witness_set)

@@ -11,7 +11,7 @@ Adheres strictly to agent.md and Milestone 0.5 (Sections 4.1 - 4.5):
 
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Callable, Mapping, Sequence, Set
+from typing import Callable, Mapping, Sequence, Set, Optional
 from minemesis.core.event_log import EventLog
 from minemesis.core.rng import keyed_choice, keyed_float, keyed_int, keyed_sample
 from minemesis.core.types import BeliefSource, Emotion, EventType, Intent, Scale
@@ -20,6 +20,15 @@ from minemesis.models.character import Character
 from minemesis.models.memory import Memory
 from minemesis.models.relationship import Relationship
 from minemesis.models.settlement import Settlement, TradeRoute
+from minemesis.core.kinship import get_kin_network, kin_degree, get_kin_relation
+
+
+class _DictStore:
+    def __init__(self, chars: dict[str, Character]):
+        self.chars = chars
+
+    def get_person(self, person_id: str) -> Optional[Character]:
+        return self.chars.get(person_id)
 
 
 @dataclass
@@ -37,6 +46,54 @@ class ActiveFeud:
     revenge_count: int = 0
     minor_raids: int = 0
     raid_count: int = 0
+    primary_avenger_id: Optional[str] = None
+    secondary_avenger_id: Optional[str] = None
+
+
+def select_feud_avengers(
+    feud: ActiveFeud,
+    characters: dict[str, Character],
+    get_relationship: Callable[[str, str], Relationship],
+    tick: int,
+) -> tuple[Optional[str], Optional[str]]:
+    """
+    Gender-neutral avenger selection across adult living degree 1 and 2 kin.
+    Motivation score: (hatred / 100.0) * 0.5 + (0.5 if age >= 18 else 0.1) * 0.3 + suspicion * 0.2 - forgiveness * 0.2.
+    One primary avenger per feud; plus at most one secondary avenger only if feud duration > 24 ticks.
+    """
+    store = characters if hasattr(characters, "get_person") else _DictStore(characters)
+    
+    # Pool candidate kin from instigator
+    candidate_ids: set[str] = set()
+    candidate_ids.add(feud.instigator_char_id)
+    kin_net = get_kin_network(store, feud.instigator_char_id, max_degree=2)
+    candidate_ids.update(kin_net.keys())
+
+    scored_candidates: list[tuple[float, str]] = []
+    for cid in candidate_ids:
+        c = store.get_person(cid)
+        if not c or not c.alive:
+            continue
+        rel = get_relationship(c.id, feud.target_char_id)
+        hatred = rel.hatred
+        age_score = 0.5 if c.age_years >= 18 else 0.1
+        susp = c.suspicion
+        forg = c.forgiveness
+        motivation = (hatred / 100.0) * 0.5 + age_score * 0.3 + susp * 0.2 - forg * 0.2
+        scored_candidates.append((motivation, c.id))
+
+    if not scored_candidates:
+        return None, None
+
+    scored_candidates.sort(key=lambda x: x[0], reverse=True)
+    primary = scored_candidates[0][1]
+
+    secondary = None
+    elapsed = tick - feud.start_tick
+    if elapsed > 24 and len(scored_candidates) > 1 and scored_candidates[1][0] > 0.1:
+        secondary = scored_candidates[1][1]
+
+    return primary, secondary
 
 
 def process_conflicts_and_economy(
@@ -445,9 +502,11 @@ def process_conflicts_and_economy(
                 if not is_valid_offence or not offence_actor or offence_actor == char.id:
                     continue
 
-                # Directive 10: Closed grievances cannot start new feuds
+                # Directive 10: Closed grievances cannot start new feuds unless instigator holds an uncorrected belief
                 if event_ref in resolved_grievance_event_ids:
-                    continue
+                    inst_b = char_beliefs.get(event_ref)
+                    if not inst_b or inst_b.supersedes_belief_id is not None or inst_b.believed_intent not in (Intent.INTENTIONAL, Intent.MILITARY_ACTION):
+                        continue
 
                 accused = characters.get(offence_actor)
                 if not accused or not accused.alive:
@@ -495,6 +554,7 @@ def process_conflicts_and_economy(
                             is_wrongful=is_wrongful,
                             start_tick=tick,
                             active=True,
+                            primary_avenger_id=char.id,
                         )
                         active_feuds.append(new_feud)
                         active_instigators.add(char.id)
@@ -508,11 +568,67 @@ def process_conflicts_and_economy(
                 break
 
     # =========================================================================
-    # 5. REVENGE KILLINGS (Historical Pressure 1, Section 4.5)
+    # 5. REVENGE KILLINGS & AVENGER SELECTION (Historical Pressure 1, Section 4.5 & M1)
     # =========================================================================
     for feud in active_feuds:
         if not feud.active:
             continue
+
+        # Inherited Grudges: When parent dies, children inherit feud grudge
+        orig_inst = characters.get(feud.instigator_char_id)
+        if orig_inst and (not orig_inst.alive or tick % 12 == 0):
+            p_beliefs = beliefs_by_character.get(orig_inst.id, {})
+            p_b = p_beliefs.get(feud.root_cause_event_id)
+            if p_b:
+                for child_id in orig_inst.children_ids:
+                    child = characters.get(child_id)
+                    if not child or not child.alive:
+                        continue
+                    c_beliefs = beliefs_by_character.get(child.id, {})
+                    if feud.root_cause_event_id not in c_beliefs:
+                        new_b_id = belief_counter[0]
+                        belief_counter[0] += 1
+                        new_b = Belief(
+                            belief_id=new_b_id,
+                            believer_id=child.id,
+                            event_ref=feud.root_cause_event_id,
+                            source=BeliefSource.TOLD_BY_PARENT,
+                            source_character_id=orig_inst.id,
+                            confidence=p_b.confidence * 0.7,
+                            tick_acquired=tick,
+                            believed_type=p_b.believed_type,
+                            believed_intent=p_b.believed_intent,
+                            believed_actor=p_b.believed_actor,
+                            believed_target=p_b.believed_target,
+                            believed_location=p_b.believed_location,
+                            believed_payload={"inherited_from": orig_inst.id},
+                        )
+                        c_beliefs[feud.root_cause_event_id] = new_b
+                        beliefs_by_character[child.id] = c_beliefs
+
+                        p_rel = get_relationship(orig_inst.id, feud.target_char_id)
+                        p_hatred = p_rel.hatred if orig_inst.alive else 80.0
+                        b_decay = 0.003 * (1.0 + child.forgiveness)
+                        memories.append(
+                            Memory(
+                                id=memory_counter[0],
+                                observer_id=child.id,
+                                belief_event_ref=feud.root_cause_event_id,
+                                target_entity_id=feud.target_char_id,
+                                emotion=Emotion.HATRED,
+                                initial_intensity=max(20.0, p_hatred * 0.6),
+                                decay_rate=b_decay * 2.0,
+                                tick_formed=tick,
+                                source_belief_id=new_b.belief_id,
+                            )
+                        )
+                        memory_counter[0] += 1
+
+        # Avenger Selection: gender-neutral across degree 1 and 2 kin
+        primary_av, secondary_av = select_feud_avengers(feud, characters, get_relationship, tick)
+        feud.primary_avenger_id = primary_av or feud.instigator_char_id
+        feud.secondary_avenger_id = secondary_av
+
         if feud.revenge_count >= 1:
             continue
 
@@ -520,19 +636,26 @@ def process_conflicts_and_economy(
         if elapsed < 18 or (tick - feud.last_revenge_tick) < 36:
             continue
 
-        instigator = characters.get(feud.instigator_char_id)
+        # Choose acting avenger
+        avenger = characters.get(feud.primary_avenger_id) if feud.primary_avenger_id else None
+        if not avenger or not avenger.alive:
+            if feud.secondary_avenger_id:
+                avenger = characters.get(feud.secondary_avenger_id)
+        if not avenger or not avenger.alive:
+            avenger = characters.get(feud.instigator_char_id)
+
         target = characters.get(feud.target_char_id)
 
-        if not instigator or not instigator.alive or not target or not target.alive:
+        if not avenger or not avenger.alive or not target or not target.alive:
             continue
 
         target_set_living = [c for c in living_chars if c.settlement_id == target.settlement_id]
         if len(target_set_living) <= 3:
             continue
 
-        rel = get_relationship(instigator.id, target.id)
-        if rel.hatred >= 70.0 and instigator.forgiveness < 0.50:
-            revenge_chance = 0.04 * (1.1 - instigator.forgiveness)
+        rel = get_relationship(avenger.id, target.id)
+        if rel.hatred >= 60.0 and avenger.forgiveness < 0.60:
+            revenge_chance = 0.04 * (1.1 - avenger.forgiveness)
             roll = keyed_float(seed, "revenge_kill", str(feud.id), tick)
             if roll < revenge_chance:
                 target.alive = False
@@ -544,7 +667,7 @@ def process_conflicts_and_economy(
                     tick=tick,
                     location=target.settlement_id,
                     event_type=EventType.DEATH,
-                    participants={"actor": instigator.id, "target": target.id},
+                    participants={"actor": avenger.id, "target": target.id},
                     causes=[feud.root_cause_event_id, feud.id],
                     intent=Intent.INTENTIONAL,
                     scale=Scale.INDIVIDUAL,
@@ -552,6 +675,7 @@ def process_conflicts_and_economy(
                         "revenge": True,
                         "cause_of_death": "Revenge",
                         "feud_id": feud.id,
+                        "avenger_id": avenger.id,
                     },
                 )
                 target.death_event_id = evt.id
@@ -764,6 +888,68 @@ def process_conflicts_and_economy(
                         )
                         memory_counter[0] += len(reappraisal_mems)
                         memories.extend(reappraisal_mems)
+
+                        # Cascade correction to living degree-1 kin (Milestone 1 requirement)
+                        store = characters if hasattr(characters, "get_person") else _DictStore(characters)
+                        kin_net = get_kin_network(store, instigator.id, max_degree=1)
+                        living_deg1 = [characters[kid] for kid in kin_net if kid in characters and characters[kid].alive]
+
+                        accepted_count = 1  # Instigator already accepted
+                        total_deg1_count = 1 + len(living_deg1)
+
+                        for kin_char in living_deg1:
+                            rel_kin_w = get_relationship(kin_char.id, witness.id)
+                            t_factor = max(0.2, min(1.0, (rel_kin_w.trust + 50.0) / 100.0))
+                            s_factor = max(0.5, 1.5 - kin_char.suspicion)
+                            kin_cred = incoming_credibility * t_factor * s_factor
+
+                            kin_cur_b = beliefs_by_character.get(kin_char.id, {}).get(feud.root_cause_event_id)
+                            kin_conf = kin_cur_b.confidence if kin_cur_b else 0.50
+
+                            if kin_cred >= kin_conf * 0.70:
+                                accepted_count += 1
+                                old_k_bid = kin_cur_b.belief_id if kin_cur_b else None
+                                new_k_bid = belief_counter[0]
+                                belief_counter[0] += 1
+                                kin_new_b = Belief(
+                                    belief_id=new_k_bid,
+                                    believer_id=kin_char.id,
+                                    event_ref=feud.root_cause_event_id,
+                                    source=BeliefSource.TOLD,
+                                    source_character_id=instigator.id,
+                                    confidence=min(1.0, kin_cred),
+                                    tick_acquired=tick,
+                                    believed_type=root_event.type,
+                                    believed_intent=Intent.ACCIDENTAL,
+                                    believed_actor=root_event.participants_dict.get("actor"),
+                                    believed_target=root_event.participants_dict.get("target"),
+                                    believed_location=root_event.location,
+                                    believed_payload={"note": f"Cascade revelation via #{rev_evt.id}"},
+                                    supersedes_belief_id=old_k_bid,
+                                )
+                                if kin_char.id not in beliefs_by_character:
+                                    beliefs_by_character[kin_char.id] = {}
+                                beliefs_by_character[kin_char.id][feud.root_cause_event_id] = kin_new_b
+
+                                if old_k_bid is not None:
+                                    for m in memories:
+                                        if m.observer_id == kin_char.id and m.source_belief_id == old_k_bid:
+                                            superseded_memory_ids.add(m.id)
+
+                                kin_rel_cur = get_relationship(kin_char.id, feud.target_char_id)
+                                kin_reappraisal = form_memories_from_belief(
+                                    belief=kin_new_b,
+                                    characters=characters,
+                                    next_memory_id=memory_counter[0],
+                                    tick=tick,
+                                    prior_hatred=kin_rel_cur.hatred,
+                                )
+                                memory_counter[0] += len(kin_reappraisal)
+                                memories.extend(kin_reappraisal)
+
+                        # Reconcile feud ONLY if > 50% of living degree-1 kin accept the correction
+                        if (accepted_count / total_deg1_count) <= 0.50:
+                            continue
 
                         feud.active = False
 

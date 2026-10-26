@@ -11,6 +11,7 @@ from viewer.ui.tabs.books import BooksTab
 from viewer.ui.tabs.faith import FaithTab
 from viewer.ui.tabs.threads import ThreadsTab
 from viewer.ui.tabs.world import WorldTab
+from viewer.ui.tabs.dynasty import DynastyTab
 
 __all__ = [
     "BaseTab",
@@ -24,4 +25,5 @@ __all__ = [
     "FaithTab",
     "ThreadsTab",
     "WorldTab",
+    "DynastyTab",
 ]

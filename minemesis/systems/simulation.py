@@ -280,7 +280,50 @@ class Simulation:
         if self.religion_engine and char_id in self.religion_engine.religions:
             return self.religion_engine.religions[char_id].name
         return str(char_id)
-        return []
+
+    # -------------------------------------------------------------------------
+    # PersonStore Protocol Implementation (Milestone 1 & Milestone 4)
+    # -------------------------------------------------------------------------
+    def get_person(self, person_id: str) -> Optional[Character]:
+        """Returns living or loaded Character from self.characters."""
+        return self.characters.get(person_id)
+
+    def materialize_person(self, person_id: str) -> Optional[Character]:
+        """Ensures person entity is materialized, reconstructing from archive if needed."""
+        if person_id in self.characters:
+            return self.characters[person_id]
+        if person_id in self.historical_archive:
+            arch = self.historical_archive[person_id]
+            c = Character(
+                id=arch["id"],
+                first_name=arch.get("first_name", "Citizen"),
+                last_name=arch.get("last_name", "Commoner"),
+                settlement_id=arch.get("settlement_id", ""),
+                age_ticks=arch.get("age_ticks", 240),
+                sex=arch.get("sex", "M"),
+                alive=False,
+                death_tick=arch.get("death_tick"),
+                spouse_id=arch.get("spouse_id"),
+                father_id=arch.get("father_id"),
+                mother_id=arch.get("mother_id"),
+                children_ids=list(arch.get("children_ids", [])),
+                profession=arch.get("profession", "Laborer"),
+                family_id=arch.get("family_id", ""),
+                name_ordinal=arch.get("name_ordinal", 1),
+                display_name=arch.get("display_name", arch.get("name", "")),
+            )
+            return c
+        return None
+
+    def is_alive(self, person_id: str) -> bool:
+        c = self.characters.get(person_id)
+        return c.alive if c else False
+
+    def get_living_ids(self) -> list[str]:
+        return [c.id for c in self.characters.values() if c.alive]
+
+    def get_settlement_living_ids(self, settlement_id: str) -> list[str]:
+        return [c.id for c in self.characters.values() if c.alive and c.settlement_id == settlement_id]
 
     def get_book(self, book_id: str):
         """Retrieves a book by its unique ID."""
