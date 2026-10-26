@@ -376,6 +376,37 @@ CAUSE_GRAMMAR: Mapping[EventType, GrammarRule] = {
             EventType.FEUD,
         }),
     ),
+    EventType.ALLIANCE_FORMED: GrammarRule(
+        root_allowed=True,
+        allowed_cause_types=frozenset({
+            EventType.TRADE_ROUTE_FOUNDED,
+            EventType.MARRIAGE,
+            EventType.PEACE,
+            EventType.TREATY_SIGNED,
+            EventType.WAR_DECLARED,
+        }),
+    ),
+    EventType.WAR_DECLARED: GrammarRule(
+        root_allowed=False,
+        allowed_cause_types=frozenset({
+            EventType.FEUD,
+            EventType.RAID,
+            EventType.DEATH,
+            EventType.TRADE_ROUTE_BROKEN,
+            EventType.SUCCESSION_CRISIS,
+            EventType.FAMINE,
+        }),
+    ),
+    EventType.TREATY_SIGNED: GrammarRule(
+        root_allowed=False,
+        allowed_cause_types=frozenset({
+            EventType.WAR_DECLARED,
+            EventType.RAID,
+            EventType.FEUD,
+            EventType.PEACE,
+            EventType.FAMINE,
+        }),
+    ),
 }
 
 

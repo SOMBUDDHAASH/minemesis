@@ -54,8 +54,25 @@ class EventType(str, Enum):
     BOOK_WRITTEN = "BookWritten"
     ARCHIVE_DAMAGED = "ArchiveDamaged"
 
+    # Milestone 2: Settlement Politics & Warfare
+    ALLIANCE_FORMED = "AllianceFormed"
+    WAR_DECLARED = "WarDeclared"
+    TREATY_SIGNED = "TreatySigned"
+
     # Alias for backwards compatibility
     FEUD_BEGINS = "Feud"
+
+
+class DiplomaticStance(str, Enum):
+    """
+    Diplomatic Stances between settlements for Milestone 2.
+    """
+    ALLIANCE = "Alliance"
+    FRIENDLY = "Friendly"
+    NEUTRAL = "Neutral"
+    SUSPICIOUS = "Suspicious"
+    HOSTILE = "Hostile"
+    WAR = "War"
 
 
 class Intent(str, Enum):

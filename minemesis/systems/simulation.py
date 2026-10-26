@@ -22,6 +22,7 @@ from minemesis.core.seed import SeedPair
 from minemesis.models.relationship import Relationship, compute_relationship
 from minemesis.models.settlement import Settlement, TradeRoute
 from minemesis.models.demographics import DemographicRegistry
+from minemesis.core.diplomacy import DiplomacyManager
 from minemesis.core.knowledge import KnowledgeEngine, KnowledgeOwnerType, KnowledgeTargetType
 from minemesis.core.relationship_cache import RelationshipCache
 from minemesis.systems.conflict import ActiveFeud, process_conflicts_and_economy
@@ -110,6 +111,7 @@ class Simulation:
         self.knowledge_engine = KnowledgeEngine()
         self.relationship_cache = RelationshipCache(default_ttl_ticks=12)
         self.historical_archive: dict[str, dict[str, Any]] = {}
+        self.diplomacy = DiplomacyManager()
 
         # Monotonic counters
         self.char_counter = [len(self.characters)]
@@ -655,6 +657,21 @@ class Simulation:
             resolved_grievance_event_ids=self.resolved_grievance_event_ids,
         )
         self._register_and_perceive_events(conflict_start)
+
+        # -------------------------------------------------------------
+        # Step 3b: Geopolitics & Diplomacy (Milestone 2)
+        # -------------------------------------------------------------
+        diplomacy_start = len(self.event_log)
+        self.diplomacy.step_diplomacy(
+            settlements=self.settlements,
+            trade_routes=self.trade_routes,
+            active_feuds=self.active_feuds,
+            marriage_events=self.marriage_events,
+            event_log=self.event_log,
+            tick=self.tick,
+            seed=self.seed,
+        )
+        self._register_and_perceive_events(diplomacy_start)
 
         # -------------------------------------------------------------
         # Step 4: Standalone Religion Engine (Milestone R0 & R1)

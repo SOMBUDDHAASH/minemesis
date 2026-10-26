@@ -115,6 +115,18 @@ class Event:
             return f"Book penned: {title} by {parts.get('author', 'scholar')}"
         elif t == EventType.MIGRATION:
             return f"Migration from {parts.get('source', '')} to {parts.get('destination', '')}"
+        elif t == EventType.ALLIANCE_FORMED:
+            s1 = parts.get("settlement1", loc)
+            s2 = parts.get("settlement2", "Allied Settlement")
+            return f"Alliance forged between {s1} and {s2}"
+        elif t == EventType.WAR_DECLARED:
+            init = parts.get("aggressor", loc)
+            tgt = parts.get("defender", "Enemy")
+            return f"War declared by {init} against {tgt}"
+        elif t == EventType.TREATY_SIGNED:
+            s1 = parts.get("party1", loc)
+            s2 = parts.get("party2", "Party")
+            return f"Treaty signed between {s1} and {s2}"
         return f"{t.value} at {loc}"
 
 
