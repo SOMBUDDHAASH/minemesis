@@ -56,7 +56,96 @@ class WorldTab(BaseTab):
         self.chart_dist = CanvasChart(self.tab_dist)
         self.chart_dist.pack(fill=tk.BOTH, expand=True)
 
+        # Tab 4: 2D Macro World Map & Replay Controller (Milestone 6)
+        self.tab_map = tk.Frame(self.sub_notebook, bg=c["bg"], padx=8, pady=8)
+        self.sub_notebook.add(self.tab_map, text="Macro World Map & Replay")
+        self._build_macro_map_tab()
+
         bus.subscribe("session:loaded", lambda **kw: self.refresh())
+
+    def _build_macro_map_tab(self) -> None:
+        c = theme.colors
+        top_bar = tk.Frame(self.tab_map, bg=c["panel_bg"], padx=10, pady=6)
+        top_bar.pack(fill=tk.X, pady=(0, 6))
+
+        tk.Label(top_bar, text="Target Replay Year:", font=("Segoe UI", 9, "bold"), fg=c["fg"], bg=c["panel_bg"]).pack(side=tk.LEFT, padx=(0, 6))
+        self.entry_replay_year = tk.Entry(top_bar, font=("Segoe UI", 9), width=8, bg=c["bg"], fg=c["fg"], insertbackground=c["fg"])
+        self.entry_replay_year.pack(side=tk.LEFT, padx=(0, 10))
+        self.entry_replay_year.insert(0, "50")
+
+        self.btn_replay = tk.Button(
+            top_bar,
+            text="Replay Simulation",
+            font=("Segoe UI", 8, "bold"),
+            bg=c["accent"],
+            fg="#ffffff",
+            relief=tk.FLAT,
+            padx=10,
+            pady=3,
+            cursor="hand2",
+            command=self._on_replay_click,
+        )
+        self.btn_replay.pack(side=tk.LEFT)
+
+        self.lbl_replay_status = tk.Label(top_bar, text="Pure keyed deterministic forward replay", font=("Segoe UI", 8), fg=c["fg_muted"], bg=c["panel_bg"])
+        self.lbl_replay_status.pack(side=tk.LEFT, padx=12)
+
+        self.canvas_map = tk.Canvas(self.tab_map, bg="#121824", highlightthickness=0)
+        self.canvas_map.pack(fill=tk.BOTH, expand=True)
+
+    def _on_replay_click(self) -> None:
+        try:
+            yr = int(self.entry_replay_year.get().strip())
+            self.lbl_replay_status.config(text=f"Replaying deterministic simulation to Year {yr}...")
+            self.update_idletasks()
+            w_seed = int(session.db.meta.get("world_seed", 42)) if session.db else 42
+            h_seed = int(session.db.meta.get("history_seed", 1337)) if session.db else 1337
+            from minemesis.core.save_load import replay_to_year
+            sim = replay_to_year(world_seed=w_seed, history_seed=h_seed, target_year=yr)
+            self.lbl_replay_status.config(
+                text=f"Replay to Year {yr} complete: {sim.get_total_living_population()} pop, {len(sim.event_log)} events."
+            )
+        except Exception as e:
+            self.lbl_replay_status.config(text=f"Replay error: {e}")
+
+    def _render_macro_map(self) -> None:
+        if not session.db:
+            return
+        w_seed = int(session.db.meta.get("world_seed", 42))
+        from minemesis.core.save_load import reconstruct_macro_world_map
+        map_data = reconstruct_macro_world_map(world_seed=w_seed)
+
+        self.canvas_map.delete("all")
+        cw = max(400, self.canvas_map.winfo_width())
+        ch = max(300, self.canvas_map.winfo_height())
+        scale_x = cw / 1100.0
+        scale_y = ch / 1100.0
+
+        # Draw road / connection lines
+        for conn in map_data["connections"]:
+            s1 = next((s for s in map_data["settlements"] if s["id"] == conn["from"]), None)
+            s2 = next((s for s in map_data["settlements"] if s["id"] == conn["to"]), None)
+            if s1 and s2:
+                x1, y1 = 50 + s1["x"] * scale_x, 50 + s1["y"] * scale_y
+                x2, y2 = 50 + s2["x"] * scale_x, 50 + s2["y"] * scale_y
+                self.canvas_map.create_line(x1, y1, x2, y2, fill="#2a3b5c", width=1.5, dash=(4, 4))
+
+        # Draw settlement nodes
+        biome_colors = {
+            "Plains": "#48bb78",
+            "Forest": "#2f855a",
+            "Mountains": "#a0aec0",
+            "Coast": "#3182ce",
+            "Desert": "#d69e2e",
+        }
+
+        for s in map_data["settlements"]:
+            x = 50 + s["x"] * scale_x
+            y = 50 + s["y"] * scale_y
+            col = biome_colors.get(s["biome"], "#38bdf8")
+            self.canvas_map.create_oval(x - 8, y - 8, x + 8, y + 8, fill=col, outline="#ffffff", width=1.5)
+            self.canvas_map.create_text(x, y - 14, text=s["name"], fill="#e2e8f0", font=("Segoe UI", 9, "bold"))
+            self.canvas_map.create_text(x, y + 14, text=f"{s['biome']}", fill="#94a3b8", font=("Segoe UI", 7))
 
     def refresh(self) -> None:
         self.clear_error()
@@ -118,6 +207,9 @@ class WorldTab(BaseTab):
                 self.lbl_stats.config(
                     text=f"Year {latest_year} Census: {len(bar_cats)} Settlements Active • Cumulative Births: {tot_births} • Cumulative Deaths: {tot_deaths}"
                 )
+
+            # 4. Render 2D Macro World Map
+            self._render_macro_map()
 
         except Exception as e:
             log_error("Error in WorldTab.refresh", e)
