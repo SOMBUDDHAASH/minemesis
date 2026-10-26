@@ -183,7 +183,7 @@ class DirectorTab(BaseTab):
             self.lbl_migration.config(text=f"Migration Wanderlust: x{last_mig:.2f}")
             self.lbl_stagnation.config(text=f"Total Interventions: {len(rows)}")
 
-            self.interventions_table.set_data(reversed(rows))
+            self.interventions_table.set_data(list(reversed(rows)))
 
         except Exception as e:
             log_error(f"Error loading Director tab: {e}")

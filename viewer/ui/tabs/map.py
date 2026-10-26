@@ -358,7 +358,10 @@ class MapTab(BaseTab):
         self.roads = generate_road_network(grid=self.grid, settlements=self.settlements)
 
         # Update settlement dropdown
-        names = [f"{s.name} ({s.biome})" for s in self.settlements]
+        names = [
+            f"{s.name} ({getattr(s, 'site_type', getattr(s, 'biome', 'plains')).capitalize()})"
+            for s in self.settlements
+        ]
         self.cb_settlement["values"] = names
         if names:
             self.cb_settlement.current(0)
@@ -516,9 +519,12 @@ class MapTab(BaseTab):
         s = self.settlements[idx]
         self.selected_settlement_id = s.id
 
+        def_val = getattr(s, "defensibility", getattr(s, "defensibility_score", 1.0))
+        biome_str = getattr(s, "site_type", getattr(s, "biome", "Plains")).capitalize()
+
         self.lbl_card_title.config(text=f"{s.name}")
         self.lbl_card_body.config(
-            text=f"ID: {s.id}\nLocation: Tile ({s.x}, {s.y})\nBiome: {s.biome}\nDefensibility: {s.defensibility_score:.1f}"
+            text=f"ID: {s.id}\nLocation: Tile ({s.x}, {s.y})\nType: {biome_str}\nDefensibility: {def_val:.1f}"
         )
 
         # Analyze Catchment
@@ -527,12 +533,12 @@ class MapTab(BaseTab):
             self.lbl_endowments.config(
                 text=(
                     f"Catchment Resources (Radius 12):\n"
-                    f" • Farmland:   {catchment['farmland_pct']:.1f}%\n"
-                    f" • Forest:     {catchment['forest_pct']:.1f}%\n"
-                    f" • Ore:        {catchment['ore_richness']:.1f}\n"
-                    f" • Fish:       {catchment['fish_potential']:.1f}\n"
-                    f" • Stone:      {catchment['stone_abundance']:.1f}\n"
-                    f" • Trade Acc:  {catchment['trade_access']:.1f}"
+                    f" • Farmland:   {catchment.get('farmland', 0.0):.1f}\n"
+                    f" • Forest:     {catchment.get('forest', 0.0):.1f}\n"
+                    f" • Ore:        {catchment.get('ore_richness', 0.0):.1f}\n"
+                    f" • Fish:       {catchment.get('fish_potential', 0.0):.1f}\n"
+                    f" • Stone:      {catchment.get('stone', 0.0):.1f}\n"
+                    f" • Defense:    {catchment.get('defensibility', 0.0):.1f}"
                 )
             )
 

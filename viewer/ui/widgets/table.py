@@ -91,11 +91,15 @@ class PaginatedTable(tk.Frame):
         )
         self.btn_next.pack(side=tk.LEFT)
 
-    def set_items(self, items: list[dict[str, Any]]) -> None:
-        self._all_items = items
-        self.total_rows = len(items)
+    def set_items(self, items: Any) -> None:
+        self._all_items = list(items)
+        self.total_rows = len(self._all_items)
         self.current_page = 0
         self._render_current_page()
+
+    def set_data(self, items: list[dict[str, Any]]) -> None:
+        """Alias for set_items for consistent table APIs."""
+        self.set_items(items)
 
     def _render_current_page(self) -> None:
         self.tree.delete(*self.tree.get_children())

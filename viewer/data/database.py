@@ -343,6 +343,8 @@ class RunDatabase:
         self,
         settlement_id: Optional[str] = None,
         search: Optional[str] = None,
+        limit: Optional[int] = None,
+        offset: int = 0,
     ) -> list[dict[str, Any]]:
         clauses = []
         params: list[Any] = []
@@ -353,9 +355,10 @@ class RunDatabase:
             clauses.append("(title LIKE ? OR author_name LIKE ? OR topic LIKE ?)")
             params.extend([f"%{search}%", f"%{search}%", f"%{search}%"])
         where_sql = ("WHERE " + " AND ".join(clauses)) if clauses else ""
+        limit_sql = f" LIMIT {int(limit)} OFFSET {int(offset)}" if limit is not None else ""
         cur = self._conn.cursor()
         rows = cur.execute(
-            f"SELECT id, title, author_id, author_name, year_written, settlement_id, topic, page_count FROM books {where_sql} ORDER BY year_written DESC",
+            f"SELECT id, title, author_id, author_name, year_written, settlement_id, topic, page_count FROM books {where_sql} ORDER BY year_written DESC{limit_sql}",
             params,
         ).fetchall()
         return [dict(r) for r in rows]

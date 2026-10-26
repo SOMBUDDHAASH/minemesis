@@ -4,8 +4,8 @@
 **Single-File Executable:** `MinemesisViewer-v2.exe` (15.16 MB)  
 **Portable Folder Archive:** `MinemesisViewer-v2-portable.zip` (24.74 MB)  
 **Measured Startup Times:**  
-- Portable Folder: `0.232s` (Target: < 1.0s)  
-- Single-File Exe: `1.971s` (Target: < 3.0s)  
+- Portable Folder: `0.204s` (Target: < 1.0s)  
+- Single-File Exe: `1.826s` (Target: < 3.0s)  
 
 ---
 

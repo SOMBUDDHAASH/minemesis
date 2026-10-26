@@ -187,7 +187,7 @@ class PlayerTab(BaseTab):
                         "summary": desc,
                     })
 
-            self.history_table.set_data(reversed(player_evts))
+            self.history_table.set_data(list(reversed(player_evts)))
 
             # Query epistemic cases / grudge cases against player
             epistemic = session.db.get_epistemic_cases(limit=100)
