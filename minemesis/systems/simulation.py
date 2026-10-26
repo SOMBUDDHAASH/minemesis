@@ -24,6 +24,7 @@ from minemesis.models.settlement import Settlement, TradeRoute
 from minemesis.models.demographics import DemographicRegistry
 from minemesis.core.diplomacy import DiplomacyManager
 from minemesis.systems.player_system import PlayerSystem
+from minemesis.systems.director import NarrativeDirector
 from minemesis.core.knowledge import KnowledgeEngine, KnowledgeOwnerType, KnowledgeTargetType
 from minemesis.core.relationship_cache import RelationshipCache
 from minemesis.systems.conflict import ActiveFeud, process_conflicts_and_economy
@@ -113,6 +114,7 @@ class Simulation:
         self.relationship_cache = RelationshipCache(default_ttl_ticks=12)
         self.historical_archive: dict[str, dict[str, Any]] = {}
         self.diplomacy = DiplomacyManager()
+        self.director = NarrativeDirector(seed=self.seed)
 
         # Monotonic counters
         self.char_counter = [len(self.characters)]
@@ -681,6 +683,13 @@ class Simulation:
             seed=self.seed,
         )
         self._register_and_perceive_events(diplomacy_start)
+
+        # -------------------------------------------------------------
+        # Step 3c: Narrative Director Pacing (Milestone 5)
+        # -------------------------------------------------------------
+        director_start = len(self.event_log)
+        self.director.step_director(self)
+        self._register_and_perceive_events(director_start)
 
         # -------------------------------------------------------------
         # Step 4: Standalone Religion Engine (Milestone R0 & R1)

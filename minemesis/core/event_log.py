@@ -131,6 +131,11 @@ class Event:
             action = self.payload.get("action", "action")
             target = parts.get("target", loc)
             return f"Player Traveler performed {action} upon {target}"
+        elif t == EventType.DIRECTOR_ACTION:
+            lever = self.payload.get("lever", "environmental lever")
+            mag = self.payload.get("magnitude", 1.0)
+            reason = self.payload.get("reason", "historical pacing")
+            return f"Narrative Director adjusted {lever} (x{mag}) due to {reason}"
         return f"{t.value} at {loc}"
 
 

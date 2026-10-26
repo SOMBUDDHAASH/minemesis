@@ -418,6 +418,15 @@ CAUSE_GRAMMAR: Mapping[EventType, GrammarRule] = {
             EventType.TRADE_ROUTE_BROKEN,
         }),
     ),
+    EventType.DIRECTOR_ACTION: GrammarRule(
+        root_allowed=True,
+        allowed_cause_types=frozenset({
+            EventType.FAMINE,
+            EventType.PEACE,
+            EventType.SETTLEMENT_COLLAPSE,
+            EventType.WAR_DECLARED,
+        }),
+    ),
 }
 
 

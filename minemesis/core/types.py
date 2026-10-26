@@ -62,6 +62,9 @@ class EventType(str, Enum):
     # Milestone 3: Player as Simulation Actor
     PLAYER_ACTION = "PlayerAction"
 
+    # Milestone 5: Narrative Director
+    DIRECTOR_ACTION = "DirectorAction"
+
     # Alias for backwards compatibility
     FEUD_BEGINS = "Feud"
 

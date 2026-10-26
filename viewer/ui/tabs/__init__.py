@@ -14,6 +14,7 @@ from viewer.ui.tabs.world import WorldTab
 from viewer.ui.tabs.dynasty import DynastyTab
 from viewer.ui.tabs.diplomacy import DiplomacyTab
 from viewer.ui.tabs.player import PlayerTab
+from viewer.ui.tabs.director import DirectorTab
 
 __all__ = [
     "BaseTab",
@@ -30,4 +31,5 @@ __all__ = [
     "DynastyTab",
     "DiplomacyTab",
     "PlayerTab",
+    "DirectorTab",
 ]
