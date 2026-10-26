@@ -7,3 +7,4 @@
 | Milestone | Simulated Years | Ticks | Living Population | Total Events | Peak RSS (MB) | Runtime (s) | Status (< 1000 MB) |
 |---|---|---|---|---|---|---|---|
 | M1 | 100 | 1200 | 2380 | 12688 | 110.8 | 66.95 | PASS |
+| M4 | 100 | 1200 | 2380 | 12688 | 110.6 | 76.36 | PASS |

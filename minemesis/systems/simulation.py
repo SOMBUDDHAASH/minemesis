@@ -21,6 +21,7 @@ from minemesis.models.memory import Memory
 from minemesis.core.seed import SeedPair
 from minemesis.models.relationship import Relationship, compute_relationship
 from minemesis.models.settlement import Settlement, TradeRoute
+from minemesis.models.demographics import DemographicRegistry
 from minemesis.core.knowledge import KnowledgeEngine, KnowledgeOwnerType, KnowledgeTargetType
 from minemesis.core.relationship_cache import RelationshipCache
 from minemesis.systems.conflict import ActiveFeud, process_conflicts_and_economy
@@ -90,6 +91,21 @@ class Simulation:
         self.collapsed_settlements: set[str] = set()
         self.resolved_grievance_event_ids: set[int] = set()
         
+        # Demographic Cohorts & Population Layering (Milestone 4)
+        self.demographics = DemographicRegistry(
+            world_seed=self.world_seed, history_seed=self.history_seed
+        )
+        for s in self.settlements.values():
+            base_bg = max(50, int(80 * s.farmland))
+            self.demographics.add_population(s.id, "child", "M", int(base_bg * 0.15), profession="Child")
+            self.demographics.add_population(s.id, "child", "F", int(base_bg * 0.15), profession="Child")
+            self.demographics.add_population(s.id, "young_adult", "M", int(base_bg * 0.20), profession="Laborer")
+            self.demographics.add_population(s.id, "young_adult", "F", int(base_bg * 0.20), profession="Laborer")
+            self.demographics.add_population(s.id, "adult", "M", int(base_bg * 0.12), profession="Farmer")
+            self.demographics.add_population(s.id, "adult", "F", int(base_bg * 0.12), profession="Farmer")
+            self.demographics.add_population(s.id, "elder", "M", int(base_bg * 0.03), profession="Elder")
+            self.demographics.add_population(s.id, "elder", "F", int(base_bg * 0.03), profession="Elder")
+
         # Epistemic & Performance Systems (Milestone 0.5.4)
         self.knowledge_engine = KnowledgeEngine()
         self.relationship_cache = RelationshipCache(default_ttl_ticks=12)
@@ -325,6 +341,44 @@ class Simulation:
     def get_settlement_living_ids(self, settlement_id: str) -> list[str]:
         return [c.id for c in self.characters.values() if c.alive and c.settlement_id == settlement_id]
 
+    def get_settlement_total_population(self, settlement_id: str) -> int:
+        """Returns total population of settlement: living promoted + background cohorts."""
+        prom = len([c for c in self.characters.values() if c.alive and c.settlement_id == settlement_id])
+        bg = self.demographics.get_settlement_population(settlement_id)
+        return prom + bg
+
+    def get_total_living_population(self) -> int:
+        """Returns total living population across all settlements."""
+        prom = len([c for c in self.characters.values() if c.alive])
+        bg = self.demographics.get_total_population()
+        return prom + bg
+
+    def promote_ordinary_citizen(
+        self,
+        settlement_id: str,
+        age_bracket: str = "adult",
+        sex: Optional[str] = None,
+        reason: str = "promotion",
+    ) -> Optional[Character]:
+        """Promotes a background citizen to a full Character entity and records in database."""
+        existing_surnames = [c.last_name for c in self.characters.values() if c.settlement_id == settlement_id]
+        char = self.demographics.promote_citizen(
+            settlement_id=settlement_id,
+            age_bracket=age_bracket,
+            sex=sex,
+            reason=reason,
+            tick=self.tick,
+            char_counter=self.char_counter,
+            existing_surnames=existing_surnames,
+            name_salt=self.name_salt,
+        )
+        if char:
+            self.characters[char.id] = char
+            self.beliefs_by_character[char.id] = {}
+            if self.export_sink:
+                self.export_sink.record_character(char)
+        return char
+
     def get_book(self, book_id: str):
         """Retrieves a book by its unique ID."""
         if self.lore_engine and self.lore_engine.enabled:
@@ -539,6 +593,18 @@ class Simulation:
         )
         self._register_and_perceive_events(events_start)
 
+        # Step 1b: Demographic Cohorts Background Flows (Milestone 4)
+        living_promoted_by_s = {
+            s_id: len([c for c in self.characters.values() if c.alive and c.settlement_id == s_id])
+            for s_id in self.settlements.keys()
+        }
+        self.demographics.step_demographics(
+            self.settlements,
+            living_promoted_by_s,
+            self.tick,
+            self.seed,
+        )
+
         # -------------------------------------------------------------
         # Step 2: Knowledge Propagation (Gossip / Rumors)
         # -------------------------------------------------------------
@@ -668,7 +734,7 @@ class Simulation:
                 self.export_sink.record_census(
                     year=year,
                     settlement_id=s_id,
-                    population=living_pop_by_s.get(s_id, 0),
+                    population=self.get_settlement_total_population(s_id),
                     food=s.food,
                     wealth=s.wealth,
                 )
