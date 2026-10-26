@@ -17,6 +17,13 @@ def int_hash_2d(seed: int, x: int, y: int, salt: int = 0) -> int:
     return ((h ^ (h >> 16)) * 2654435761) & 0xFFFFFFFF
 
 
+def int_hash_3d(seed: int, x: int, y: int, z: int, salt: int = 0) -> int:
+    """Deterministic 32-bit unsigned integer hash of a 3D coordinate."""
+    h = (seed ^ (x * 374761393) ^ (y * 668265263) ^ (z * 1103515245) ^ (salt * 1442695040888963407)) & 0xFFFFFFFF
+    h = ((h ^ (h >> 13)) * 1274126177) & 0xFFFFFFFF
+    return ((h ^ (h >> 16)) * 2654435761) & 0xFFFFFFFF
+
+
 def smoothstep(t: float) -> float:
     """3t^2 - 2t^3 cubic Hermite polynomial using only elementary arithmetic."""
     return t * t * (3.0 - 2.0 * t)

@@ -8,6 +8,8 @@ Thumbs.db
 *.zip
 releases/**/*.json
 releases/samples/
+releases/exports/
+releases/test_export*
 build/
 dist/
 *.spec
