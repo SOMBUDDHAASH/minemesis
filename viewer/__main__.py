@@ -11,6 +11,10 @@ import argparse
 from pathlib import Path
 import sys
 
+_ROOT = Path(__file__).resolve().parent.parent
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
+
 from minemesis.core.seed import SeedPair
 from minemesis.export.schema import BUILD_ID, CURRENT_SCHEMA_VERSION
 from minemesis.export.writer import RunDBWriter

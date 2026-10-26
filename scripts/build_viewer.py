@@ -57,6 +57,7 @@ def build_pyinstaller() -> tuple[Path, Path, Path]:
         "--exclude-module", "idlelib",
         "--add-data", f"viewer{os.pathsep}viewer",
         "--add-data", f"minemesis{os.pathsep}minemesis",
+        "--add-data", f"translators{os.pathsep}translators",
     ]
 
     # 1. Build Onedir Distribution (Portable Folder)
