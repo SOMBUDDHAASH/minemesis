@@ -23,6 +23,7 @@ from minemesis.models.relationship import Relationship, compute_relationship
 from minemesis.models.settlement import Settlement, TradeRoute
 from minemesis.models.demographics import DemographicRegistry
 from minemesis.core.diplomacy import DiplomacyManager
+from minemesis.systems.player_system import PlayerSystem
 from minemesis.core.knowledge import KnowledgeEngine, KnowledgeOwnerType, KnowledgeTargetType
 from minemesis.core.relationship_cache import RelationshipCache
 from minemesis.systems.conflict import ActiveFeud, process_conflicts_and_economy
@@ -144,6 +145,10 @@ class Simulation:
             )
         except ImportError:
             self.lore_engine = None
+
+        # Player as Simulation Actor (Milestone 3)
+        self.player_system = PlayerSystem()
+        self.player_system.initialize_player(self)
 
         if export_sink:
             self.set_export_sink(export_sink)
@@ -402,6 +407,10 @@ class Simulation:
         if self.lore_engine and self.lore_engine.enabled:
             return self.lore_engine.export_minecraft_book(book_id)
         return None
+
+    def execute_player_command(self, command: str, args: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Executes a player command in the simulation."""
+        return self.player_system.execute_command(command, args or {}, self)
 
     def get_relationship(self, source_id: str, target_id: str) -> Relationship:
         """

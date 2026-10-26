@@ -13,6 +13,7 @@ from viewer.ui.tabs.threads import ThreadsTab
 from viewer.ui.tabs.world import WorldTab
 from viewer.ui.tabs.dynasty import DynastyTab
 from viewer.ui.tabs.diplomacy import DiplomacyTab
+from viewer.ui.tabs.player import PlayerTab
 
 __all__ = [
     "BaseTab",
@@ -28,4 +29,5 @@ __all__ = [
     "WorldTab",
     "DynastyTab",
     "DiplomacyTab",
+    "PlayerTab",
 ]

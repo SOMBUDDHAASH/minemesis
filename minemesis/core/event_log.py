@@ -127,6 +127,10 @@ class Event:
             s1 = parts.get("party1", loc)
             s2 = parts.get("party2", "Party")
             return f"Treaty signed between {s1} and {s2}"
+        elif t == EventType.PLAYER_ACTION:
+            action = self.payload.get("action", "action")
+            target = parts.get("target", loc)
+            return f"Player Traveler performed {action} upon {target}"
         return f"{t.value} at {loc}"
 
 

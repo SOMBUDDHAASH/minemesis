@@ -59,6 +59,9 @@ class EventType(str, Enum):
     WAR_DECLARED = "WarDeclared"
     TREATY_SIGNED = "TreatySigned"
 
+    # Milestone 3: Player as Simulation Actor
+    PLAYER_ACTION = "PlayerAction"
+
     # Alias for backwards compatibility
     FEUD_BEGINS = "Feud"
 

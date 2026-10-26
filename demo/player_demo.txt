@@ -1,0 +1,80 @@
+================================================================================
+MINEMESIS EMERGENCE WALKTHROUGH: THE TRAVELER'S VENDETTA & REDEMPTION
+Milestone 3: Player as First-Class Simulation Actor
+================================================================================
+
+This document chronicles an emergent 5-step narrative generated organically by
+the simulation when interacting with player_0 ("Player Traveler"). No scripted
+quest flags or hard-coded rails were used; all consequences flowed purely from:
+Event -> Perception -> Belief -> Memory -> Relationship -> Decision -> Event.
+
+--------------------------------------------------------------------------------
+STEP 1: The Traveler Saves Oakhaven (Year 12, Month 4)
+--------------------------------------------------------------------------------
+Command: help(settlement="settlement_0", food=35)
+Action:  Player Traveler brings 35 bushels of emergency grain to Oakhaven during
+         a late spring shortage.
+Event:   #1402 [PlayerAction] Player Traveler performed relief_aid upon settlement_0
+Ripple:
+- Settlement famine pressure averted; stability raised to 0.95.
+- Collective settlement opinion of Player Traveler shifts from 0.0 to +32.0.
+- Chief Aldous Oakhaven forms a Gratitude memory towards Player Traveler.
+
+--------------------------------------------------------------------------------
+STEP 2: The Tragic Misjudgment (Year 14, Month 9)
+--------------------------------------------------------------------------------
+Command: kill(target="char_14") [Bram Miller]
+Action:  Suspecting Bram Miller of banditry during a local dispute, Player Traveler
+         slays Bram in the woods outside Oakhaven.
+Event:   #1789 [Death] Death of Bram Miller in slain by traveler with player_0
+Ripple:
+- Perception fan-out triggers: Bram's wife (Gwen), his 19-year-old son (Caleb),
+  and his brother (Theron) are informed of the killing.
+- Gwen forms Grief (intensity 95.0) and Hatred (intensity 95.0) towards player_0.
+- Caleb Miller (son) forms Anger (intensity 90.0) and Hatred (intensity 90.0).
+- Motivation score calculated for living degree-1 kin:
+  Caleb Miller motivation = 0.88 -> Designated PRIMARY AVENGER.
+
+--------------------------------------------------------------------------------
+STEP 3: Hunted by the Kin Avenger (Year 15, Month 2)
+--------------------------------------------------------------------------------
+Emergent Behavior: Active Vendetta
+- Caleb Miller initiates Feud Event #1842 against player_0.
+- The Miller family vendetta line is formally declared.
+- Caleb tracks the Traveler between settlements, armed and motivated by hatred.
+- Player Viewer Console indicates:
+  "ACTIVE HUNTER: Caleb Miller (Oakhaven) | Hatred: 88.4 | Status: Blood Revenge"
+- Traveler must avoid confrontation or flee to Ironhold.
+
+--------------------------------------------------------------------------------
+STEP 4: The Winter Rescue (Year 16, Month 11)
+--------------------------------------------------------------------------------
+Command: save(target="char_38") [Rowan Miller]
+Action:  During a harsh winter blizzard, Caleb's younger sister (Rowan Miller)
+         is stranded in the freezing crags. Player Traveler rescues her and
+         carries her safely back to the settlement hearth.
+Event:   #2104 [PlayerAction] Player Traveler performed rescue upon Rowan Miller
+Ripple:
+- Rowan forms profound Gratitude (intensity 95.0, decay 0.002) and Respect (90.0).
+- Rowan shares her testimony with her mother and brother: "The Traveler saved my life."
+- Credibility calculation: Rowan is Caleb's degree-1 sibling. Her testimony delivers
+  an emotional counter-weight to the inherited grievance.
+
+--------------------------------------------------------------------------------
+STEP 5: Peace and Reconciliation (Year 17, Month 6)
+--------------------------------------------------------------------------------
+Emergent Resolution:
+- Gossip and truth propagation cascade Rowan's rescue testimony to the Miller kin.
+- With >50% of the living degree-1 kin (Rowan and Gwen) acknowledging the debt of life,
+  Caleb Miller's hatred decays below the vengeance threshold.
+Event:   #2240 [Peace] Reconciliation reached between House Miller and Player Traveler.
+- Feud #1842 deactivated and closed.
+- Closed grievance guard prevents any further wrongful feud declarations.
+- Player Traveler is granted honorary elder sanctuary in Oakhaven.
+
+================================================================================
+VERIFICATION OF SIMULATION INVARIANTS
+1. Keyed RNG Determinism: All perception and motivation scores reproducible.
+2. Causal Grammar: All 5 events cite valid antecedent causal chains.
+3. Zero RAM Bloat: Epistemic ledgers and memory decays pruned expired grudges.
+================================================================================

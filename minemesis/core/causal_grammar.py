@@ -407,6 +407,17 @@ CAUSE_GRAMMAR: Mapping[EventType, GrammarRule] = {
             EventType.FAMINE,
         }),
     ),
+    EventType.PLAYER_ACTION: GrammarRule(
+        root_allowed=True,
+        allowed_cause_types=frozenset({
+            EventType.DEATH,
+            EventType.RAID,
+            EventType.FEUD,
+            EventType.FAMINE,
+            EventType.SUCCESSION_CRISIS,
+            EventType.TRADE_ROUTE_BROKEN,
+        }),
+    ),
 }
 
 
