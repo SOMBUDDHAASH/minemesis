@@ -93,6 +93,19 @@ class RunDatabase:
         rows = cur.execute("SELECT * FROM settlements ORDER BY id").fetchall()
         return [dict(r) for r in rows]
 
+    def get_geography(self) -> Optional[dict[str, Any]]:
+        cur = self._conn.cursor()
+        try:
+            row = cur.execute("SELECT * FROM geography LIMIT 1").fetchone()
+            if row:
+                d = dict(row)
+                if d.get("roads_json"):
+                    d["roads"] = json.loads(d["roads_json"])
+                return d
+        except Exception:
+            pass
+        return None
+
     def get_settlement(self, settlement_id: str) -> Optional[dict[str, Any]]:
         cur = self._conn.cursor()
         row = cur.execute("SELECT * FROM settlements WHERE id = ?", (settlement_id,)).fetchone()

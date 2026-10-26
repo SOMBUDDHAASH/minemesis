@@ -28,6 +28,17 @@ class RunDBSink:
     def record_settlement(self, id: str, name: str, founded_tick: int, biome: str, culture: str) -> None:
         pass
 
+    def record_geography(
+        self,
+        world_seed: int,
+        map_width: int,
+        map_height: int,
+        settlement_count: int,
+        terrain_blob_compressed: Optional[bytes],
+        roads_json: str,
+    ) -> None:
+        pass
+
     def record_census(self, year: int, settlement_id: str, population: int, food: float, wealth: float) -> None:
         pass
 
@@ -212,6 +223,25 @@ class RunDBWriter(RunDBSink):
         self._written_settlements.add(id)
         self._buffers["settlements"].append((id, name, founded_tick, biome, culture))
         self._check_flush("settlements")
+
+    def record_geography(
+        self,
+        world_seed: int,
+        map_width: int,
+        map_height: int,
+        settlement_count: int,
+        terrain_blob_compressed: Optional[bytes],
+        roads_json: str,
+    ) -> None:
+        try:
+            cur = self._conn.cursor()
+            cur.execute(
+                "INSERT OR REPLACE INTO geography VALUES (?, ?, ?, ?, ?, ?)",
+                (int(world_seed), int(map_width), int(map_height), int(settlement_count), terrain_blob_compressed, str(roads_json)),
+            )
+            self._conn.commit()
+        except Exception as e:
+            logger.warning("Failed to record geography: %s", e)
 
     def record_census(self, year: int, settlement_id: str, population: int, food: float, wealth: float) -> None:
         self._buffers["census"].append((year, settlement_id, int(population), float(food), float(wealth)))

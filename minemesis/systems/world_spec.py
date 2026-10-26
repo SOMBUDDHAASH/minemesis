@@ -65,8 +65,10 @@ class WorldSpec:
     map_width: int
     map_height: int
     settlements: tuple[SettlementSite, ...]
-    generator_version: str = "v0"
+    roads: tuple[dict[str, Any], ...] = field(default_factory=tuple)
+    generator_version: str = "T0"
     digest: str = ""
+    terrain_data: Optional[bytes] = None
 
     def __post_init__(self):
         if not self.digest:
@@ -77,6 +79,7 @@ class WorldSpec:
                 "map_height": self.map_height,
                 "generator_version": self.generator_version,
                 "settlements": [s.to_dict() for s in self.settlements],
+                "road_count": len(self.roads),
             }
             json_bytes = json.dumps(canonical_data, sort_keys=True).encode("utf-8")
             h = hashlib.sha256(json_bytes).hexdigest()
@@ -97,6 +100,15 @@ class WorldSpec:
         return None
 
     def to_dict(self) -> dict:
+        return {
+            "world_seed": self.world_seed,
+            "map_width": self.map_width,
+            "map_height": self.map_height,
+            "generator_version": self.generator_version,
+            "digest": self.digest,
+            "settlements": [s.to_dict() for s in self.settlements],
+            "roads": list(self.roads),
+        }
         return {
             "world_seed": self.world_seed,
             "map_width": self.map_width,

@@ -182,4 +182,14 @@ CREATE TABLE IF NOT EXISTS name_audit (
     issue_type TEXT NOT NULL,
     details TEXT NOT NULL
 );
+
+-- Macro WorldSpec & Geography
+CREATE TABLE IF NOT EXISTS geography (
+    world_seed INTEGER PRIMARY KEY,
+    map_width INTEGER NOT NULL,
+    map_height INTEGER NOT NULL,
+    settlement_count INTEGER NOT NULL,
+    terrain_blob_compressed BLOB,
+    roads_json TEXT NOT NULL
+);
 """

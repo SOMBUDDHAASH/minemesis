@@ -27,4 +27,5 @@ TABLE_NAMES = [
     "myths",
     "threads",
     "name_audit",
+    "geography",
 ]

@@ -18,6 +18,7 @@ from minemesis.models.character import Character
 from minemesis.models.settlement import Settlement
 from minemesis.systems.world_spec import WorldSpec, SettlementSite, WorldProvider
 from minemesis.systems.world_gen_v0 import V0WorldGenerator
+from minemesis.terrain.world_provider_t0 import T0WorldProvider
 from minemesis.systems.cast_gen import (
     CastGenerator,
     GIVEN_NAMES_MALE as FIRST_NAMES_MALE,
@@ -43,7 +44,7 @@ def generate_world(
         raise TypeError(f"Expected SeedPair or int, got {type(seed_or_pair)}")
 
     # 1. World Generation (from world_seed only)
-    provider = world_provider or V0WorldGenerator()
+    provider = world_provider or T0WorldProvider()
     world_spec = provider.generate(pair.world, name_salt=name_salt)
 
     # 2. Construct Settlements

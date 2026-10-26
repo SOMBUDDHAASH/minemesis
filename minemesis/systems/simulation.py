@@ -159,6 +159,25 @@ class Simulation:
         """Attaches an export sink and registers listeners."""
         self.export_sink = sink
         if self.export_sink:
+            if hasattr(self, "world_spec") and self.world_spec:
+                import json
+                roads_data = [
+                    r if isinstance(r, dict) else {
+                        "from": getattr(r, "from_settlement", getattr(r, "from_id", "")),
+                        "to": getattr(r, "to_settlement", getattr(r, "to_id", "")),
+                        "distance": getattr(r, "distance", getattr(r, "length", 0)),
+                        "path": getattr(r, "path", []),
+                    }
+                    for r in self.world_spec.roads
+                ]
+                self.export_sink.record_geography(
+                    world_seed=self.world_spec.world_seed,
+                    map_width=self.world_spec.map_width,
+                    map_height=self.world_spec.map_height,
+                    settlement_count=len(self.world_spec.settlements),
+                    terrain_blob_compressed=self.world_spec.terrain_data,
+                    roads_json=json.dumps(roads_data),
+                )
             for s in self.settlements.values():
                 self.export_sink.record_settlement(
                     id=s.id,

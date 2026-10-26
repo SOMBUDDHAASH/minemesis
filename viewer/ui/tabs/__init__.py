@@ -4,6 +4,7 @@ Viewer V2 Tab Registration Package.
 
 from viewer.ui.tabs.base import BaseTab, TAB_REGISTRY, register_tab
 from viewer.ui.tabs.home import HomeTab
+from viewer.ui.tabs.map import MapTab
 from viewer.ui.tabs.chronicle import ChronicleTab
 from viewer.ui.tabs.people import PeopleTab
 from viewer.ui.tabs.places import PlacesTab
@@ -21,6 +22,7 @@ __all__ = [
     "TAB_REGISTRY",
     "register_tab",
     "HomeTab",
+    "MapTab",
     "ChronicleTab",
     "PeopleTab",
     "PlacesTab",
