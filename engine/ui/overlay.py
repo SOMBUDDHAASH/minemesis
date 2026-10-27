@@ -85,12 +85,12 @@ class OverlayRenderer:
         ortho[0, 0] = 2.0 / width
         ortho[1, 1] = -2.0 / height
         ortho[2, 2] = -1.0
-        ortho[3, 0] = -1.0
-        ortho[3, 1] = 1.0
+        ortho[0, 3] = -1.0
+        ortho[1, 3] = 1.0
         ortho[3, 3] = 1.0
 
         if "u_ortho" in self.program:
-            self.program["u_ortho"].write(ortho.tobytes())
+            self.program["u_ortho"].write(np.ascontiguousarray(ortho.T, dtype=np.float32).tobytes())
 
     def draw_rect(
         self,
@@ -136,6 +136,25 @@ class OverlayRenderer:
                     cur_x, y1, u0, v1, r, g, b, a,
                 ])
             cur_x += cw
+
+    def render_crosshair(self) -> None:
+        """Renders a centered screen crosshair."""
+        cx = self.width / 2.0
+        cy = self.height / 2.0
+        verts: list[float] = []
+        # Horizontal bar (16x2)
+        self.draw_rect(verts, cx - 8.0, cy - 1.0, 16.0, 2.0, (1.0, 1.0, 1.0, 0.85))
+        # Vertical bar (2x16)
+        self.draw_rect(verts, cx - 1.0, cy - 8.0, 2.0, 16.0, (1.0, 1.0, 1.0, 0.85))
+
+        self.ctx.disable(moderngl.DEPTH_TEST)
+        self.ctx.enable(moderngl.BLEND)
+        if "u_is_text" in self.program:
+            self.program["u_is_text"].value = 0
+        raw_bg = np.array(verts, dtype=np.float32).tobytes()
+        self.vbo.write(raw_bg)
+        self.vao.render(moderngl.TRIANGLES, vertices=len(verts) // 8)
+        self.ctx.enable(moderngl.DEPTH_TEST)
 
     def render_overlay(self, lines: list[str]) -> None:
         if not lines:

@@ -39,6 +39,13 @@ class ChunkManager:
         self.chunks: Dict[Tuple[int, int], Chunk] = {}
         self.chunk_deltas: Dict[Tuple[int, int], Dict[Tuple[int, int, int], int]] = {}
 
+        # Rendering & Debug State
+        self.wireframe: bool = False
+        self.chunk_debug_colors: bool = False
+        self.draw_calls: int = 0
+        self.chunks_rendered: int = 0
+        self.triangles_rendered: int = 0
+
     def get_chunk(self, cx: int, cz: int) -> Chunk:
         key = (cx, cz)
         if key not in self.chunks:
@@ -93,32 +100,59 @@ class ChunkManager:
             return True
         return False
 
-    def render(self, px: float, pz: float) -> int:
-        """Renders all loaded chunk meshes. Returns total draw calls."""
+    def render(self, px: float, pz: float) -> Tuple[int, int, int]:
+        """Renders all loaded chunk meshes. Returns (draw_calls, chunks_rendered, triangles_rendered)."""
         pcx = int(px) // 16
         pcz = int(pz) // 16
         vd = self.view_distance
         draw_calls = 0
+        chunks_rendered = 0
+        triangles_rendered = 0
 
-        # Pass 1: Opaque Geometries (depth write ON)
         self.ctx.enable(moderngl.DEPTH_TEST)
         self.ctx.depth_func = "<="
-        self.ctx.enable(moderngl.CULL_FACE)
 
+        # Wireframe mode support
+        if self.wireframe:
+            self.ctx.wireframe = True
+            self.ctx.disable(moderngl.CULL_FACE)
+        else:
+            self.ctx.wireframe = False
+            self.ctx.disable(moderngl.CULL_FACE)
+
+        # Pass 1: Opaque Geometries
         for (cx, cz), chunk in self.chunks.items():
             if abs(cx - pcx) <= vd and abs(cz - pcz) <= vd:
                 if chunk.opaque_mesh:
                     vao, count = chunk.opaque_mesh
+                    # Chunk debug color tint (red, green, blue, yellow)
+                    if self.chunk_debug_colors and "u_light_color" in self.program:
+                        colors = [
+                            (1.0, 0.2, 0.2),  # Red
+                            (0.2, 1.0, 0.2),  # Green
+                            (0.2, 0.4, 1.0),  # Blue
+                            (1.0, 1.0, 0.2),  # Yellow
+                        ]
+                        c_idx = ((cx % 2) + 2 * (cz % 2)) % 4
+                        self.program["u_light_color"].value = colors[c_idx]
+
                     vao.render(moderngl.TRIANGLES, vertices=count)
                     draw_calls += 1
+                    chunks_rendered += 1
+                    triangles_rendered += count // 3
 
         # Pass 2: Transparent Geometries (water, leaves, glass)
-        self.ctx.enable(moderngl.BLEND)
-        for (cx, cz), chunk in self.chunks.items():
-            if abs(cx - pcx) <= vd and abs(cz - pcz) <= vd:
-                if chunk.transparent_mesh:
-                    vao, count = chunk.transparent_mesh
-                    vao.render(moderngl.TRIANGLES, vertices=count)
-                    draw_calls += 1
+        if not self.wireframe:
+            self.ctx.enable(moderngl.BLEND)
+            for (cx, cz), chunk in self.chunks.items():
+                if abs(cx - pcx) <= vd and abs(cz - pcz) <= vd:
+                    if chunk.transparent_mesh:
+                        vao, count = chunk.transparent_mesh
+                        vao.render(moderngl.TRIANGLES, vertices=count)
+                        draw_calls += 1
+                        triangles_rendered += count // 3
 
-        return draw_calls
+        self.draw_calls = draw_calls
+        self.chunks_rendered = chunks_rendered
+        self.triangles_rendered = triangles_rendered
+        return draw_calls, chunks_rendered, triangles_rendered

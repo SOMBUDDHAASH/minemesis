@@ -37,7 +37,11 @@ def main() -> int:
     if args.benchmark > 0:
         print(f"[*] Running Minemesis Benchmark for {args.benchmark} frames...")
         t0 = time.perf_counter()
-        app.run(max_frames=args.benchmark)
+        for i in range(max(1, args.benchmark - 1)):
+            app.run_frame()
+
+        shot_path = args.screenshot or "reports/screens/benchmark.png"
+        app.capture_screenshot(shot_path)
         total_time = time.perf_counter() - t0
         avg_fps = args.benchmark / total_time if total_time > 0 else 60.0
 
@@ -46,16 +50,16 @@ def main() -> int:
         print(f"     Total Time:   {total_time:.3f} s")
         print(f"     Average FPS:  {avg_fps:.1f} FPS")
         print(f"     Peak RAM:     {app.peak_rss_mb:.1f} MB")
-
-        shot_path = args.screenshot or "reports/screens/benchmark.png"
-        app.capture_screenshot(shot_path)
         print(f"     Screenshot:   {shot_path}")
+        app.window.destroy()
         return 0
 
     # Normal interactive execution
-    app.run()
+    while not app.window.should_close():
+        app.run_frame()
     if args.screenshot:
         app.capture_screenshot(args.screenshot)
+    app.window.destroy()
     return 0
 
 

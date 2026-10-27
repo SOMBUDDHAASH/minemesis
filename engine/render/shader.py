@@ -4,6 +4,7 @@ ModernGL Shader Program Management.
 
 from __future__ import annotations
 import moderngl
+import numpy as np
 
 
 BASIC_VOXEL_VERTEX_SHADER = """
@@ -89,7 +90,8 @@ class ShaderProgram:
 
     def set_uniform_mat4(self, name: str, value: any) -> None:
         if name in self.program:
-            self.program[name].write(value.astype("f4").tobytes())
+            mat = np.ascontiguousarray(value.T, dtype=np.float32)
+            self.program[name].write(mat.tobytes())
 
     def set_uniform_vec3(self, name: str, x: float, y: float, z: float) -> None:
         if name in self.program:

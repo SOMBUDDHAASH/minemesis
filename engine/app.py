@@ -158,6 +158,7 @@ class EngineApp:
 
         self.peak_rss_mb: float = 0.0
         self.show_f3: bool = True
+        self._pending_screenshot_path: Optional[str] = None
 
     def _alert_nearby_guards(self, victim: NPC) -> None:
         """Alerts settlement guards if player attacks or steals within hearing range."""
@@ -259,12 +260,8 @@ class EngineApp:
         self.overlay.update_projection(width, height)
 
     def capture_screenshot(self, output_path: str | Path) -> None:
-        p = Path(output_path)
-        p.parent.mkdir(parents=True, exist_ok=True)
-        raw = self.ctx.fbo.read(components=3, alignment=1)
-        img = Image.frombytes("RGB", (self.width, self.height), raw)
-        img = img.transpose(Image.FLIP_TOP_BOTTOM)
-        img.save(p)
+        self._pending_screenshot_path = str(output_path)
+        self.run_frame()
 
     def run_frame(self) -> None:
         dt = self.timer.tick()
@@ -279,6 +276,16 @@ class EngineApp:
             self._run_spike_frame(dt, rss_mb)
         else:
             self._run_world_frame(dt, rss_mb)
+
+        # Capture screenshot BEFORE buffer swap
+        if self._pending_screenshot_path:
+            p = Path(self._pending_screenshot_path)
+            p.parent.mkdir(parents=True, exist_ok=True)
+            raw = self.ctx.fbo.read(components=3, alignment=1)
+            img = Image.frombytes("RGB", (self.width, self.height), raw)
+            img = img.transpose(Image.FLIP_TOP_BOTTOM)
+            img.save(p)
+            self._pending_screenshot_path = None
 
         # Swap buffers and poll OS window events
         self.window.swap_buffers()
@@ -505,6 +512,14 @@ class EngineApp:
         if inp.is_key_pressed(glfw.KEY_F3):
             self.show_f3 = not self.show_f3
 
+        # Toggle F4 Wireframe Mode
+        if inp.is_key_pressed(glfw.KEY_F4):
+            self.chunk_mgr.wireframe = not self.chunk_mgr.wireframe
+
+        # Toggle F5 Chunk Colors Debug Mode
+        if inp.is_key_pressed(glfw.KEY_F5):
+            self.chunk_mgr.chunk_debug_colors = not self.chunk_mgr.chunk_debug_colors
+
         # Mouse look
         if inp.mouse_captured:
             sensitivity = 0.15
@@ -628,21 +643,28 @@ class EngineApp:
 
             total_deltas = sum(len(d) for d in self.chunk_mgr.chunk_deltas.values())
 
+            ground_h = float(self.chunk_mgr.generator.get_interpolated_height(int(p.x), int(p.z)))
+            chunks_meshed = sum(1 for c in self.chunk_mgr.chunks.values() if c.opaque_mesh is not None)
             sim_year = self.bridge.total_simulated_ticks // 12
             lines = [
-                f"MINEMESIS VOXEL ENGINE v0.6.0 [STAGE E3] | FPS: {self.timer.fps:.1f} | Year {sim_year}",
-                f"XYZ: {p.x:.2f} / {p.y:.2f} / {p.z:.2f}  (Chunk: [{int(p.x)//16}, {int(p.z)//16}])",
-                f"Facing: Yaw {p.yaw:.1f}° | Pitch {p.pitch:.1f}° | Time: {self.sky.progress * 24.0:.1f}h",
-                f"Biome: {biome_name} (Tile {tile_x}, {tile_z}) | Elev: {int(p.y)}m",
+                f"MINEMESIS VOXEL ENGINE [RECOVERY AUDIT] | FPS: {self.timer.fps:.1f}",
+                f"Camera XYZ: {self.camera.x:.2f} / {self.camera.y:.2f} / {self.camera.z:.2f} (Yaw: {self.camera.yaw:.1f}°, Pitch: {self.camera.pitch:.1f}°)",
+                f"Terrain Elevation: {ground_h:.1f}m (Eye Altitude: {self.camera.y - ground_h:+.1f}m) | Year {sim_year}",
+                f"Chunks Loaded: {len(self.chunk_mgr.chunks)} | Chunks Meshed: {chunks_meshed}",
+                f"Chunks Rendered: {self.chunk_mgr.chunks_rendered} | Draw Calls: {self.chunk_mgr.draw_calls}",
+                f"Triangle Count: {self.chunk_mgr.triangles_rendered:,}",
+                f"Wireframe [F4]: {'ON' if self.chunk_mgr.wireframe else 'OFF'} | Chunk Colors [F5]: {'ON' if self.chunk_mgr.chunk_debug_colors else 'OFF'}",
                 f"Targeting: {target_str}",
-                f"Active Hand [Slot {p.selected_slot + 1}]: {sel_name} ({sel_count}x)",
-                f"Location: {near_set} | Chunks Loaded: {len(self.chunk_mgr.chunks)} (Draw Calls: {draw_calls})",
-                f"Living NPCs: {len(self.npcs)} | Memory RSS: {rss_mb:.1f} MB (Peak: {self.peak_rss_mb:.1f} MB)",
+                f"Hand [Slot {p.selected_slot + 1}]: {sel_name} ({sel_count}x) | Location: {near_set}",
             ]
             if action_prompt:
                 lines.append(action_prompt)
-            lines.append("Controls: [WASD] Move [Space] Jump [L/R Click] Mine/Build [E] Talk [R] Read [M] Map [J] Chronicle [Esc] Pause [F3] HUD")
+            lines.append("Controls: [WASD] Move [Space] Jump [L/R Click] Mine/Build [F4] Wireframe [F5] Chunk Colors [F3] HUD [Esc] Pause")
             self.overlay.render_overlay(lines)
+
+        # Crosshair in first-person gameplay
+        if not self.paused and not self.book_reader.is_reading and not self.interaction.menu_open and not self.show_chronicle and not self.show_world_map:
+            self.overlay.render_crosshair()
 
     def _render_3d_scene(self, p: PlayerController) -> int:
         """Renders sky, chunks, and 3D humanoids."""
@@ -669,13 +691,14 @@ class EngineApp:
         self.shader.set_uniform_vec3("u_camera_pos", eye_x, eye_y, eye_z)
 
         # 1. Render Chunks
-        draw_calls = self.chunk_mgr.render(p.x, p.z)
+        draw_calls, chunks_rendered, triangles_rendered = self.chunk_mgr.render(p.x, p.z)
 
-        # 2. Render Humanoid NPCs
-        for npc in self.npcs:
-            dist = math.sqrt((p.x - npc.x) ** 2 + (p.z - npc.z) ** 2)
-            if dist < float(self.view_distance * 16):
-                npc.render(self.humanoid_mesh, self.shader, self.camera)
+        # 2. Render Humanoid NPCs (if not wireframe)
+        if not self.chunk_mgr.wireframe:
+            for npc in self.npcs:
+                dist = math.sqrt((p.x - npc.x) ** 2 + (p.z - npc.z) ** 2)
+                if dist < float(self.view_distance * 16):
+                    npc.render(self.humanoid_mesh, self.shader, self.camera)
 
         return draw_calls
 

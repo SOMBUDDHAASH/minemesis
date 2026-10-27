@@ -72,7 +72,7 @@ class ChunkMesher:
         world_offset_x = chunk.cx * 16
         world_offset_z = chunk.cz * 16
 
-        for y in range(1, 255):
+        for y in range(0, 256):
             for z in range(16):
                 for x in range(16):
                     bid = chunk.get_block(x, y, z)
