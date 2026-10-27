@@ -53,6 +53,8 @@ def build_engine_exe() -> Path:
         "--collect-all", "glfw",
         "--add-data", f"engine{os.pathsep}engine",
         "--add-data", f"data{os.pathsep}data",
+        "--add-data", f"minemesis{os.pathsep}minemesis",
+        "--add-data", f"samples{os.pathsep}samples",
         "--onefile",
         "--name", "Minemesis",
         "engine/__main__.py",
@@ -83,8 +85,8 @@ def verify_engine_exe(exe_path: Path) -> None:
     print(f"[*] Output: {res_ver.stdout.strip()}")
     assert res_ver.returncode == 0, f"Version check failed: {res_ver.stderr}"
 
-    # 2. Benchmark check (Stage E1 world meshing & rendering, 30 frames, headless)
-    shot_path = ROOT_DIR / "reports" / "screens" / "stage_e1_exe_benchmark.png"
+    # 2. Benchmark check (Stage E3 full world, living NPCs, bridge, 30 frames, headless)
+    shot_path = ROOT_DIR / "reports" / "screens" / "stage_e3_exe_benchmark.png"
     t1 = time.perf_counter()
     cmd_bench = [str(exe_path), "--benchmark", "30", "--headless", "--screenshot", str(shot_path)]
     res_bench = subprocess.run(cmd_bench, capture_output=True, text=True, timeout=60)
@@ -93,15 +95,41 @@ def verify_engine_exe(exe_path: Path) -> None:
     print(res_bench.stdout)
     assert res_bench.returncode == 0, f"Benchmark failed: {res_bench.stderr}"
     assert shot_path.exists(), f"Screenshot {shot_path} was not created!"
-    print(f"[SUCCESS] Stage E1 Engine Executable Verified 100% Operational!")
+    print(f"[SUCCESS] Minemesis Engine Executable Verified 100% Operational!")
+
+
+def create_portable_zip(exe_path: Path) -> Path:
+    import zipfile
+    releases_dir = ROOT_DIR / "releases"
+    zip_path = releases_dir / "Minemesis-portable.zip"
+    print(f"\n[PACKAGING] Creating {zip_path}...")
+    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
+        zf.write(exe_path, arcname="Minemesis.exe")
+        how_to = releases_dir / "HOW_TO_PLAY.txt"
+        if how_to.exists():
+            zf.write(how_to, arcname="HOW_TO_PLAY.txt")
+        # Add sample run databases
+        samples_dir = ROOT_DIR / "samples"
+        if samples_dir.exists():
+            for f in samples_dir.glob("*.minemesis"):
+                zf.write(f, arcname=f"samples/{f.name}")
+        # Add data definitions
+        data_dir = ROOT_DIR / "data"
+        if data_dir.exists():
+            for f in data_dir.rglob("*"):
+                if f.is_file():
+                    zf.write(f, arcname=f"data/{f.relative_to(data_dir)}")
+    print(f"[SUCCESS] Standalone Portable Distribution Created: {zip_path} ({zip_path.stat().st_size / (1024*1024):.1f} MB)")
+    return zip_path
 
 
 def main() -> None:
     print("=====================================================")
-    print(" Minemesis Standalone Engine Packaging Spike (E0)   ")
+    print(" Minemesis Standalone Engine Final Build (Stage E3)  ")
     print("=====================================================")
     exe = build_engine_exe()
     verify_engine_exe(exe)
+    create_portable_zip(exe)
 
 
 if __name__ == "__main__":

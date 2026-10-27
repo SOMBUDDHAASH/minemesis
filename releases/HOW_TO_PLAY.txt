@@ -1,0 +1,56 @@
+======================================================================
+               MINEMESIS: VOXEL CIVILIZATION SIMULATOR
+              Standalone Self-Hosted Game (OpenGL 3.3 Core)
+======================================================================
+
+Welcome to Minemesis, an entirely standalone 3D voxel civilization game
+where an autonomous living historical simulation is coupled directly to a
+custom physical 3D voxel world engine.
+
+Zero external engine dependencies. Pure self-hosted procedural technology.
+
+----------------------------------------------------------------------
+CONTROLS & SHORTCUTS:
+----------------------------------------------------------------------
+  [W, A, S, D]      Move character (Forward, Left, Backward, Right)
+  [Space]           Jump (0.5m automatic stair-stepping built-in)
+  [Left Shift]      Sprint
+  [Mouse Look]      First-person camera rotation (Pitch & Yaw)
+  [Mouse Left]      Mine / Break targeted voxel block
+  [Mouse Right]     Place active hand block against targeted face
+  [1 to 9]          Select hotbar item
+  [Mouse Wheel]     Scroll through hotbar items
+  [E]               Speak / Interact with living NPC in front of you
+  [R]               Read Ancient Chronicle when targeting Bookshelf / Lectern
+  [M]               Continental World Map overlay (settlements & defenses)
+  [J]               Historical Chronicle overlay (living events ledger)
+  [Esc]             Pause Game Menu / Toggle Cursor / Close Overlays
+  [F3]              Toggle Debug & Profiling HUD
+
+----------------------------------------------------------------------
+LIVING CIVILIZATION INTERACTIONS:
+----------------------------------------------------------------------
+- NPCs follow real 24-hour daily schedules:
+  * 00:00 - 06:00: Sleeping at Home
+  * 06:00 - 12:00: Morning Labor at Workshops / Fields / Archives
+  * 12:00 - 14:00: Socializing at Village Well / Market
+  * 14:00 - 18:00: Afternoon Crafting & Guard Duty
+  * 18:00 - 22:00: Evening Worship at Village Shrine
+  * 22:00 - 24:00: Returning to Cottage Hearth
+- Approach any villager and press [E]:
+  * [1] Talk: Context-sensitive dialogue with the citizen
+  * [2] Trade: Trade regional goods
+  * [3] Gift: Increase affinity (+15)
+  * [4] Help: Learn of settlement fortification needs
+  * [5] Steal: Attempt pickpocketing (Beware: screams alert guards!)
+  * [6] Attack: Engage in combat (Witnesses scream, guards hunt you down!)
+- Building Fortifications:
+  * Placing stone bricks, cobblestone, or palisade walls near settlements
+    increases their Defensibility Score.
+  * Villages adapt: morale rises, guards man the battlements, and
+    citizens express gratitude for your walls!
+- Sleeping:
+  * Open Pause Menu [Esc] and select [5] Sleep Until Morning to skip time
+    forward to dawn, advancing the simulation clock and historical events.
+
+======================================================================

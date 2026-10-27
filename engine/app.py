@@ -16,6 +16,7 @@ from PIL import Image
 
 from engine.core.window import Window
 from engine.core.timer import FrameTimer
+from engine.core.process_bridge import SimulationBridge
 from engine.entities.npc import NPC, VoxelHumanoidMesh
 from engine.entities.interaction import InteractionEngine
 from engine.entities.book_reader import BookReader
@@ -147,6 +148,13 @@ class EngineApp:
             self.book_reader = BookReader()
             self.npcs: list[NPC] = []
             self._spawn_settlement_npcs()
+
+            # Stage E3: Live Simulation Bridge, Game Shell & Overlays
+            self.bridge = SimulationBridge(world_spec=self.world_spec, prehistory_years=20)
+            self.paused: bool = False
+            self.show_chronicle: bool = False
+            self.show_world_map: bool = False
+            self.save_message: str = ""
 
         self.peak_rss_mb: float = 0.0
         self.show_f3: bool = True
@@ -324,7 +332,94 @@ class EngineApp:
         p = self.player
         inp = self.window.input
 
-        # Handle modal states first: Book Reader
+        # Advance live simulation bridge
+        if not self.paused and not self.book_reader.is_reading:
+            self.bridge.tick(dt, self)
+
+        # Handle modal states: Chronicle Overlay [J]
+        if self.show_chronicle:
+            if inp.is_key_pressed(glfw.KEY_ESCAPE) or inp.is_key_pressed(glfw.KEY_J):
+                self.show_chronicle = False
+                self.window.set_mouse_capture(True)
+
+            self._render_3d_scene(p)
+            current_year = self.bridge.total_simulated_ticks // 12
+            chron_lines = [
+                "=== HISTORICAL CHRONICLE & LIVING RECORD ===",
+                f"World Seed: {self.bridge.seed_pair.world} | History Seed: {self.bridge.seed_pair.history}",
+                f"Era: Year {current_year} (Simulated Months: {self.bridge.total_simulated_ticks})",
+                "--------------------------------------------------------------------------------",
+            ]
+            for ev in self.bridge.recent_chronicle_events[-12:]:
+                chron_lines.append(ev)
+            chron_lines.append("--------------------------------------------------------------------------------")
+            chron_lines.append("[J / Esc] Close Chronicle Overlay")
+            self.overlay.render_centered_overlay(chron_lines)
+            return
+
+        # Handle modal states: World Map Overlay [M]
+        if self.show_world_map:
+            if inp.is_key_pressed(glfw.KEY_ESCAPE) or inp.is_key_pressed(glfw.KEY_M):
+                self.show_world_map = False
+                self.window.set_mouse_capture(True)
+
+            self._render_3d_scene(p)
+            map_lines = [
+                "=== CONTINENTAL WORLD MAP & SETTLEMENTS ===",
+                f"World Seed: {self.bridge.seed_pair.world} | Continent Grid: 1024x1024 Voxels",
+                f"Traveler Position: ({int(p.x)}, {int(p.z)}) | Elevation: {int(p.y)}m",
+                "--------------------------------------------------------------------------------",
+            ]
+            for s in self.world_spec.settlements:
+                sx = s.x * 8 + 4
+                sz = s.y * 8 + 4
+                dist = math.sqrt((p.x - sx) ** 2 + (p.z - sz) ** 2)
+                def_score = self.bridge.settlement_defensibility.get(s.id, 10.0)
+                map_lines.append(
+                    f"  * {s.name:<14s} ({s.site_type:<8s}) Pos: ({sx:4d}, {sz:4d}) | Dist: {int(dist):4d}m | Defense: {def_score:.0f}%"
+                )
+            map_lines.append("--------------------------------------------------------------------------------")
+            map_lines.append("[M / Esc] Close World Map")
+            self.overlay.render_centered_overlay(map_lines)
+            return
+
+        # Handle modal states: Pause Menu
+        if self.paused:
+            if inp.is_key_pressed(glfw.KEY_ESCAPE) or inp.is_key_pressed(glfw.KEY_1):
+                self.paused = False
+                self.window.set_mouse_capture(True)
+            elif inp.is_key_pressed(glfw.KEY_2):
+                self.paused = False
+                self.show_world_map = True
+            elif inp.is_key_pressed(glfw.KEY_3):
+                self.paused = False
+                self.show_chronicle = True
+            elif inp.is_key_pressed(glfw.KEY_4):
+                self.bridge.save_world("saves/default", self)
+                self.save_message = "World State Saved Successfully to saves/default/!"
+            elif inp.is_key_pressed(glfw.KEY_5):
+                self.bridge.skip_time(8.0, self)
+                self.save_message = "Slept until sunrise (06:00). History and crops advanced!"
+
+            self._render_3d_scene(p)
+            pause_lines = [
+                "=== MINEMESIS PAUSED ===",
+                "Standalone 3D Voxel Civilization Game",
+                "--------------------------------------------------",
+                "[1] Resume Game",
+                "[2] Continental World Map (M)",
+                "[3] Historical Chronicle (J)",
+                "[4] Quick Save World State",
+                "[5] Sleep Until Morning (Advance 8h)",
+                "[Esc] Resume Game",
+                "--------------------------------------------------",
+            ]
+            if self.save_message:
+                pause_lines.append(f"Status: {self.save_message}")
+            self.overlay.render_centered_overlay(pause_lines)
+            return
+
+        # Handle modal states: Book Reader
         if self.book_reader.is_reading:
             if inp.is_key_pressed(glfw.KEY_ESCAPE):
                 self.book_reader.close_book()
@@ -360,6 +455,17 @@ class EngineApp:
                     self._alert_nearby_guards(active_npc)
             elif inp.is_key_pressed(glfw.KEY_6):
                 self.interaction.execute_action("attack", p)
+                # Find witnesses within 40m
+                witnesses = [
+                    npc for npc in self.npcs
+                    if math.sqrt((npc.x - active_npc.x) ** 2 + (npc.z - active_npc.z) ** 2) < 40.0
+                ]
+                self.bridge.record_combat_encounter(
+                    victim_npc=active_npc,
+                    damage=6.0,
+                    fatal=(active_npc.health <= 0.0),
+                    witnesses=witnesses,
+                )
                 self._alert_nearby_guards(active_npc)
 
             # Render 3D scene paused in background
@@ -381,9 +487,19 @@ class EngineApp:
             return
 
         # Standard First-Person Game Loop
-        # Toggle mouse capture / pause
+        # In-game Pause on Escape
         if inp.is_key_pressed(glfw.KEY_ESCAPE):
-            self.window.set_mouse_capture(not inp.mouse_captured)
+            self.paused = True
+            self.save_message = ""
+            self.window.set_mouse_capture(False)
+
+        # Chronicle [J] and World Map [M]
+        if inp.is_key_pressed(glfw.KEY_J):
+            self.show_chronicle = True
+            self.window.set_mouse_capture(False)
+        elif inp.is_key_pressed(glfw.KEY_M):
+            self.show_world_map = True
+            self.window.set_mouse_capture(False)
 
         # Toggle F3 HUD
         if inp.is_key_pressed(glfw.KEY_F3):
@@ -512,19 +628,20 @@ class EngineApp:
 
             total_deltas = sum(len(d) for d in self.chunk_mgr.chunk_deltas.values())
 
+            sim_year = self.bridge.total_simulated_ticks // 12
             lines = [
-                f"MINEMESIS VOXEL ENGINE v0.6.0 [STAGE E2] | FPS: {self.timer.fps:.1f}",
+                f"MINEMESIS VOXEL ENGINE v0.6.0 [STAGE E3] | FPS: {self.timer.fps:.1f} | Year {sim_year}",
                 f"XYZ: {p.x:.2f} / {p.y:.2f} / {p.z:.2f}  (Chunk: [{int(p.x)//16}, {int(p.z)//16}])",
                 f"Facing: Yaw {p.yaw:.1f}° | Pitch {p.pitch:.1f}° | Time: {self.sky.progress * 24.0:.1f}h",
                 f"Biome: {biome_name} (Tile {tile_x}, {tile_z}) | Elev: {int(p.y)}m",
                 f"Targeting: {target_str}",
                 f"Active Hand [Slot {p.selected_slot + 1}]: {sel_name} ({sel_count}x)",
                 f"Location: {near_set} | Chunks Loaded: {len(self.chunk_mgr.chunks)} (Draw Calls: {draw_calls})",
-                f"Living NPCs in Valley: {len(self.npcs)} | Memory RSS: {rss_mb:.1f} MB (Peak: {self.peak_rss_mb:.1f} MB)",
+                f"Living NPCs: {len(self.npcs)} | Memory RSS: {rss_mb:.1f} MB (Peak: {self.peak_rss_mb:.1f} MB)",
             ]
             if action_prompt:
                 lines.append(action_prompt)
-            lines.append("Controls: [WASD] Move [Space] Jump [L-Click] Mine [R-Click] Place [E] Talk [R] Read [F3] HUD [Esc] Menu")
+            lines.append("Controls: [WASD] Move [Space] Jump [L/R Click] Mine/Build [E] Talk [R] Read [M] Map [J] Chronicle [Esc] Pause [F3] HUD")
             self.overlay.render_overlay(lines)
 
     def _render_3d_scene(self, p: PlayerController) -> int:

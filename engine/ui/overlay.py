@@ -182,3 +182,54 @@ class OverlayRenderer:
 
         # Restore depth testing
         self.ctx.enable(moderngl.DEPTH_TEST)
+
+    def render_centered_overlay(
+        self,
+        lines: list[str],
+        title_color: tuple[float, float, float, float] = (1.0, 0.85, 0.25, 1.0),
+        body_color: tuple[float, float, float, float] = (0.92, 0.94, 0.96, 1.0),
+        bg_color: tuple[float, float, float, float] = (0.04, 0.06, 0.10, 0.92),
+    ) -> None:
+        if not lines:
+            return
+
+        bg_verts: list[float] = []
+        text_verts: list[float] = []
+
+        pad_x, pad_y = 24.0, 20.0
+        line_h = 20.0
+        max_chars = max(len(l) for l in lines)
+        box_w = max_chars * self.font.char_w + pad_x * 2
+        box_h = len(lines) * line_h + pad_y * 2
+
+        # Center in window
+        start_x = max(20.0, (self.width - box_w) / 2.0)
+        start_y = max(20.0, (self.height - box_h) / 2.0)
+
+        self.draw_rect(bg_verts, start_x, start_y, box_w, box_h, bg_color)
+
+        for i, line in enumerate(lines):
+            col = title_color if i == 0 else body_color
+            self.draw_text(text_verts, line, start_x + pad_x, start_y + pad_y + i * line_h, col)
+
+        self.ctx.disable(moderngl.DEPTH_TEST)
+        self.ctx.enable(moderngl.BLEND)
+
+        if bg_verts:
+            if "u_is_text" in self.program:
+                self.program["u_is_text"].value = 0
+            raw_bg = np.array(bg_verts, dtype=np.float32).tobytes()
+            self.vbo.write(raw_bg)
+            self.vao.render(moderngl.TRIANGLES, vertices=len(bg_verts) // 8)
+
+        if text_verts:
+            self.font.bind(unit=1)
+            if "u_font_tex" in self.program:
+                self.program["u_font_tex"].value = 1
+            if "u_is_text" in self.program:
+                self.program["u_is_text"].value = 1
+            raw_text = np.array(text_verts, dtype=np.float32).tobytes()
+            self.vbo.write(raw_text)
+            self.vao.render(moderngl.TRIANGLES, vertices=len(text_verts) // 8)
+
+        self.ctx.enable(moderngl.DEPTH_TEST)

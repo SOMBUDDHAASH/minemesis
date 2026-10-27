@@ -35,7 +35,7 @@ def main() -> int:
     app = EngineApp(width=1280, height=720, visible=visible)
 
     if args.benchmark > 0:
-        print(f"[*] Running Stage E0 Benchmark for {args.benchmark} frames...")
+        print(f"[*] Running Minemesis Benchmark for {args.benchmark} frames...")
         t0 = time.perf_counter()
         app.run(max_frames=args.benchmark)
         total_time = time.perf_counter() - t0
@@ -47,7 +47,7 @@ def main() -> int:
         print(f"     Average FPS:  {avg_fps:.1f} FPS")
         print(f"     Peak RAM:     {app.peak_rss_mb:.1f} MB")
 
-        shot_path = args.screenshot or "reports/screens/stage_e0_spike.png"
+        shot_path = args.screenshot or "reports/screens/benchmark.png"
         app.capture_screenshot(shot_path)
         print(f"     Screenshot:   {shot_path}")
         return 0

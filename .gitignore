@@ -14,4 +14,7 @@ build/
 dist/
 *.spec
 sample_20yr_test*
+saves/
+*.minemesis-shm
+*.minemesis-wal
 
