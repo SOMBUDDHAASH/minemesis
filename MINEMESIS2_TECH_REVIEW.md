@@ -1,231 +1,151 @@
-# MINEMESIS2 TECHNOLOGY REVIEW & STRATEGIC RESET BLUEPRINT
+# MINEMESIS2: STANDALONE GAME ARCHITECTURE & TECHNOLOGY BLUEPRINT
 
-> **Directive:** *MINEMESIS2 RESET DIRECTIVE — Freeze custom voxel engine development. Reuse aggressively. Innovate only where Minemesis is unique.*  
-> **Guiding Axiom:** *The unique part of Minemesis is beliefs, memories, knowledge, culture, history, families, politics, and books. The unique part is NOT mouse look, hotbars, inventory, gravity, chunk meshing, or pathfinding.*
-
----
-
-## 1. Executive Diagnosis: The Voxel Engine Trap
-
-The development of the Stage E0–E3 prototype produced two starkly divergent results:
-
-1. **The Civilization Simulation Engine ("The Brain"):**
-   - **Status:** **World-Class Innovation.**
-   - Generates 200+ years of grounded history, true generational bloodlines, subjective religious schisms, personal epistemological memories, clan feuds, and dynamically transcribed historical literature.
-   - Every entity in the world possesses true parentage, living spouses, feuds, and daily schedules.
-   - This is the soul and proprietary IP of Minemesis.
-
-2. **The Custom Voxel Engine ("The Body"):**
-   - **Status:** **High Friction, High Maintenance Prototype.**
-   - Required fighting basic camera smoothing, chunk meshing edge cases, AABB collision sliding, gravity dip offsets, inventory drag-and-drop hit testing, and soft-cone raycasting.
-   - Voxel engineering has accumulated **15 years of battle-tested solutions** across projects like Minecraft, Luanti (Minetest), Veloren, Vintage Story, and Terasology.
-   - Attempting to rebuild chunk streaming, audio propagation, networked physics, and inventory management in Python while simultaneously building an unprecedented civilization simulator divides focus and slows momentum.
-
-```mermaid
-flowchart LR
-    subgraph Trap["The Previous Strategy (Reinventing the Wheel)"]
-        direction TB
-        E1["Chunk Streaming & Meshing"] --- E2["Input & Camera Smoothing"]
-        E2 --- E3["AABB Physics & Wall Sliding"]
-        E3 --- E4["2D Inventory Drag & Drop"]
-        E4 --- E5["Crosshair Raycasting"]
-        E5 ==> CoreSim["Civilization Simulation (Stifled & Delayed)"]
-    end
-
-    subgraph Minemesis2["The Minemesis2 Strategy (Decoupled Foundation)"]
-        direction TB
-        Host["Mature Voxel Host (Luanti / Godot)"] --- Core["Pure Decoupled Civilization Brain (Python)"]
-        Host --> Mechanics["Camera, Gravity, Inventory, Audio, Networking, Shaders (OUT OF THE BOX)"]
-        Core --> Innovation["Dynasties, Memories, Feuds, Books, Religion, Politics (100% FOCUS)"]
-    end
-```
+> **Core Directive:** **MINEMESIS2 MUST SHIP AS AN INDEPENDENT STANDALONE GAME.**  
+> - **The User Experience:** Download `Minemesis.exe` $\to$ Double click $\to$ Play. Nothing else required.  
+> - **Zero External Runtimes:** No Minecraft dependency, no Luanti installation, no Minetest installation, no Godot installation.  
+> - **The Guiding Principle:** *Minemesis owns the brain. We blatantly borrow, adapt, and integrate 15 years of proven voxel solutions (Luanti, Minecraft, Quake, Veloren) into our own self-contained executable rather than reinventing the wheel.*
 
 ---
 
-## 2. Analysis of Strategic Architectural Options
+## 1. The Strategic Pivot: Independent Game vs. Mod
 
-We evaluated three potential strategic pathways for Minemesis2:
-
-### Option A: Embed into an Existing Voxel Engine / Game (Game as Platform)
-- **Concept:** Adopt a mature open-source voxel game (such as **Luanti / Minetest** or **Veloren**) as the host client-server runtime. Minemesis is authored as a comprehensive gamepack/mod that connects to the Python civilization simulation.
-- **Pros:**
-  - Zero time spent on mouse look, hotbars, inventory GUI, chunk streaming, lighting, sound, or network multiplayer.
-  - Complete ecosystem of existing assets (textures, models, sound packs, shaders).
-  - Can be played by thousands of users immediately on Windows, Linux, macOS, and mobile.
-- **Cons:**
-  - Must conform to the host engine's modding constraints and API lifecycle.
-  - Lua or Rust modding sandbox requires an inter-process bridge to Python.
-
-### Option B: Fork an Existing Open-Source Voxel Game
-- **Concept:** Fork the C++ source of Minetest or the Rust source of Veloren, strip out unneeded default gameplay (e.g. fantasy mobs, arbitrary crafting recipes), and compile the Minemesis simulation engine directly into the core binary.
-- **Pros:**
-  - Total control over the binary, splash screen, branding, and distribution installer.
-  - Native in-process performance without network/socket serialization overhead.
-- **Cons:**
-  - High ongoing maintenance burden when merging upstream engine improvements and security patches.
-  - Compiling large C++ or Rust codebases with embedded Python runtimes (CPython / PyO3) introduces packaging friction across operating systems.
-
-### Option C: Build on a Modern Game Engine with a Voxel Plugin (e.g., Godot 4 + godot_voxel)
-- **Concept:** Build Minemesis in **Godot 4** utilizing Zylann's `godot_voxel` C++ extension. Godot handles input, camera, UI widgets, animation trees, post-processing shaders, and audio, while a custom scene drives the Minemesis gameplay loop.
-- **Pros:**
-  - State-of-the-art UI system (Control nodes, responsive containers, rich text BBCode for historical books).
-  - First-class visual fidelity (Vulkan Forward+, volumetric fog, dynamic shadows, post-processing).
-  - Seamless Python integration via GDExtension, Py4Godot, or local IPC.
-- **Cons:**
-  - Voxel gameplay mechanics (block break timers, player inventory grids, hotbars) must still be configured in Godot scenes, though Godot's node hierarchy makes this vastly simpler than raw OpenGL.
-
----
-
-## 3. Technology Evaluation Matrix
-
-We conducted an in-depth technical audit of the five major open-source and modular voxel platforms:
-
-| Engine | Core Language | Scripting / API | License | Maturity | Inventory & Movement Out of Box | Simulation Integration Friction | Standalone Viability | Overall Score |
-| :--- | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: |
-| **Luanti (Minetest)** | C++17 | Lua 5.1 / LuaJIT | LGPL-2.1 | **14+ Years** (Ultra-stable) | **100% Complete** | **LOW** (IPC / Sockets / SQLite) | **High** (Custom gamepack) | **9.4 / 10** |
-| **Godot 4 + godot_voxel**| C++ | GDScript / C# / GDExt | MIT | **7+ Years** (Active) | **75% Complete** (Needs UI scenes) | **LOW-MEDIUM** (GDExtension / IPC) | **Maximum** (Custom standalone) | **9.0 / 10** |
-| **Veloren** | Rust | Monolithic / Rust | GPL-3.0 | 6 Years (Fast-moving) | **90% Complete** | **HIGH** (Rust compile barrier) | **Moderate** (Complex fork) | **7.2 / 10** |
-| **Terasology** | Java | Java (Gestalt ECS) | Apache 2.0 | 12 Years | **85% Complete** | **MEDIUM-HIGH** (JVM-Python bridge) | **Moderate** (Heavy JVM footprint)| **6.5 / 10** |
-| **Vintage Story Architecture**| C# (.NET) | C# Mod API | Proprietary | 8 Years (Polished) | **100% Complete** | **DISQUALIFIED** (Cannot redistribute) | **Zero** (Requires paid game) | **N/A** |
-
----
-
-## 4. Deep-Dive Subsystem Breakdown
-
-### 4.1 Luanti (formerly Minetest) — The Pragmatic Powerhouse
-- **Why it fits Minemesis:**
-  - Luanti is not just a game; it is an **extensible voxel engine**. The engine itself contains zero game logic; games (like *Minetest Game*, *VoxeLibre*, *NodeCore*) are entirely separate packages written in Lua.
-  - Provides instant, flawless Quake-grade movement, jump physics, collision sliding, customizable view bobbing, full 3D audio, chunk streaming, dynamic day/night lighting, and client-server multiplayer out of the box.
-  - **Formspecs (UI Engine):** Enables native, scriptable 2D dialogue windows, trading interfaces, chronicle books, and inventory panels with zero OpenGL programming.
-  - **Database Independence:** Worlds can be backed by SQLite3 or PostgreSQL. Minemesis can seed the world database directly from Python before the client even boots.
-- **Simulation Bridge Strategy:**
-  - Minemesis runs as a standalone Python background service (`minemesis-daemon`).
-  - A lightweight Luanti mod (`minemesis_bridge.lua`) communicates with the Python daemon via local TCP sockets (`127.0.0.1:48123`) or HTTP/JSON-RPC.
-  - When the player talks to an NPC in Luanti, the mod requests dialogue, family history, and personal beliefs from the Python daemon in 2 milliseconds, then renders a native Luanti dialogue formspec.
-
-### 4.2 Godot 4 + godot_voxel (Zylann) — The Visual & Standalone Champion
-- **Why it fits Minemesis:**
-  - If standalone branding, custom stylized shaders, and bespoke first-person animations are mandatory, Godot 4 is the strongest candidate.
-  - Zylann's `godot_voxel` is a production-grade C++ module providing blocky voxels, greedy meshing, LOD terrain streaming, and fast voxel raycasting.
-  - Godot's UI system allows creating parchment book readers, family dynasty tree visualizers, and interactive diplomatic maps using native GUI containers.
-- **Simulation Bridge Strategy:**
-  - Python civilization simulation runs either as a linked GDExtension library or via an asynchronous IPC socket.
-
-### 4.3 Veloren — The Rust Contender
-- **Why it is secondary:**
-  - Veloren has stunning graphics and an advanced procedural world generation system.
-  - However, Veloren's codebase is written in modern Rust with a custom ECS. Merging a dynamic, stateful Python generational simulation into Veloren's compile-time borrow-checker model requires significant Rust FFI glue and rebuilding Veloren from source on every update.
-  - It is an incredible technological achievement, but the development friction is disproportionately high for a pair-programming project centered on historical simulation.
-
-### 4.4 Vintage Story — Architectural Lessons
-- While legally disqualified for standalone open distribution, Vintage Story proves the value of **micro-interactions**:
-  - NPC daily schedules should feel grounded in work stations (anvils, hearths, fields).
-  - Books and scrolls should be physical objects stored in libraries and private chests.
-  - Construction should have societal consequence (settlement walls raise defensibility metrics).
-
----
-
-## 5. The Minemesis2 Decoupled Architecture
-
-Minemesis2 strictly enforces a **three-tier decoupled architecture**:
+There is a fundamental difference between two approaches:
 
 ```mermaid
 flowchart TD
-    subgraph Brain["1. Pure Civilization Brain (minemesis-core)"]
-        direction TB
-        GenSim["Generational Simulation (200+ Years)"]
-        Dynasties["Family Clans & Genealogies"]
-        Epist["Subjective Epistemology & Beliefs"]
-        Relig["Religious Schisms & Tenets"]
-        Chron["Chronicle Annals & Event Log"]
-        Books["Generated Literature & Biographies"]
-        Pol["Feuds, Wars, & Succession"]
+    subgraph WrongPath["Wrong Approach: Minemesis as a Mod / External Dependency"]
+        M1["Minemesis"] --> M2["Depends on External Luanti / Minecraft Runtime"]
+        M2 --> M3["Constrained by External Sandboxes & Breaking Changes"]
+        M3 --> M4["User Friction: Must Install & Configure External Host"]
     end
 
-    subgraph Bridge["2. Universal IPC Bridge (minemesis-rpc)"]
-        direction TB
-        Socket["Localhost TCP / Unix Socket (JSON-RPC)"]
-        API1["GET /world/seed"]
-        API2["GET /npc/query?id=X"]
-        API3["POST /npc/interact (talk, trade, attack)"]
-        API4["GET /settlement/overview?id=Y"]
-        API5["GET /library/book?id=Z"]
+    subgraph RightPath["Right Approach: Standalone Minemesis with Borrowed Architecture"]
+        S1["Minemesis Standalone (Minemesis.exe)"]
+        S1 --> S2["Minemesis Core: Pure Generational Civilization Brain (Unique IP)"]
+        S1 --> S3["Minemesis Runtime: Borrowed Proven Voxel Solutions (Camera, Physics, Inventory, Audio)"]
+        S1 --> S4["Minemesis Client: Standalone ModernGL/OpenGL Presentation & UI"]
+        S1 ==> S5["User Experience: Single Binary Self-Contained Release"]
     end
-
-    subgraph Host["3. Voxel Gameplay Host (Luanti / Godot)"]
-        direction TB
-        Renderer["Modern 3D Voxel Engine"]
-        Phys["Flawless Terrestrial & Flight Physics"]
-        InvUI["Complete Drag & Drop Inventory"]
-        Audio["Positional 3D Soundscapes"]
-        Multi["Client-Server Multiplayer (Zero Extra Code)"]
-    end
-
-    Brain <===>|Real-Time State Sync| Bridge
-    Bridge <===>|Asynchronous IPC| Host
 ```
 
-### The Inviolable Separation of Responsibilities
+### The Inviolable Architectural Separation
 
-| Responsibility | Handled By | Implementation |
+| Subsystem | Source of Truth | Design Strategy |
 | :--- | :--- | :--- |
-| **History & Time Advancement** | `minemesis-core` (Python) | Generational simulation ticks, marriages, births, succession, feuds. |
-| **Beliefs & Memories** | `minemesis-core` (Python) | Subjective belief graph; NPC knowledge diffusion; gossip. |
-| **Literature Generation** | `minemesis-core` (Python) | Mark-down / text book synthesis; poetry; chronicles. |
-| **Voxel World Rendering** | Voxel Host (Luanti / Godot) | Chunk meshing, greedy meshing, shaders, skybox, ambient occlusion. |
-| **Player Movement & Camera** | Voxel Host (Luanti / Godot) | Mouse look, WASD, jump, sprint, fly mode, collision sliding. |
-| **Inventory & Hotbar** | Voxel Host (Luanti / Godot) | Item dragging, stack splitting, slot tooltips, crafting grids. |
-| **Sound & Particles** | Voxel Host (Luanti / Godot) | Footstep audio, block mining cracks, debris particles, ambient wind. |
+| **History & Time Engine** | **Minemesis Core (Unique IP)** | 200+ years of generational simulations, births, marriages, feuds, deaths. |
+| **Beliefs & Memories** | **Minemesis Core (Unique IP)** | Subjective belief graph; NPC knowledge diffusion, gossip, trauma, and vendettas. |
+| **Dynasties & Politics** | **Minemesis Core (Unique IP)** | True generational clans, chief successions, realm defensibility, diplomatic standings. |
+| **Literature Generation** | **Minemesis Core (Unique IP)** | Historical biographies, poetry, chronicles transcribed by ancient scribes. |
+| **Camera & Mouse Look** | **Borrowed (Quake / Luanti)** | Raw mouse input with exponential smoothing and dynamic view bobbing. |
+| **Movement & Gravity** | **Borrowed (Quake / Luanti)** | Ground friction (9.0), wall-face tangent sliding, 1.1m auto-stepping, gravity fall. |
+| **Mining & Placement** | **Borrowed (Minecraft / Luanti)** | Continuous mining hardness accumulator, progressive face cracks, particle burst, ghost preview. |
+| **Inventory & Hotbar** | **Borrowed (Minecraft / Luanti)** | 9 hotbar, 27 storage, 4 equipment, left-click swap, right-click split, shift-click quick move. |
+| **Audio & Game Feel** | **Borrowed / Synthesized** | Zero-dependency procedural WAV sound synthesis (break crunch, place thud, UI click). |
+| **NPC Navigation** | **Borrowed (Veloren / Luanti)** | Whisker lookahead obstacle avoidance probes ($\pm 40^\circ$ at $1.2$m). |
 
 ---
 
-## 6. Concrete Phased Migration Roadmap
+## 2. Subsystems: What Was Borrowed vs. What Is Unique
+
+### 2.1 The "Solved Problems" We Borrow
+Nobody cares if your mouse look algorithm or hotbar slot drag logic is original. These problems have been solved across dozens of open-source projects:
+
+1. **Movement Feel (Quake / Luanti)**:
+   - Implemented `FRICTION = 9.0` ground deceleration and wishdir acceleration.
+   - Implemented wall-face tangent sliding: hitting an obstacle on X zeroes only $v_x$, leaving $v_z$ intact so the player slides smoothly forward along walls instead of sticking dead.
+   - Implemented landing shock absorption: negative camera dip on ground contact that decays smoothly.
+   - Dynamic sprint FOV interpolation: camera smoothly expands by $+8.0^\circ$ while sprinting.
+
+2. **Mining & Block Interaction (Minecraft / Luanti)**:
+   - Instant block deletion felt like a debugging editor. We implemented a continuous hardness break timer (`hardness * 0.75`), 4-stage progressive crack lines, an embodied first-person arm swing arc, and 14-particle debris scattering.
+
+3. **Inventory UX (Minecraft / Luanti)**:
+   - 40-slot layout (4 equipment, 27 main grid, 9 active hotbar).
+   - Left-click pick/drop/swap, Right-click split half / single-drop, Shift-click quick move between hotbar and main storage.
+   - Coordinate hit-testing, glowing hover outlines, floating tooltip cards, and cursor stack following the mouse.
+
+4. **Zero-Dependency Procedural Audio Engine (NEW)**:
+   - Added `engine/core/audio.py` using Python's built-in `winsound` multimedia system.
+   - Synthesizes 16-bit 22050Hz PCM audio completely in-memory:
+     - `break`: crunchy, crumbly noise burst on block destruction.
+     - `place`: solid, crisp wooden/stone thud on placement.
+     - `click`: subtle high-frequency UI slot selection click.
+     - `punch`: gentle air whoosh on fist swing.
+   - Non-blocking threaded playback ensures 0ms frame lag.
+
+5. **Developer Quality-of-Life Debug Modes (NEW)**:
+   - **`[F8]` 3D Spectator Fly Mode**: 6-DOF look-direction flight, Space/Ctrl vertical lift, and $42\text{ m/s}$ fast travel sprint.
+   - **`[F9]` Creative Build Mode**: Instant 1-click block mining (zero hardness delay) and infinite block placement.
+   - **Overhead NPC Debug Labels**: Floating world-to-screen label cards displaying Name, Clan, Profession, and Current AI Task above every citizen within 35 meters.
+
+---
+
+## 3. Technology Evaluation for Future Standalone Scaling
+
+While Minemesis currently runs as a standalone Python/ModernGL executable ([`releases/Minemesis.exe`](file:///d:/minemesis/releases/Minemesis.exe)), we evaluated the architectural patterns of the top five open-source engines for how Minemesis can scale without losing single-binary independence:
+
+| Engine | Core Pattern to Borrow | Feasibility for Self-Contained `.exe` | Recommendation |
+| :--- | :--- | :---: | :--- |
+| **Luanti (Minetest)** | Formspec UI patterns, client-server event ticks, SQLite world chunk schema (`map.sqlite`) | **High** (Study C++ architecture; port concepts directly into Python/C) | **Primary Reference Implementation** |
+| **Veloren** | Procedural settlement layout, whisker NPC navigation, multi-threaded ECS chunk mesher | **High** (Borrow algorithms) | **Secondary Reference** |
+| **Godot 4 + `godot_voxel`** | Forward+ Vulkan rendering, node-based UI containers, GDExtension native embedding | **High** (Can compile into a single self-contained binary) | **Candidate for Minemesis 2.0 Client** |
+| **Terasology** | Gestalt modular block systems | **Low** (JVM dependency too heavy for lightweight standalone distribution) | **Reference Only** |
+| **Vintage Story** | Micro-block chiseled aesthetics, societal wall defense mechanics | **N/A** (Proprietary commercial engine; cannot redistribute) | **Design Inspiration Only** |
+
+---
+
+## 4. The Minemesis2 Layered Architecture
+
+To prevent future custom engine traps, the codebase is strictly separated into three isolated layers:
 
 ```mermaid
-flowchart LR
-    Phase1["Phase 1: Prototype Freeze & Developer QoL (COMPLETE)"]
-    Phase2["Phase 2: Core Decoupling (minemesis-core)"]
-    Phase3["Phase 3: Luanti Bridge Prototype"]
-    Phase4["Phase 4: Full Minemesis2 Gameplay Experience"]
+classDiagram
+    class MinemesisCore {
+        +GenerationalSimulation
+        +DynastyEngine
+        +ReligionEngine
+        +EpistemologyGraph
+        +EventLog
+        +LiteratureGenerator
+        +tick(dt)
+        +save_state()
+    }
 
-    Phase1 ==> Phase2 ==> Phase3 ==> Phase4
+    class MinemesisRuntime {
+        +PlayerController (Quake movement)
+        +Inventory (40 slots, drag & drop)
+        +MiningSystem (Hardness accumulator)
+        +ChunkManager (Greedy meshing)
+        +SoundEngine (Procedural audio)
+        +ParticleSystem (3D debris)
+    }
+
+    class MinemesisClient {
+        +Camera3D (World-to-screen projection)
+        +OverlayRenderer (HUD, Inventory GUI, Labels)
+        +DialogueSystem (Real lineage & feuds)
+        +BookReader (Historical manuscripts)
+        +WorldMap (Continental view)
+    }
+
+    MinemesisCore <|-- MinemesisRuntime : Feeds living history into
+    MinemesisRuntime <|-- MinemesisClient : Renders and presents
 ```
-
-### Phase 1: Prototype Freeze & Developer QoL (Completed)
-- **Status:** **DONE.**
-- Current custom engine prototype frozen on branch `big-build` (tag `playability-complete`).
-- Immediate developer debug tools implemented and verified:
-  - **`[F8]` 3D Fly Mode:** Spectator flight in look direction, 42 m/s fast travel sprint, Space/Ctrl vertical lift.
-  - **`[F9]` Creative Build Mode:** Infinite building blocks, instant 1-click block mining with zero hardness delay.
-  - **Overhead NPC Debug Labels:** Floating 3D world-to-screen labels displaying Name, Clan, Profession, and Current AI Task above every citizen.
-
-### Phase 2: Decouple `minemesis-core` into an Independent Package
-- Extract the simulation engine into a clean, standalone Python library `minemesis-core` with zero Pygame, OpenGL, or GLFW dependencies.
-- Ensure the package runs headlessly on any machine and exposes clean serialization (`to_dict()`, SQLite, and JSON-RPC).
-- Verify 100% test coverage over generational history, book generation, and clan succession.
-
-### Phase 3: The Luanti Minemesis2 Bridge Prototype
-- Install Luanti (Minetest) and create a custom game folder: `games/minemesis/`.
-- Write `minemesis_bridge` Lua mod:
-  1. Boot a local Luanti world.
-  2. The Lua mod launches the background `minemesis-core` daemon.
-  3. The terrain generator queries the Python world spec to place settlements, houses, shrines, and town halls.
-  4. Spawn embodied Luanti entities for each living citizen.
-  5. Right-clicking an NPC opens a native Luanti dialog formspec showing their clan, spouse, children, subjective faith, and recent memories.
-
-### Phase 4: Full Minemesis2 Gameplay Experience
-- Enable players to explore sprawling, living historical settlements with zero engine bugs, flawless Quake movement, full audio, and seamless inventory management.
-- Reconnect physical player actions to historical consequences:
-  - Building a wall in Luanti increases the settlement's defense score in `minemesis-core`.
-  - Attacking a chief marks the player as an outlaw in the simulation event log.
-  - Books written by ancient scribes can be picked up, read, and stored in town bookshelves.
 
 ---
 
-## 7. Strategic Conclusion
+## 5. Summary of Completed Deliverables
 
-> **The hard part of Minemesis was always the civilization simulator — and it already works.**  
->
-> Re-engineering camera smoothing, inventory hit-testing, and chunk meshing from scratch was a detour. By adopting **Luanti (Minetest)** as the primary gameplay host and keeping **Godot 4** as an alternative visual engine, Minemesis2 immediately inherits 15 years of polished voxel gameplay.  
->
-> All development energy can now be focused 100% on what makes Minemesis unique: **a living, breathing, historical human world.**
+1. **Standalone Binary Verified**:
+   - [`releases/Minemesis.exe`](file:///d:/minemesis/releases/Minemesis.exe) and [`releases/Minemesis-portable.zip`](file:///d:/minemesis/releases/Minemesis-portable.zip) (51.1 MB).
+   - Single-file executable: zero external dependencies, double-click to play.
+2. **Procedural Sound Engine**:
+   - [`engine/core/audio.py`](file:///d:/minemesis/engine/core/audio.py) wired into block breaking, placement, and UI inventory interactions.
+3. **Developer Debug Controls**:
+   - `[F8]` 3D Spectator Fly Mode & Fast Travel ($42\text{ m/s}$).
+   - `[F9]` Creative Build Mode (Infinite blocks & instant mining).
+   - Overhead 3D NPC Debug Labels (Name, Family, Job, Task).
+4. **All 11 Pillars Verified**:
+   - [`scripts/verify_playability.py`](file:///d:/minemesis/scripts/verify_playability.py) passing 100% with live ModernGL screen proof captured in [`reports/screens/playability_verified.png`](file:///d:/minemesis/reports/screens/playability_verified.png).
+5. **History Engine Ground Truth**:
+   - [`scripts/audit_history_integration.py`](file:///d:/minemesis/scripts/audit_history_integration.py) passing 100% with chief assassination succession test.

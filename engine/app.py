@@ -17,6 +17,7 @@ from PIL import Image
 from engine.core.window import Window
 from engine.core.timer import FrameTimer
 from engine.core.settings import GameSettings
+from engine.core.audio import SoundEngine
 from engine.core.process_bridge import SimulationBridge
 from engine.entities.npc import NPC, VoxelHumanoidMesh
 from engine.entities.interaction import InteractionEngine
@@ -94,6 +95,7 @@ class EngineApp:
         self.highlight_renderer = BlockHighlightRenderer(self.ctx)
         self.particles = ParticleSystem(self.ctx)
         self.hand_renderer = FirstPersonHandRenderer(self.ctx, self.atlas)
+        self.audio = SoundEngine()
 
         # Window resize binding
         self.window.resize_callback = self._on_resize
@@ -522,11 +524,13 @@ class EngineApp:
                 if slot:
                     slot_type, slot_id = slot
                     p.inventory.handle_slot_click(slot_type, slot_id, button=1, shift=is_shift)
+                    self.audio.play_click()
             elif inp.is_mouse_pressed(glfw.MOUSE_BUTTON_RIGHT):
                 slot = self.overlay.get_inventory_slot_under_cursor(inp.mouse_x, inp.mouse_y)
                 if slot:
                     slot_type, slot_id = slot
                     p.inventory.handle_slot_click(slot_type, slot_id, button=2, shift=is_shift)
+                    self.audio.play_click()
 
             self._render_3d_scene(p)
             self.overlay.render_inventory_gui(p.inventory, inp.mouse_x, inp.mouse_y)
@@ -763,9 +767,12 @@ class EngineApp:
             if broken:
                 bx, by, bz, bid = broken
                 self.particles.spawn_block_break(bx, by, bz, bid)
+                self.audio.play_break()
 
             if inp.is_mouse_pressed(glfw.MOUSE_BUTTON_RIGHT):
-                p.place_block_against_target(self.chunk_mgr)
+                placed = p.place_block_against_target(self.chunk_mgr)
+                if placed:
+                    self.audio.play_place()
         else:
             p.update_mining(self.chunk_mgr, dt, False)
 
