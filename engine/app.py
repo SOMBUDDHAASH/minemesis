@@ -142,19 +142,19 @@ class EngineApp:
             if visible:
                 self.window.set_mouse_capture(True)
 
-            # Stage E2: Living Entities, Schedules, and Book Archives
-            self.humanoid_mesh = VoxelHumanoidMesh(self.ctx, self.shader.program, self.atlas)
-            self.interaction = InteractionEngine()
-            self.book_reader = BookReader()
-            self.npcs: list[NPC] = []
-            self._spawn_settlement_npcs()
-
             # Stage E3: Live Simulation Bridge, Game Shell & Overlays
             self.bridge = SimulationBridge(world_spec=self.world_spec, prehistory_years=20)
             self.paused: bool = False
             self.show_chronicle: bool = False
             self.show_world_map: bool = False
             self.save_message: str = ""
+
+            # Stage E2: Living Entities, Schedules, and Book Archives
+            self.humanoid_mesh = VoxelHumanoidMesh(self.ctx, self.shader.program, self.atlas)
+            self.interaction = InteractionEngine()
+            self.book_reader = BookReader()
+            self.npcs: list[NPC] = []
+            self._spawn_settlement_npcs()
 
         self.peak_rss_mb: float = 0.0
         self.show_f3: bool = True
@@ -173,84 +173,142 @@ class EngineApp:
                     npc.current_activity = f"HUNTING INTRUDER (Defending {victim.name})!"
 
     def _spawn_settlement_npcs(self) -> None:
-        """Populates living purpose-driven NPCs into each settlement."""
+        """
+        Populates living simulated citizens from the generational simulation into each settlement.
+        Every NPC is an embodied character with real lineages, clan surnames, true spouses/children,
+        feuds, and daily schedules.
+        """
+        sim = self.bridge.simulation
+        all_chars = sim.characters
+
         for s in self.world_spec.settlements:
             bx = float(s.x * 8 + 4)
             bz = float(s.y * 8 + 4)
             by = float(self.chunk_mgr.generator.get_interpolated_height(int(bx), int(bz)) + 1)
 
-            # 1. Chief / Elder
-            self.npcs.append(NPC(
-                character_id=f"{s.id}_chief",
-                name=f"Chief {s.name}",
-                profession="Chief",
-                faith="Common Faith",
-                settlement_id=s.name,
-                home_pos=(bx, by, bz),
-                work_pos=(bx + 6.0, by, bz + 4.0),
-                shrine_pos=(bx + 12.0, by, bz + 8.0),
-                well_pos=(bx + 3.0, by, bz + 3.0),
-            ))
-            # 2. Scholar / Scribe
-            self.npcs.append(NPC(
-                character_id=f"{s.id}_scholar",
-                name=f"Scribe Aethelgard of {s.name}",
-                profession="Scholar",
-                faith="Sacred Way",
-                settlement_id=s.name,
-                home_pos=(bx - 4.0, by, bz - 4.0),
-                work_pos=(bx - 8.0, by, bz + 6.0),
-                shrine_pos=(bx + 12.0, by, bz + 8.0),
-                well_pos=(bx + 3.0, by, bz + 3.0),
-            ))
-            # 3. Priest
-            self.npcs.append(NPC(
-                character_id=f"{s.id}_priest",
-                name=f"Priestess Miriel",
-                profession="Priest",
-                faith="Sacred Way",
-                settlement_id=s.name,
-                home_pos=(bx + 8.0, by, bz - 4.0),
-                work_pos=(bx + 12.0, by, bz + 8.0),
-                shrine_pos=(bx + 12.0, by, bz + 8.0),
-                well_pos=(bx + 3.0, by, bz + 3.0),
-            ))
-            # 4. Blacksmith
-            self.npcs.append(NPC(
-                character_id=f"{s.id}_smith",
-                name=f"Thorvald the Smith",
-                profession="Smith",
-                faith="Common Faith",
-                settlement_id=s.name,
-                home_pos=(bx - 6.0, by, bz + 4.0),
-                work_pos=(bx - 10.0, by, bz),
-                shrine_pos=(bx + 12.0, by, bz + 8.0),
-                well_pos=(bx + 3.0, by, bz + 3.0),
-            ))
-            # 5. Master Farmer
-            self.npcs.append(NPC(
-                character_id=f"{s.id}_farmer",
-                name=f"Farmer Brand",
-                profession="Farmer",
-                faith="Common Faith",
-                settlement_id=s.name,
-                home_pos=(bx + 4.0, by, bz + 8.0),
-                work_pos=(bx + 8.0, by, bz + 12.0),
-                shrine_pos=(bx + 12.0, by, bz + 8.0),
-                well_pos=(bx + 3.0, by, bz + 3.0),
-            ))
-            # 6. Town Guard
-            self.npcs.append(NPC(
-                character_id=f"{s.id}_guard",
-                name=f"Warden Kenneth",
-                profession="Guard",
-                faith="Common Faith",
-                settlement_id=s.name,
-                home_pos=(bx, by, bz),
-                work_pos=(bx, by, bz - 8.0),
-                shrine_pos=(bx + 12.0, by, bz + 8.0),
-                well_pos=(bx + 3.0, by, bz + 3.0),
-            ))
+            # Retrieve all living simulation characters belonging to this settlement
+            sim_chars = [c for c in all_chars.values() if c.alive and c.settlement_id == s.id]
+            if not sim_chars:
+                continue
+
+            # Prioritize family clusters (married couples with children)
+            sim_chars_by_id = {c.id: c for c in sim_chars}
+
+            # Group characters by family clan
+            family_clans: dict[str, list[any]] = {}
+            for c in sim_chars:
+                family_clans.setdefault(c.last_name, []).append(c)
+
+            # Assign distinct home coordinates per family clan
+            family_homes: dict[str, tuple[float, float, float]] = {}
+            clan_names = list(family_clans.keys())
+            for idx, cname in enumerate(clan_names):
+                angle = (idx * 2.0 * math.pi) / max(1, len(clan_names))
+                dist = 14.0 + (idx % 3) * 6.0
+                hx = bx + math.cos(angle) * dist
+                hz = bz + math.sin(angle) * dist
+                hy = float(self.chunk_mgr.generator.get_interpolated_height(int(hx), int(hz)) + 1)
+                family_homes[cname] = (hx, hy, hz)
+
+            # Target 22 visible villagers for spawn settlement set_0 (and 12 for others)
+            target_count = 22 if s.id == "set_0" else 12
+            selected_chars = sim_chars[:target_count]
+
+            # Ensure essential roles are represented
+            has_guard = any(c.profession in ("Guard", "Soldier") for c in selected_chars)
+            has_smith = any(c.profession in ("Smith", "Blacksmith") for c in selected_chars)
+            has_priest = any(c.profession in ("Priest", "Scholar", "Scribe") for c in selected_chars)
+
+            if not has_guard and len(selected_chars) > 2:
+                selected_chars[-1].profession = "Guard"
+                if len(selected_chars) > 3:
+                    selected_chars[-2].profession = "Guard"
+            if not has_smith and len(selected_chars) > 1:
+                selected_chars[1].profession = "Blacksmith"
+            if not has_priest and len(selected_chars) > 0:
+                selected_chars[0].profession = "Scholar"
+
+            # Common settlement landmarks
+            well_pos = (bx, by, bz)
+            shrine_pos = (bx + 16.0, by, bz + 12.0)
+            tavern_pos = (bx - 12.0, by, bz + 10.0)
+            guard_patrols = [
+                (bx + 22.0, by, bz + 22.0),
+                (bx - 22.0, by, bz + 22.0),
+                (bx - 22.0, by, bz - 22.0),
+                (bx + 22.0, by, bz - 22.0),
+            ]
+
+            for c_idx, c in enumerate(selected_chars):
+                home = family_homes.get(c.last_name, (bx, by, bz))
+
+                # Determine workplace based on actual profession
+                if c.profession in ("Smith", "Blacksmith"):
+                    work = (bx - 14.0, by, bz - 8.0)
+                elif c.profession == "Farmer":
+                    work = (bx + 18.0, by, bz - 14.0)
+                elif c.profession == "Woodcutter":
+                    work = (bx - 18.0, by, bz + 14.0)
+                elif c.profession in ("Priest", "Scholar", "Scribe"):
+                    work = shrine_pos
+                elif c.profession in ("Guard", "Soldier"):
+                    work = guard_patrols[c_idx % len(guard_patrols)]
+                elif c.profession in ("Chief", "Elder"):
+                    work = (bx, by, bz - 12.0)
+                else:
+                    work = (bx + ((c_idx % 4) * 4.0 - 6.0), by, bz + ((c_idx % 3) * 4.0 - 4.0))
+
+                # Identify spouse name
+                spouse_name = None
+                if c.spouse_id and c.spouse_id in sim_chars_by_id:
+                    spouse_name = sim_chars_by_id[c.spouse_id].name
+
+                # Identify siblings
+                sibling_ids = [
+                    other.id for other in sim_chars
+                    if other.id != c.id and (
+                        (c.father_id and other.father_id == c.father_id) or
+                        (c.mother_id and other.mother_id == c.mother_id)
+                    )
+                ]
+
+                # Identify clan feuds / rivalries
+                other_clans = [cn for cn in clan_names if cn != c.last_name]
+                rival_names = [other_clans[0]] if other_clans else []
+
+                npc = NPC(
+                    character_id=c.id,
+                    name=c.name,
+                    first_name=c.first_name,
+                    last_name=c.last_name,
+                    family_id=c.family_id,
+                    age_years=c.age_years,
+                    sex=c.sex,
+                    profession=c.profession,
+                    faith="Sacred Way",
+                    settlement_id=s.id,
+                    settlement_name=s.name,
+                    spouse_id=c.spouse_id,
+                    spouse_name=spouse_name,
+                    father_id=c.father_id,
+                    mother_id=c.mother_id,
+                    children_ids=list(c.children_ids),
+                    sibling_ids=sibling_ids,
+                    rival_family_names=rival_names,
+                    home_pos=home,
+                    work_pos=work,
+                    shrine_pos=shrine_pos,
+                    tavern_pos=tavern_pos,
+                    well_pos=well_pos,
+                    guard_patrol_points=guard_patrols,
+                )
+
+                # Cache living kin names for fast lookup
+                for kid in list(c.children_ids) + sibling_ids + ([c.spouse_id] if c.spouse_id else []):
+                    if kid in sim_chars_by_id:
+                        npc.kin_names[kid] = sim_chars_by_id[kid].name
+
+                self.npcs.append(npc)
 
     def _on_resize(self, width: int, height: int) -> None:
         self.width = width
@@ -449,30 +507,20 @@ class EngineApp:
                 self.interaction.close_interaction()
                 self.window.set_mouse_capture(True)
             elif inp.is_key_pressed(glfw.KEY_1):
-                self.interaction.execute_action("talk", p)
+                self.interaction.execute_action("talk", p, app=self)
             elif inp.is_key_pressed(glfw.KEY_2):
-                self.interaction.execute_action("trade", p)
+                self.interaction.execute_action("trade", p, app=self)
             elif inp.is_key_pressed(glfw.KEY_3):
-                self.interaction.execute_action("gift", p)
+                self.interaction.execute_action("gift", p, app=self)
             elif inp.is_key_pressed(glfw.KEY_4):
-                self.interaction.execute_action("help", p)
+                self.interaction.execute_action("help", p, app=self)
             elif inp.is_key_pressed(glfw.KEY_5):
-                res = self.interaction.execute_action("steal", p)
+                res = self.interaction.execute_action("steal", p, app=self)
                 if "CAUGHT" in res:
                     self._alert_nearby_guards(active_npc)
             elif inp.is_key_pressed(glfw.KEY_6):
-                self.interaction.execute_action("attack", p)
-                # Find witnesses within 40m
-                witnesses = [
-                    npc for npc in self.npcs
-                    if math.sqrt((npc.x - active_npc.x) ** 2 + (npc.z - active_npc.z) ** 2) < 40.0
-                ]
-                self.bridge.record_combat_encounter(
-                    victim_npc=active_npc,
-                    damage=6.0,
-                    fatal=(active_npc.health <= 0.0),
-                    witnesses=witnesses,
-                )
+                self.interaction.execute_action("attack", p, app=self)
+                # Alert nearby guards
                 self._alert_nearby_guards(active_npc)
 
             # Render 3D scene paused in background
@@ -480,16 +528,21 @@ class EngineApp:
 
             # Render Interaction Menu Overlay
             if active_npc:
+                standing = self.interaction.reputation.get_title(active_npc.settlement_id)
+                rep_score = self.interaction.reputation.get_score(active_npc.settlement_id)
+                kin_str = f"Spouse: {active_npc.spouse_name or 'Unmarried'} | Kin: {len(active_npc.children_ids)} children, {len(active_npc.sibling_ids)} siblings"
                 menu_lines = [
                     f"=== INTERACTING WITH {active_npc.name.upper()} ===",
-                    f"Profession: {active_npc.profession} | Faith: {active_npc.faith} | Settlement: {active_npc.settlement_id}",
-                    f"Schedule: {active_npc.current_activity} | Health: {active_npc.health:.1f}/20.0 | Affinity: {active_npc.affinity_to_player:+.0f}",
+                    f"Clan: {active_npc.last_name} | Profession: {active_npc.profession} | Faith: {active_npc.faith}",
+                    f"{kin_str}",
+                    f"Settlement: {active_npc.settlement_name} | Standing: {standing} ({rep_score:+.0f})",
+                    f"Activity: {active_npc.current_activity} | Health: {active_npc.health:.1f}/20.0",
                     "--------------------------------------------------",
                 ]
                 for d in self.interaction.dialogue_history[-5:]:
                     menu_lines.append(d)
                 menu_lines.append("--------------------------------------------------")
-                menu_lines.append("[1] Talk  [2] Trade  [3] Gift  [4] Help  [5] Steal  [6] Attack  [Esc] Leave")
+                menu_lines.append("[1] Talk  [2] Trade  [3] Gift  [4] Help Village (+Rep)  [5] Steal  [6] Attack  [Esc] Leave")
                 self.overlay.render_overlay(menu_lines)
             return
 
@@ -507,6 +560,10 @@ class EngineApp:
         elif inp.is_key_pressed(glfw.KEY_M):
             self.show_world_map = True
             self.window.set_mouse_capture(False)
+
+        # Advance diurnal time cycle [T] (+6 hours: Dawn -> Work -> Tavern -> Night Curfew)
+        if inp.is_key_pressed(glfw.KEY_T):
+            self.sky.time_of_day = (self.sky.time_of_day + 300.0) % 1200.0
 
         # Toggle F3 HUD
         if inp.is_key_pressed(glfw.KEY_F3):
@@ -645,21 +702,45 @@ class EngineApp:
 
             ground_h = float(self.chunk_mgr.generator.get_interpolated_height(int(p.x), int(p.z)))
             chunks_meshed = sum(1 for c in self.chunk_mgr.chunks.values() if c.opaque_mesh is not None)
-            sim_year = self.bridge.total_simulated_ticks // 12
+            sim_year = (self.bridge.total_simulated_ticks // 12) + 1
+            hour = int(self.sky.progress * 24.0) % 24
+            minute = int(((self.sky.progress * 24.0) % 1.0) * 60)
+
+            time_phase = (
+                "NIGHT CURFEW (Guards on Patrol)" if (self.sky.progress < 0.25 or self.sky.progress > 0.88)
+                else "MORNING GATHERING (Village Well)" if self.sky.progress < 0.38
+                else "DAY LABOR (Fields & Anvils)" if self.sky.progress < 0.70
+                else "EVENING FELLOWSHIP (Tavern & Shrine)"
+            )
+
+            # Determine local settlement standing
+            active_set_id = "set_0"
+            for s in self.world_spec.settlements:
+                dist = math.sqrt((p.x - (s.x * 8 + 4)) ** 2 + (p.z - (s.y * 8 + 4)) ** 2)
+                if dist < 65.0:
+                    active_set_id = s.id
+                    break
+            standing = self.interaction.reputation.get_title(active_set_id)
+            rep_score = self.interaction.reputation.get_score(active_set_id)
+
             lines = [
-                f"MINEMESIS VOXEL ENGINE [RECOVERY AUDIT] | FPS: {self.timer.fps:.1f}",
-                f"Camera XYZ: {self.camera.x:.2f} / {self.camera.y:.2f} / {self.camera.z:.2f} (Yaw: {self.camera.yaw:.1f}°, Pitch: {self.camera.pitch:.1f}°)",
-                f"Terrain Elevation: {ground_h:.1f}m (Eye Altitude: {self.camera.y - ground_h:+.1f}m) | Year {sim_year}",
-                f"Chunks Loaded: {len(self.chunk_mgr.chunks)} | Chunks Meshed: {chunks_meshed}",
-                f"Chunks Rendered: {self.chunk_mgr.chunks_rendered} | Draw Calls: {self.chunk_mgr.draw_calls}",
-                f"Triangle Count: {self.chunk_mgr.triangles_rendered:,}",
-                f"Wireframe [F4]: {'ON' if self.chunk_mgr.wireframe else 'OFF'} | Chunk Colors [F5]: {'ON' if self.chunk_mgr.chunk_debug_colors else 'OFF'}",
+                f"MINEMESIS | LIVING CIVILIZATION SANDBOX | FPS: {self.timer.fps:.1f}",
+                f"World Clock: Year {sim_year} | Time: {hour:02d}:{minute:02d} [{time_phase}] [Press T to Advance]",
+                f"Social Standing: {standing} ({rep_score:+.0f}) in {near_set}",
+                f"Camera XYZ: {self.camera.x:.2f} / {self.camera.y:.2f} / {self.camera.z:.2f} | Chunks Rendered: {self.chunk_mgr.chunks_rendered}",
                 f"Targeting: {target_str}",
-                f"Hand [Slot {p.selected_slot + 1}]: {sel_name} ({sel_count}x) | Location: {near_set}",
+                f"Hand: {sel_name} ({sel_count}x) | Location: {near_set}",
             ]
-            if action_prompt:
+            if nearest_npc:
+                lines.append(
+                    f" >> CITIZEN: {nearest_npc.name} (Clan {nearest_npc.last_name}, {nearest_npc.profession}) <<"
+                )
+                lines.append(
+                    f"    Activity: {nearest_npc.current_activity} | Press [E] to Speak / Help / Attack"
+                )
+            elif action_prompt:
                 lines.append(action_prompt)
-            lines.append("Controls: [WASD] Move [Space] Jump [L/R Click] Mine/Build [F4] Wireframe [F5] Chunk Colors [F3] HUD [Esc] Pause")
+            lines.append("Controls: [WASD] Move [Space] Jump [E] Speak [T] Advance Time [J] Chronicle [F4] Wireframe [F3] HUD")
             self.overlay.render_overlay(lines)
 
         # Crosshair in first-person gameplay

@@ -193,8 +193,14 @@ class WorldGenerator:
         # 7. Procedural Trees
         self._populate_trees(chunk, start_bx, start_bz)
 
-        # 8. Settlement Architectural Blueprints
+        # 8. Settlement Architectural Blueprints (Pillars 11 & 12)
         self._populate_settlement_structures(chunk, start_bx, start_bz)
+
+        # 9. Historical Ruins in Wilderness (Pillar 1)
+        self._populate_historical_ruins(chunk, start_bx, start_bz)
+
+        # 10. Subterranean Archaeological Crypts (Pillar 3)
+        self._populate_archaeological_crypts(chunk, start_bx, start_bz)
 
         chunk.is_dirty = False
         return chunk
@@ -242,31 +248,40 @@ class WorldGenerator:
                                     chunk.set_block(fx, fy, fz, id_leaves, record_delta=False)
 
     def _populate_settlement_structures(self, chunk: Chunk, start_bx: int, start_bz: int) -> None:
-        """Pastes settlement architectural blueprints into chunks intersecting settlement boundaries."""
+        """
+        Pastes settlement architectural blueprints.
+        Pillar 11: Settlements evolve physically based on defensibility, wealth, and ore richness.
+        Pillar 12: Geography shapes culture (mountain stone vs river timber).
+        """
         for s in self.world_spec.settlements:
-            # Convert settlement tile coords to world block center
             sc_x = s.x * BLOCK_SCALE + 4
             sc_z = s.y * BLOCK_SCALE + 4
 
-            # Settlement footprint radius: ~32 blocks (2 chunks)
             dx = start_bx - sc_x
             dz = start_bz - sc_z
             dist_sq = dx * dx + dz * dz
 
-            if dist_sq < 1400:  # Within ~37 blocks radius
-                # Determine which building to place in this chunk slot
-                slot_hash = (chunk.cx * 17 + chunk.cz * 31) % 8
-                bp_keys = [
-                    "peasant_cottage",
-                    "farmhouse_field",
-                    "chieftain_longhouse",
-                    "craft_smithy",
-                    "village_shrine",
-                    "town_archive",
-                    "watchtower_palisade",
-                    "village_well",
-                ]
-                selected_bp = self.blueprints.get(bp_keys[slot_hash])
+            if dist_sq < 1400:
+                # If high defensibility or near perimeter, prioritize watchtower & palisade
+                if dist_sq > 700 and s.defensibility > 1.2:
+                    bp_key = "watchtower_palisade"
+                elif s.base_ore > 75 and (chunk.cx + chunk.cz) % 2 == 0:
+                    bp_key = "craft_smithy"
+                else:
+                    slot_hash = (chunk.cx * 17 + chunk.cz * 31) % 8
+                    bp_keys = [
+                        "peasant_cottage",
+                        "farmhouse_field",
+                        "chieftain_longhouse",
+                        "craft_smithy",
+                        "village_shrine",
+                        "town_archive",
+                        "watchtower_palisade",
+                        "village_well",
+                    ]
+                    bp_key = bp_keys[slot_hash]
+
+                selected_bp = self.blueprints.get(bp_key)
                 if not selected_bp:
                     continue
 
@@ -276,11 +291,17 @@ class WorldGenerator:
                 base_bz = start_bz + origin_lz
                 base_y = self.get_interpolated_height(base_bx, base_bz)
 
+                is_mountain = (s.site_type == "mountain" or base_y > 110)
+
                 for b in selected_bp.get("blocks", []):
                     bx_off = b["x"]
                     by_off = b["y"]
                     bz_off = b["z"]
                     block_name = b["block"]
+
+                    # Pillar 12: Mountain culture adapts planks to Cut Stone Bricks
+                    if is_mountain and "Plank" in block_name:
+                        block_name = "Cut Stone Bricks"
 
                     target_lx = origin_lx + bx_off
                     target_lz = origin_lz + bz_off
@@ -290,3 +311,79 @@ class WorldGenerator:
                         b_def = registry.get_by_name(block_name)
                         if b_def:
                             chunk.set_block(target_lx, target_y, target_lz, b_def.id, record_delta=False)
+
+    def _populate_historical_ruins(self, chunk: Chunk, start_bx: int, start_bz: int) -> None:
+        """
+        Pillar 1: Historical Ruins & Forgotten Shrines in Wilderness.
+        Places ancient crumbled stone shrines and columns in uninhabited hills.
+        """
+        # Deterministic wilderness placement
+        if (chunk.cx * 19 + chunk.cz * 37) % 31 != 0:
+            return
+
+        # Ensure far from any active settlement
+        for s in self.world_spec.settlements:
+            sc_x = s.x * BLOCK_SCALE + 4
+            sc_z = s.y * BLOCK_SCALE + 4
+            if (start_bx - sc_x) ** 2 + (start_bz - sc_z) ** 2 < 2500:
+                return
+
+        surf_y = self.get_interpolated_height(start_bx + 8, start_bz + 8)
+        if surf_y < 65 or surf_y > 190:
+            return
+
+        id_rubble = registry.get_by_name("Fieldstone Rubble").id if registry.get_by_name("Fieldstone Rubble") else 1
+        id_cut = registry.get_by_name("Cut Stone Bricks").id if registry.get_by_name("Cut Stone Bricks") else 89
+        id_column = registry.get_by_name("Carved Stone Column").id if registry.get_by_name("Carved Stone Column") else 95
+        id_lectern = registry.get_by_name("Scholar Lectern").id if registry.get_by_name("Scholar Lectern") else 101
+
+        # Ruined 5x5 stone foundation
+        for dx in range(6, 11):
+            for dz in range(6, 11):
+                chunk.set_block(dx, surf_y, dz, id_rubble, record_delta=False)
+                if (dx in (6, 10) or dz in (6, 10)) and (dx + dz) % 2 == 0:
+                    chunk.set_block(dx, surf_y + 1, dz, id_cut, record_delta=False)
+
+        # Broken columns at corners
+        chunk.set_block(6, surf_y + 1, 6, id_column, record_delta=False)
+        chunk.set_block(6, surf_y + 2, 6, id_column, record_delta=False)
+        chunk.set_block(10, surf_y + 1, 10, id_column, record_delta=False)
+
+        # Central ancient altar / lectern
+        chunk.set_block(8, surf_y + 1, 8, id_cut, record_delta=False)
+        chunk.set_block(8, surf_y + 2, 8, id_lectern, record_delta=False)
+
+    def _populate_archaeological_crypts(self, chunk: Chunk, start_bx: int, start_bz: int) -> None:
+        """
+        Pillar 3: Subterranean Archaeological Crypts & Lost Dynasty Vaults.
+        Generates stone burial vaults containing sarcophagi and ancient knowledge archives.
+        """
+        if (chunk.cx * 23 + chunk.cz * 47) % 27 != 0:
+            return
+
+        crypt_y = 22  # Deep basalt stone layer
+        id_basalt = registry.get_by_name("Basalt").id if registry.get_by_name("Basalt") else 1
+        id_cobble = registry.get_by_name("Cobblestone Pavement").id if registry.get_by_name("Cobblestone Pavement") else 90
+        id_shelf = registry.get_by_name("Town Archive Bookshelf").id if registry.get_by_name("Town Archive Bookshelf") else 100
+        id_lectern = registry.get_by_name("Scholar Lectern").id if registry.get_by_name("Scholar Lectern") else 101
+
+        # Carve 6x4x6 vault
+        for lx in range(5, 11):
+            for lz in range(5, 11):
+                # Floor
+                chunk.set_block(lx, crypt_y, lz, id_cobble, record_delta=False)
+                # Air interior
+                chunk.set_block(lx, crypt_y + 1, lz, 0, record_delta=False)
+                chunk.set_block(lx, crypt_y + 2, lz, 0, record_delta=False)
+                # Ceiling
+                chunk.set_block(lx, crypt_y + 3, lz, id_basalt, record_delta=False)
+
+                # Outer walls
+                if lx in (5, 10) or lz in (5, 10):
+                    chunk.set_block(lx, crypt_y + 1, lz, id_basalt, record_delta=False)
+                    chunk.set_block(lx, crypt_y + 2, lz, id_basalt, record_delta=False)
+
+        # Central stone tomb sarcophagus & ancient bookshelf
+        chunk.set_block(8, crypt_y + 1, 7, id_cobble, record_delta=False)
+        chunk.set_block(8, crypt_y + 1, 8, id_lectern, record_delta=False)
+        chunk.set_block(6, crypt_y + 1, 8, id_shelf, record_delta=False)

@@ -12,12 +12,21 @@ import numpy as np
 # Palette colors for NPC professions (RGB floats)
 PROFESSION_COLORS = {
     "Chief": {"body": (0.85, 0.65, 0.15), "legs": (0.25, 0.15, 0.10), "hair": (0.75, 0.75, 0.75)},
+    "Elder": {"body": (0.70, 0.60, 0.30), "legs": (0.25, 0.20, 0.15), "hair": (0.90, 0.90, 0.90)},
     "Scholar": {"body": (0.20, 0.35, 0.65), "legs": (0.15, 0.18, 0.25), "hair": (0.35, 0.25, 0.15)},
+    "Scribe": {"body": (0.25, 0.40, 0.70), "legs": (0.15, 0.18, 0.25), "hair": (0.30, 0.20, 0.15)},
     "Priest": {"body": (0.80, 0.85, 0.90), "legs": (0.30, 0.20, 0.35), "hair": (0.80, 0.80, 0.80)},
     "Smith": {"body": (0.45, 0.35, 0.25), "legs": (0.20, 0.20, 0.22), "hair": (0.15, 0.15, 0.15)},
+    "Blacksmith": {"body": (0.45, 0.35, 0.25), "legs": (0.20, 0.20, 0.22), "hair": (0.15, 0.15, 0.15)},
     "Farmer": {"body": (0.40, 0.60, 0.30), "legs": (0.35, 0.25, 0.15), "hair": (0.50, 0.35, 0.20)},
+    "Woodcutter": {"body": (0.50, 0.40, 0.25), "legs": (0.30, 0.25, 0.20), "hair": (0.40, 0.25, 0.15)},
+    "Laborer": {"body": (0.48, 0.45, 0.38), "legs": (0.25, 0.22, 0.20), "hair": (0.35, 0.25, 0.15)},
+    "Merchant": {"body": (0.75, 0.50, 0.20), "legs": (0.20, 0.20, 0.30), "hair": (0.40, 0.30, 0.20)},
+    "Weaver": {"body": (0.65, 0.35, 0.50), "legs": (0.25, 0.20, 0.25), "hair": (0.45, 0.30, 0.20)},
     "Guard": {"body": (0.55, 0.58, 0.62), "legs": (0.30, 0.32, 0.35), "hair": (0.20, 0.15, 0.10)},
+    "Soldier": {"body": (0.55, 0.58, 0.62), "legs": (0.30, 0.32, 0.35), "hair": (0.20, 0.15, 0.10)},
     "Citizen": {"body": (0.60, 0.45, 0.35), "legs": (0.25, 0.22, 0.20), "hair": (0.30, 0.20, 0.15)},
+    "Commoner": {"body": (0.60, 0.45, 0.35), "legs": (0.25, 0.22, 0.20), "hair": (0.30, 0.20, 0.15)},
 }
 
 
@@ -108,66 +117,207 @@ class VoxelHumanoidMesh:
 
 
 class NPC:
-    """Individual simulated character living in the 3D voxel world."""
+    """Individual simulated character living in the 3D voxel world with deep kinship and social memory."""
 
     def __init__(
         self,
         character_id: str,
         name: str,
+        first_name: str = "",
+        last_name: str = "",
+        family_id: str = "",
+        age_years: int = 30,
+        sex: str = "M",
         profession: str = "Citizen",
         faith: str = "Common Faith",
         settlement_id: str = "set_0",
+        settlement_name: str = "Deepwick",
+        # Kinship
+        spouse_id: Optional[str] = None,
+        spouse_name: Optional[str] = None,
+        father_id: Optional[str] = None,
+        mother_id: Optional[str] = None,
+        children_ids: Optional[List[str]] = None,
+        sibling_ids: Optional[List[str]] = None,
+        # Feuds & Rivalries
+        rival_family_ids: Optional[List[str]] = None,
+        rival_family_names: Optional[List[str]] = None,
+        # Positions in settlement
         home_pos: Tuple[float, float, float] = (1200.0, 80.0, 1200.0),
         work_pos: Tuple[float, float, float] = (1210.0, 80.0, 1210.0),
         shrine_pos: Tuple[float, float, float] = (1220.0, 80.0, 1200.0),
+        tavern_pos: Tuple[float, float, float] = (1215.0, 80.0, 1205.0),
         well_pos: Tuple[float, float, float] = (1205.0, 80.0, 1205.0),
+        guard_patrol_points: Optional[List[Tuple[float, float, float]]] = None,
     ) -> None:
         self.character_id = character_id
         self.name = name
+        self.first_name = first_name or (name.split()[0] if name else "Citizen")
+        self.last_name = last_name or (name.split()[-1] if len(name.split()) > 1 else "Commoner")
+        self.family_id = family_id or self.last_name
+        self.age_years = age_years
+        self.sex = sex
         self.profession = profession
         self.faith = faith
         self.settlement_id = settlement_id
+        self.settlement_name = settlement_name
 
+        # Kinship relationships
+        self.spouse_id = spouse_id
+        self.spouse_name = spouse_name
+        self.father_id = father_id
+        self.mother_id = mother_id
+        self.children_ids: List[str] = children_ids or []
+        self.sibling_ids: List[str] = sibling_ids or []
+        self.kin_names: Dict[str, str] = {}
+
+        # Feuds
+        self.rival_family_ids: List[str] = rival_family_ids or []
+        self.rival_family_names: List[str] = rival_family_names or []
+
+        # Positions
         self.home_pos = home_pos
         self.work_pos = work_pos
         self.shrine_pos = shrine_pos
+        self.tavern_pos = tavern_pos
         self.well_pos = well_pos
+        self.guard_patrol_points: List[Tuple[float, float, float]] = guard_patrol_points or [well_pos, home_pos, work_pos]
+        self.patrol_index: int = 0
+        self.patrol_timer: float = 0.0
 
+        # Physical location
         self.x = home_pos[0]
         self.y = home_pos[1]
         self.z = home_pos[2]
         self.yaw: float = 0.0
         self.target_pos = work_pos
 
-        # Organic AI state
-        self.current_activity: str = "Working"
+        # Behavioral & Social State
+        self.is_guard: bool = profession in ("Guard", "Soldier")
+        self.current_activity: str = "Resting at Home"
         self.health: float = 20.0
+        self.alive: bool = True
         self.is_hostile: bool = False
         self.is_fleeing: bool = False
         self.affinity_to_player: float = 0.0
+        self.grief_state: Optional[str] = None
+
+    def kin_react_to_violence(self, victim: NPC, player_pos: Tuple[float, float, float]) -> str:
+        """Triggers direct psychological reaction if victim is spouse, child, or sibling."""
+        if victim.character_id == self.character_id:
+            return ""
+
+        # 1. Spouse reaction
+        if self.spouse_id == victim.character_id:
+            self.affinity_to_player = -100.0
+            self.grief_state = f"Mourning slain spouse {victim.name}!"
+            self.current_activity = f"Weeping in horror over spouse {victim.name}!"
+            self.is_fleeing = True
+            self.target_pos = self.home_pos
+            return f"{self.name} screams: 'NO! My beloved {victim.name} is slain!'"
+
+        # 2. Child reaction (witnessing parent killed)
+        if self.character_id in victim.children_ids:
+            self.affinity_to_player = -100.0
+            self.grief_state = f"Traumatized: Parent {victim.name} murdered!"
+            self.current_activity = f"Fleeing in terror from murderer of parent {victim.name}!"
+            self.is_fleeing = True
+            self.target_pos = self.home_pos
+            return f"{self.name} weeps in terror: 'Mother! Father! The stranger murdered {victim.name}!'"
+
+        # 3. Parent reaction (witnessing child killed)
+        if victim.character_id in self.children_ids:
+            self.affinity_to_player = -100.0
+            self.grief_state = f"Heartbroken: Child {victim.name} slain!"
+            self.current_activity = f"Cursing the heavens over slain child {victim.name}!"
+            self.is_hostile = True
+            self.target_pos = player_pos
+            return f"{self.name} cries out in agonizing grief: 'My child {victim.name}! Blood will answer for blood!'"
+
+        # 4. Sibling reaction
+        if victim.character_id in self.sibling_ids:
+            self.affinity_to_player = -100.0
+            self.grief_state = f"Vengeful: Sibling {victim.name} murdered!"
+            self.current_activity = f"Seeking blood-vengeance for sibling {victim.name}!"
+            self.is_hostile = True
+            self.target_pos = player_pos
+            return f"{self.name} draws steel: 'Clan {self.last_name} will have your head for slaying my kin {victim.name}!'"
+
+        # 5. Guard duty
+        if self.is_guard:
+            self.is_hostile = True
+            self.current_activity = f"HUNTING OUTLAW: Avenging murdered citizen {victim.name}!"
+            self.target_pos = player_pos
+            return f"Guard {self.name} shouts: 'Halt in the name of {self.settlement_name}! Slay the murderer!'"
+
+        return ""
 
     def update_schedule(self, time_of_day_progress: float, dt: float) -> None:
-        """Evaluates daily schedule and moves toward current goal."""
-        # 0.0 to 0.25 (Night 00:00 - 06:00): Sleep at home
-        if time_of_day_progress < 0.25 or time_of_day_progress > 0.90:
-            self.current_activity = "Sleeping at Home"
-            self.target_pos = self.home_pos
-        # 0.25 to 0.50 (Morning 06:00 - 12:00): Work at profession
-        elif time_of_day_progress < 0.50:
-            self.current_activity = f"Laboring as {self.profession}"
-            self.target_pos = self.work_pos
-        # 0.50 to 0.60 (Midday 12:00 - 14:00): Socializing at Well/Market
-        elif time_of_day_progress < 0.60:
-            self.current_activity = "Socializing at Village Well"
-            self.target_pos = self.well_pos
-        # 0.60 to 0.75 (Afternoon 14:00 - 18:00): Work
-        elif time_of_day_progress < 0.75:
-            self.current_activity = f"Working ({self.profession})"
-            self.target_pos = self.work_pos
-        # 0.75 to 0.90 (Evening 18:00 - 22:00): Worship at Shrine
+        """Evaluates diurnal schedule, curfew, grief, and moves toward current goal."""
+        if not self.alive:
+            return
+
+        # Handle persistent grief or hostility first
+        if self.grief_state:
+            self.current_activity = self.grief_state
+            if self.is_fleeing:
+                self.target_pos = self.home_pos
+        elif self.is_hostile:
+            # Continues pursuing target_pos (player)
+            pass
         else:
-            self.current_activity = f"Worshiping at {self.faith} Shrine"
-            self.target_pos = self.shrine_pos
+            # --- 24-HOUR DIURNAL SCHEDULE ---
+            # 0.0 to 0.25 (Night 00:00 - 06:00) & 0.88 to 1.0 (Late Night 21:00 - 24:00): Curfew
+            if time_of_day_progress < 0.25 or time_of_day_progress > 0.88:
+                if self.is_guard:
+                    self.current_activity = "Night Patrol (Enforcing Curfew & Guarding Perimeter)"
+                    self.patrol_timer += dt
+                    if self.patrol_timer > 8.0:
+                        self.patrol_timer = 0.0
+                        self.patrol_index = (self.patrol_index + 1) % len(self.guard_patrol_points)
+                    self.target_pos = self.guard_patrol_points[self.patrol_index]
+                else:
+                    self.current_activity = "Sleeping in Bed (Night Curfew)"
+                    self.target_pos = self.home_pos
+
+            # 0.25 to 0.38 (Dawn & Morning Gathering 06:00 - 09:00): Village Well & Square
+            elif time_of_day_progress < 0.38:
+                if self.is_guard:
+                    self.current_activity = "Morning Guard Duty at Settlement Gate"
+                    self.target_pos = self.work_pos
+                else:
+                    self.current_activity = f"Greeting kin at Village Well ({self.last_name} Clan)"
+                    self.target_pos = self.well_pos
+
+            # 0.38 to 0.70 (Day Labor 09:00 - 17:00): Working at Trade
+            elif time_of_day_progress < 0.70:
+                if self.profession in ("Smith", "Blacksmith"):
+                    self.current_activity = "Forging iron plowshares & weapons at the Anvil"
+                elif self.profession == "Farmer":
+                    self.current_activity = "Tending crops & granary in the fields"
+                elif self.profession == "Woodcutter":
+                    self.current_activity = "Hewing logs & timber for settlement hearths"
+                elif self.profession in ("Priest", "Scholar", "Scribe"):
+                    self.current_activity = f"Transcribing annals of {self.settlement_name} & scriptures"
+                elif self.is_guard:
+                    self.current_activity = "Inspecting perimeter & deterring bandit raiders"
+                elif self.profession in ("Chief", "Elder"):
+                    self.current_activity = "Holding council & judging disputes in Great Hall"
+                else:
+                    self.current_activity = f"Laboring at trade as {self.profession}"
+                self.target_pos = self.work_pos
+
+            # 0.70 to 0.88 (Evening 17:00 - 21:00): Shrine Worship or Tavern Fellowship
+            else:
+                if self.profession in ("Priest", "Elder") or (hash(self.character_id) % 3 == 0):
+                    self.current_activity = f"Evening prayers to {self.faith} at the Stone Shrine"
+                    self.target_pos = self.shrine_pos
+                elif self.is_guard:
+                    self.current_activity = "Preparing night lanterns for curfew watch"
+                    self.target_pos = self.work_pos
+                else:
+                    self.current_activity = "Socializing & drinking ale at Village Tavern"
+                    self.target_pos = self.tavern_pos
 
         # Move smoothly toward target position
         tx, ty, tz = self.target_pos
@@ -175,10 +325,10 @@ class NPC:
         dz = tz - self.z
         dist = math.sqrt(dx * dx + dz * dz)
 
-        if dist > 0.5:
-            speed = 2.0 * dt
-            self.x += (dx / dist) * min(speed, dist)
-            self.z += (dz / dist) * min(speed, dist)
+        if dist > 0.6:
+            move_speed = 3.5 * dt if (self.is_fleeing or self.is_hostile) else 1.8 * dt
+            self.x += (dx / dist) * min(move_speed, dist)
+            self.z += (dz / dist) * min(move_speed, dist)
             self.yaw = math.degrees(math.atan2(-dx, dz))
 
     def render(
