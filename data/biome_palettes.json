@@ -1,0 +1,245 @@
+{
+  "schema_version": 1,
+  "biomes": {
+    "Ocean": {
+      "surface_block": "Fine Sand",
+      "subsurface_block": "River Gravel",
+      "stone_base": "Basalt",
+      "deep_stone": "Deepslate Basalt",
+      "fluid_block": "Deep Ocean Water",
+      "tree_species": null,
+      "tree_density": 0.0,
+      "flora_mix": [
+        [
+          "Wetland Cattails",
+          0.2
+        ]
+      ],
+      "ground_cover": "River Gravel"
+    },
+    "Beach": {
+      "surface_block": "Fine Sand",
+      "subsurface_block": "Fine Sand",
+      "stone_base": "Sandstone",
+      "deep_stone": "Granite",
+      "fluid_block": "Deep Ocean Water",
+      "tree_species": "Palm",
+      "tree_density": 0.005,
+      "flora_mix": [
+        [
+          "River Marsh Reeds",
+          0.3
+        ]
+      ],
+      "ground_cover": "River Gravel"
+    },
+    "Grassland": {
+      "surface_block": "Grass Turf",
+      "subsurface_block": "Loam Dirt",
+      "stone_base": "Limestone",
+      "deep_stone": "Deepslate Basalt",
+      "fluid_block": "Fresh River Water",
+      "tree_species": "Oak",
+      "tree_density": 0.015,
+      "flora_mix": [
+        [
+          "Wild Golden Wheat",
+          0.35
+        ],
+        [
+          "Wild Rye Grain",
+          0.2
+        ],
+        [
+          "Crimson Poppy",
+          0.15
+        ],
+        [
+          "Sunny Golden Marigold",
+          0.15
+        ],
+        [
+          "Blue Flax Stalks",
+          0.15
+        ]
+      ],
+      "ground_cover": "Loam Dirt"
+    },
+    "Forest": {
+      "surface_block": "Grass Turf",
+      "subsurface_block": "Loam Dirt",
+      "stone_base": "Granite",
+      "deep_stone": "Gneiss",
+      "fluid_block": "Fresh River Water",
+      "tree_species": "Oak",
+      "tree_density": 0.08,
+      "flora_mix": [
+        [
+          "Forest Maidenhair Fern",
+          0.4
+        ],
+        [
+          "Velvet Forest Moss",
+          0.3
+        ],
+        [
+          "Brown Forest Bolete",
+          0.15
+        ],
+        [
+          "Wild Briar Rose",
+          0.15
+        ]
+      ],
+      "ground_cover": "Velvet Forest Moss"
+    },
+    "Taiga": {
+      "surface_block": "Grass Turf",
+      "subsurface_block": "Coarse Dirt",
+      "stone_base": "Slate",
+      "deep_stone": "Deepslate Basalt",
+      "fluid_block": "Fresh River Water",
+      "tree_species": "Pine",
+      "tree_density": 0.07,
+      "flora_mix": [
+        [
+          "Forest Maidenhair Fern",
+          0.35
+        ],
+        [
+          "Velvet Forest Moss",
+          0.35
+        ],
+        [
+          "Red Fly Agaric",
+          0.15
+        ],
+        [
+          "Highland Thistle",
+          0.15
+        ]
+      ],
+      "ground_cover": "Coarse Dirt"
+    },
+    "Mountain": {
+      "surface_block": "Granite",
+      "subsurface_block": "Granite",
+      "stone_base": "Granite",
+      "deep_stone": "Gneiss",
+      "fluid_block": "Fresh River Water",
+      "tree_species": "Pine",
+      "tree_density": 0.01,
+      "flora_mix": [
+        [
+          "Purple Mountain Heather",
+          0.5
+        ],
+        [
+          "Highland Thistle",
+          0.3
+        ],
+        [
+          "Tundra Rock Lichen",
+          0.2
+        ]
+      ],
+      "ground_cover": "River Gravel"
+    },
+    "Snow": {
+      "surface_block": "Packed Snow",
+      "subsurface_block": "Permafrost",
+      "stone_base": "Slate",
+      "deep_stone": "Deepslate Basalt",
+      "fluid_block": "Glacial Ice",
+      "tree_species": "Pine",
+      "tree_density": 0.005,
+      "flora_mix": [
+        [
+          "Tundra Rock Lichen",
+          0.7
+        ],
+        [
+          "Purple Mountain Heather",
+          0.3
+        ]
+      ],
+      "ground_cover": "Glacial Ice"
+    },
+    "Desert": {
+      "surface_block": "Fine Sand",
+      "subsurface_block": "Sandstone",
+      "stone_base": "Sandstone",
+      "deep_stone": "Basalt",
+      "fluid_block": "Fresh River Water",
+      "tree_species": null,
+      "tree_density": 0.0,
+      "flora_mix": [
+        [
+          "Prickly Arid Cactus",
+          0.6
+        ],
+        [
+          "Desert Dry Scrub",
+          0.4
+        ]
+      ],
+      "ground_cover": "Red Desert Sand"
+    },
+    "Swamp": {
+      "surface_block": "Mud",
+      "subsurface_block": "Peat",
+      "stone_base": "Shale",
+      "deep_stone": "Clay",
+      "fluid_block": "Stagnant Swamp Water",
+      "tree_species": "Willow",
+      "tree_density": 0.05,
+      "flora_mix": [
+        [
+          "Wetland Cattails",
+          0.4
+        ],
+        [
+          "River Marsh Reeds",
+          0.3
+        ],
+        [
+          "Brown Forest Bolete",
+          0.15
+        ],
+        [
+          "Velvet Forest Moss",
+          0.15
+        ]
+      ],
+      "ground_cover": "Peat"
+    },
+    "Hills": {
+      "surface_block": "Grass Turf",
+      "subsurface_block": "Clay",
+      "stone_base": "Limestone",
+      "deep_stone": "Marble",
+      "fluid_block": "Fresh River Water",
+      "tree_species": "Birch",
+      "tree_density": 0.03,
+      "flora_mix": [
+        [
+          "Aromatic Lavender",
+          0.3
+        ],
+        [
+          "Sunny Golden Marigold",
+          0.3
+        ],
+        [
+          "Wild Rye Grain",
+          0.2
+        ],
+        [
+          "Highland Thistle",
+          0.2
+        ]
+      ],
+      "ground_cover": "Limestone"
+    }
+  }
+}

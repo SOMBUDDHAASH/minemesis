@@ -1,0 +1,676 @@
+{
+  "name": "village_shrine",
+  "size": {
+    "width": 7,
+    "height": 5,
+    "depth": 7
+  },
+  "blocks": [
+    {
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 0,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 0,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 0,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 0,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 0,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "z": 0,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 1,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 1,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 1,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 1,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 1,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 1,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "z": 1,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 2,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 2,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 2,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 2,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 2,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 2,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "z": 2,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 3,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 3,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 3,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 3,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 3,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 3,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "z": 3,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 4,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 4,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 4,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 4,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 4,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 4,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "z": 4,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 5,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 5,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 5,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 5,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 5,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 5,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "z": 5,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 6,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 6,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 6,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 6,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 6,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 6,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "z": 6,
+      "block": "Chiseled Ashlar Blocks"
+    },
+    {
+      "x": 1,
+      "y": 1,
+      "z": 1,
+      "block": "Carved Stone Column"
+    },
+    {
+      "x": 5,
+      "y": 1,
+      "z": 1,
+      "block": "Carved Stone Column"
+    },
+    {
+      "x": 3,
+      "y": 1,
+      "z": 3,
+      "block": "Shrine Offering Altar"
+    },
+    {
+      "x": 1,
+      "y": 1,
+      "z": 5,
+      "block": "Carved Stone Column"
+    },
+    {
+      "x": 5,
+      "y": 1,
+      "z": 5,
+      "block": "Carved Stone Column"
+    },
+    {
+      "x": 1,
+      "y": 2,
+      "z": 1,
+      "block": "Carved Stone Column"
+    },
+    {
+      "x": 5,
+      "y": 2,
+      "z": 1,
+      "block": "Carved Stone Column"
+    },
+    {
+      "x": 1,
+      "y": 2,
+      "z": 5,
+      "block": "Carved Stone Column"
+    },
+    {
+      "x": 5,
+      "y": 2,
+      "z": 5,
+      "block": "Carved Stone Column"
+    },
+    {
+      "x": 1,
+      "y": 3,
+      "z": 1,
+      "block": "Carved Stone Column"
+    },
+    {
+      "x": 5,
+      "y": 3,
+      "z": 1,
+      "block": "Carved Stone Column"
+    },
+    {
+      "x": 1,
+      "y": 3,
+      "z": 5,
+      "block": "Carved Stone Column"
+    },
+    {
+      "x": 5,
+      "y": 3,
+      "z": 5,
+      "block": "Carved Stone Column"
+    },
+    {
+      "x": 0,
+      "y": 4,
+      "z": 0,
+      "block": "Marble"
+    },
+    {
+      "x": 1,
+      "y": 4,
+      "z": 0,
+      "block": "Marble"
+    },
+    {
+      "x": 2,
+      "y": 4,
+      "z": 0,
+      "block": "Marble"
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "z": 0,
+      "block": "Marble"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "z": 0,
+      "block": "Marble"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "z": 0,
+      "block": "Marble"
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "z": 0,
+      "block": "Marble"
+    },
+    {
+      "x": 0,
+      "y": 4,
+      "z": 1,
+      "block": "Marble"
+    },
+    {
+      "x": 1,
+      "y": 4,
+      "z": 1,
+      "block": "Marble"
+    },
+    {
+      "x": 2,
+      "y": 4,
+      "z": 1,
+      "block": "Marble"
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "z": 1,
+      "block": "Marble"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "z": 1,
+      "block": "Marble"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "z": 1,
+      "block": "Marble"
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "z": 1,
+      "block": "Marble"
+    },
+    {
+      "x": 0,
+      "y": 4,
+      "z": 2,
+      "block": "Marble"
+    },
+    {
+      "x": 1,
+      "y": 4,
+      "z": 2,
+      "block": "Marble"
+    },
+    {
+      "x": 2,
+      "y": 4,
+      "z": 2,
+      "block": "Marble"
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "z": 2,
+      "block": "Marble"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "z": 2,
+      "block": "Marble"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "z": 2,
+      "block": "Marble"
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "z": 2,
+      "block": "Marble"
+    },
+    {
+      "x": 0,
+      "y": 4,
+      "z": 3,
+      "block": "Marble"
+    },
+    {
+      "x": 1,
+      "y": 4,
+      "z": 3,
+      "block": "Marble"
+    },
+    {
+      "x": 2,
+      "y": 4,
+      "z": 3,
+      "block": "Marble"
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "z": 3,
+      "block": "Marble"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "z": 3,
+      "block": "Marble"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "z": 3,
+      "block": "Marble"
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "z": 3,
+      "block": "Marble"
+    },
+    {
+      "x": 0,
+      "y": 4,
+      "z": 4,
+      "block": "Marble"
+    },
+    {
+      "x": 1,
+      "y": 4,
+      "z": 4,
+      "block": "Marble"
+    },
+    {
+      "x": 2,
+      "y": 4,
+      "z": 4,
+      "block": "Marble"
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "z": 4,
+      "block": "Marble"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "z": 4,
+      "block": "Marble"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "z": 4,
+      "block": "Marble"
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "z": 4,
+      "block": "Marble"
+    },
+    {
+      "x": 0,
+      "y": 4,
+      "z": 5,
+      "block": "Marble"
+    },
+    {
+      "x": 1,
+      "y": 4,
+      "z": 5,
+      "block": "Marble"
+    },
+    {
+      "x": 2,
+      "y": 4,
+      "z": 5,
+      "block": "Marble"
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "z": 5,
+      "block": "Marble"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "z": 5,
+      "block": "Marble"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "z": 5,
+      "block": "Marble"
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "z": 5,
+      "block": "Marble"
+    },
+    {
+      "x": 0,
+      "y": 4,
+      "z": 6,
+      "block": "Marble"
+    },
+    {
+      "x": 1,
+      "y": 4,
+      "z": 6,
+      "block": "Marble"
+    },
+    {
+      "x": 2,
+      "y": 4,
+      "z": 6,
+      "block": "Marble"
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "z": 6,
+      "block": "Marble"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "z": 6,
+      "block": "Marble"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "z": 6,
+      "block": "Marble"
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "z": 6,
+      "block": "Marble"
+    }
+  ]
+}

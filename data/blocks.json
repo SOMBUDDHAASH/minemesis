@@ -1,0 +1,1761 @@
+{
+  "schema_version": 1,
+  "total_blocks": 132,
+  "blocks": [
+    {
+      "id": 0,
+      "name": "Air",
+      "category": "special",
+      "hardness": 0.0,
+      "transparent": true,
+      "texture": "air",
+      "tags": [
+        "gas",
+        "permeable"
+      ],
+      "drops": "air"
+    },
+    {
+      "id": 1,
+      "name": "Limestone",
+      "category": "rock",
+      "hardness": 1.8,
+      "transparent": false,
+      "texture": "limestone",
+      "tags": [
+        "stone",
+        "sedimentary",
+        "building"
+      ],
+      "drops": "limestone"
+    },
+    {
+      "id": 2,
+      "name": "Basalt",
+      "category": "rock",
+      "hardness": 2.8,
+      "transparent": false,
+      "texture": "basalt",
+      "tags": [
+        "stone",
+        "igneous",
+        "dense"
+      ],
+      "drops": "basalt"
+    },
+    {
+      "id": 3,
+      "name": "Granite",
+      "category": "rock",
+      "hardness": 2.5,
+      "transparent": false,
+      "texture": "granite",
+      "tags": [
+        "stone",
+        "igneous",
+        "hard"
+      ],
+      "drops": "granite"
+    },
+    {
+      "id": 4,
+      "name": "Slate",
+      "category": "rock",
+      "hardness": 2.0,
+      "transparent": false,
+      "texture": "slate",
+      "tags": [
+        "stone",
+        "metamorphic",
+        "roofing"
+      ],
+      "drops": "slate"
+    },
+    {
+      "id": 5,
+      "name": "Chalk",
+      "category": "rock",
+      "hardness": 0.8,
+      "transparent": false,
+      "texture": "chalk",
+      "tags": [
+        "stone",
+        "soft",
+        "mineral"
+      ],
+      "drops": "chalk"
+    },
+    {
+      "id": 6,
+      "name": "Marble",
+      "category": "rock",
+      "hardness": 2.2,
+      "transparent": false,
+      "texture": "marble",
+      "tags": [
+        "stone",
+        "metamorphic",
+        "ornate"
+      ],
+      "drops": "marble"
+    },
+    {
+      "id": 7,
+      "name": "Sandstone",
+      "category": "rock",
+      "hardness": 1.5,
+      "transparent": false,
+      "texture": "sandstone",
+      "tags": [
+        "stone",
+        "sedimentary"
+      ],
+      "drops": "sandstone"
+    },
+    {
+      "id": 8,
+      "name": "Shale",
+      "category": "rock",
+      "hardness": 1.2,
+      "transparent": false,
+      "texture": "shale",
+      "tags": [
+        "stone",
+        "layered"
+      ],
+      "drops": "shale"
+    },
+    {
+      "id": 9,
+      "name": "Diorite",
+      "category": "rock",
+      "hardness": 2.4,
+      "transparent": false,
+      "texture": "diorite",
+      "tags": [
+        "stone",
+        "igneous"
+      ],
+      "drops": "diorite"
+    },
+    {
+      "id": 10,
+      "name": "Andesite",
+      "category": "rock",
+      "hardness": 2.3,
+      "transparent": false,
+      "texture": "andesite",
+      "tags": [
+        "stone",
+        "igneous"
+      ],
+      "drops": "andesite"
+    },
+    {
+      "id": 11,
+      "name": "Deepslate Basalt",
+      "category": "rock",
+      "hardness": 3.5,
+      "transparent": false,
+      "texture": "deepslate_basalt",
+      "tags": [
+        "stone",
+        "subterranean"
+      ],
+      "drops": "deepslate_basalt"
+    },
+    {
+      "id": 12,
+      "name": "Gneiss",
+      "category": "rock",
+      "hardness": 2.6,
+      "transparent": false,
+      "texture": "gneiss",
+      "tags": [
+        "stone",
+        "banded"
+      ],
+      "drops": "gneiss"
+    },
+    {
+      "id": 13,
+      "name": "Gabbro",
+      "category": "rock",
+      "hardness": 3.0,
+      "transparent": false,
+      "texture": "gabbro",
+      "tags": [
+        "stone",
+        "plutonic"
+      ],
+      "drops": "gabbro"
+    },
+    {
+      "id": 14,
+      "name": "Obsidian",
+      "category": "rock",
+      "hardness": 5.0,
+      "transparent": false,
+      "texture": "obsidian",
+      "tags": [
+        "stone",
+        "volcanic",
+        "glassy"
+      ],
+      "drops": "obsidian"
+    },
+    {
+      "id": 15,
+      "name": "Clay",
+      "category": "soil",
+      "hardness": 0.6,
+      "transparent": false,
+      "texture": "clay",
+      "tags": [
+        "soil",
+        "crafting",
+        "waterproof"
+      ],
+      "drops": "clay"
+    },
+    {
+      "id": 16,
+      "name": "Mud",
+      "category": "soil",
+      "hardness": 0.5,
+      "transparent": false,
+      "texture": "mud",
+      "tags": [
+        "soil",
+        "viscous"
+      ],
+      "drops": "mud"
+    },
+    {
+      "id": 17,
+      "name": "Peat",
+      "category": "soil",
+      "hardness": 0.7,
+      "transparent": false,
+      "texture": "peat",
+      "tags": [
+        "soil",
+        "fuel",
+        "organic"
+      ],
+      "drops": "peat"
+    },
+    {
+      "id": 18,
+      "name": "Loam Dirt",
+      "category": "soil",
+      "hardness": 0.5,
+      "transparent": false,
+      "texture": "dirt",
+      "tags": [
+        "soil",
+        "fertile"
+      ],
+      "drops": "loam_dirt"
+    },
+    {
+      "id": 19,
+      "name": "Grass Turf",
+      "category": "soil",
+      "hardness": 0.6,
+      "transparent": false,
+      "texture": "grass_turf",
+      "tags": [
+        "soil",
+        "vegetation",
+        "surface"
+      ],
+      "drops": "grass_turf"
+    },
+    {
+      "id": 20,
+      "name": "Coarse Dirt",
+      "category": "soil",
+      "hardness": 0.6,
+      "transparent": false,
+      "texture": "coarse_dirt",
+      "tags": [
+        "soil",
+        "rough"
+      ],
+      "drops": "coarse_dirt"
+    },
+    {
+      "id": 21,
+      "name": "Fine Sand",
+      "category": "soil",
+      "hardness": 0.4,
+      "transparent": false,
+      "texture": "sand",
+      "tags": [
+        "granular",
+        "desert",
+        "beach"
+      ],
+      "drops": "fine_sand"
+    },
+    {
+      "id": 22,
+      "name": "Red Desert Sand",
+      "category": "soil",
+      "hardness": 0.4,
+      "transparent": false,
+      "texture": "red_sand",
+      "tags": [
+        "granular",
+        "arid"
+      ],
+      "drops": "red_desert_sand"
+    },
+    {
+      "id": 23,
+      "name": "River Gravel",
+      "category": "soil",
+      "hardness": 0.6,
+      "transparent": false,
+      "texture": "gravel",
+      "tags": [
+        "granular",
+        "aggregate"
+      ],
+      "drops": "river_gravel"
+    },
+    {
+      "id": 24,
+      "name": "Permafrost",
+      "category": "ice",
+      "hardness": 1.8,
+      "transparent": false,
+      "texture": "permafrost",
+      "tags": [
+        "frozen",
+        "polar"
+      ],
+      "drops": "permafrost"
+    },
+    {
+      "id": 25,
+      "name": "Glacial Ice",
+      "category": "ice",
+      "hardness": 1.0,
+      "transparent": false,
+      "texture": "glacial_ice",
+      "tags": [
+        "frozen",
+        "translucent"
+      ],
+      "drops": "glacial_ice"
+    },
+    {
+      "id": 26,
+      "name": "Packed Snow",
+      "category": "ice",
+      "hardness": 0.4,
+      "transparent": false,
+      "texture": "snow",
+      "tags": [
+        "frozen",
+        "fluffy"
+      ],
+      "drops": "packed_snow"
+    },
+    {
+      "id": 27,
+      "name": "Coal Seam",
+      "category": "ore",
+      "hardness": 2.0,
+      "transparent": false,
+      "texture": "ore_coal",
+      "tags": [
+        "ore",
+        "fuel"
+      ],
+      "drops": "coal_seam"
+    },
+    {
+      "id": 28,
+      "name": "Lignite Deposit",
+      "category": "ore",
+      "hardness": 1.5,
+      "transparent": false,
+      "texture": "ore_lignite",
+      "tags": [
+        "ore",
+        "low_fuel"
+      ],
+      "drops": "lignite_deposit"
+    },
+    {
+      "id": 29,
+      "name": "Native Copper Ore",
+      "category": "ore",
+      "hardness": 2.2,
+      "transparent": false,
+      "texture": "copper_ore",
+      "tags": [
+        "ore",
+        "metal",
+        "copper"
+      ],
+      "drops": "native_copper_ore"
+    },
+    {
+      "id": 30,
+      "name": "Malachite Vein",
+      "category": "ore",
+      "hardness": 2.4,
+      "transparent": false,
+      "texture": "malachite_ore",
+      "tags": [
+        "ore",
+        "copper",
+        "ornamental"
+      ],
+      "drops": "malachite_vein"
+    },
+    {
+      "id": 31,
+      "name": "Magnetite Iron Ore",
+      "category": "ore",
+      "hardness": 2.8,
+      "transparent": false,
+      "texture": "iron_ore",
+      "tags": [
+        "ore",
+        "metal",
+        "iron"
+      ],
+      "drops": "magnetite_iron_ore"
+    },
+    {
+      "id": 32,
+      "name": "Hematite Bed",
+      "category": "ore",
+      "hardness": 2.7,
+      "transparent": false,
+      "texture": "hematite_ore",
+      "tags": [
+        "ore",
+        "iron"
+      ],
+      "drops": "hematite_bed"
+    },
+    {
+      "id": 33,
+      "name": "Bog Iron Ore",
+      "category": "ore",
+      "hardness": 1.8,
+      "transparent": false,
+      "texture": "bog_iron",
+      "tags": [
+        "ore",
+        "low_iron"
+      ],
+      "drops": "bog_iron_ore"
+    },
+    {
+      "id": 34,
+      "name": "Cassiterite Tin Ore",
+      "category": "ore",
+      "hardness": 2.2,
+      "transparent": false,
+      "texture": "tin_ore",
+      "tags": [
+        "ore",
+        "metal",
+        "bronze"
+      ],
+      "drops": "cassiterite_tin_ore"
+    },
+    {
+      "id": 35,
+      "name": "Silver Ore",
+      "category": "ore",
+      "hardness": 2.5,
+      "transparent": false,
+      "texture": "silver_ore",
+      "tags": [
+        "ore",
+        "precious",
+        "currency"
+      ],
+      "drops": "silver_ore"
+    },
+    {
+      "id": 36,
+      "name": "Gold Vein",
+      "category": "ore",
+      "hardness": 2.6,
+      "transparent": false,
+      "texture": "gold_ore",
+      "tags": [
+        "ore",
+        "precious",
+        "jewelry"
+      ],
+      "drops": "gold_vein"
+    },
+    {
+      "id": 37,
+      "name": "Electrum Deposit",
+      "category": "ore",
+      "hardness": 2.7,
+      "transparent": false,
+      "texture": "electrum_ore",
+      "tags": [
+        "ore",
+        "precious"
+      ],
+      "drops": "electrum_deposit"
+    },
+    {
+      "id": 38,
+      "name": "Galena Lead Ore",
+      "category": "ore",
+      "hardness": 2.4,
+      "transparent": false,
+      "texture": "lead_ore",
+      "tags": [
+        "ore",
+        "dense_metal"
+      ],
+      "drops": "galena_lead_ore"
+    },
+    {
+      "id": 39,
+      "name": "Cinnabar Red Ore",
+      "category": "ore",
+      "hardness": 2.0,
+      "transparent": false,
+      "texture": "cinnabar_ore",
+      "tags": [
+        "ore",
+        "mercury",
+        "pigment"
+      ],
+      "drops": "cinnabar_red_ore"
+    },
+    {
+      "id": 40,
+      "name": "Sulfur Crystal",
+      "category": "ore",
+      "hardness": 1.5,
+      "transparent": false,
+      "texture": "sulfur_ore",
+      "tags": [
+        "mineral",
+        "alchemy"
+      ],
+      "drops": "sulfur_crystal"
+    },
+    {
+      "id": 41,
+      "name": "Saltpetre Crust",
+      "category": "ore",
+      "hardness": 1.2,
+      "transparent": false,
+      "texture": "saltpetre",
+      "tags": [
+        "mineral",
+        "preservative"
+      ],
+      "drops": "saltpetre_crust"
+    },
+    {
+      "id": 42,
+      "name": "Quartz Crystal",
+      "category": "ore",
+      "hardness": 3.0,
+      "transparent": false,
+      "texture": "quartz_ore",
+      "tags": [
+        "crystal",
+        "optic"
+      ],
+      "drops": "quartz_crystal"
+    },
+    {
+      "id": 43,
+      "name": "Emerald Clustered Rock",
+      "category": "ore",
+      "hardness": 3.2,
+      "transparent": false,
+      "texture": "emerald_ore",
+      "tags": [
+        "gem",
+        "valuable"
+      ],
+      "drops": "emerald_clustered_rock"
+    },
+    {
+      "id": 44,
+      "name": "Sapphire Corundum",
+      "category": "ore",
+      "hardness": 3.4,
+      "transparent": false,
+      "texture": "sapphire_ore",
+      "tags": [
+        "gem",
+        "hard"
+      ],
+      "drops": "sapphire_corundum"
+    },
+    {
+      "id": 45,
+      "name": "Ruby Corundum",
+      "category": "ore",
+      "hardness": 3.4,
+      "transparent": false,
+      "texture": "ruby_ore",
+      "tags": [
+        "gem",
+        "royal"
+      ],
+      "drops": "ruby_corundum"
+    },
+    {
+      "id": 46,
+      "name": "Amethyst Geode",
+      "category": "ore",
+      "hardness": 2.8,
+      "transparent": false,
+      "texture": "amethyst",
+      "tags": [
+        "gem",
+        "crystal"
+      ],
+      "drops": "amethyst_geode"
+    },
+    {
+      "id": 47,
+      "name": "Lapislazuli Vein",
+      "category": "ore",
+      "hardness": 2.2,
+      "transparent": false,
+      "texture": "lapis_ore",
+      "tags": [
+        "mineral",
+        "dye",
+        "pigment"
+      ],
+      "drops": "lapislazuli_vein"
+    },
+    {
+      "id": 48,
+      "name": "Alabaster Rock",
+      "category": "ore",
+      "hardness": 1.4,
+      "transparent": false,
+      "texture": "alabaster",
+      "tags": [
+        "stone",
+        "carving"
+      ],
+      "drops": "alabaster_rock"
+    },
+    {
+      "id": 49,
+      "name": "Bismuth Shimmer",
+      "category": "ore",
+      "hardness": 2.5,
+      "transparent": false,
+      "texture": "bismuth_ore",
+      "tags": [
+        "metal",
+        "iridescent"
+      ],
+      "drops": "bismuth_shimmer"
+    },
+    {
+      "id": 50,
+      "name": "Kaolinite White Clay",
+      "category": "ore",
+      "hardness": 0.8,
+      "transparent": false,
+      "texture": "kaolin_clay",
+      "tags": [
+        "mineral",
+        "ceramic"
+      ],
+      "drops": "kaolinite_white_clay"
+    },
+    {
+      "id": 51,
+      "name": "Oak Log",
+      "category": "wood",
+      "hardness": 1.8,
+      "transparent": false,
+      "texture": "oak_log",
+      "tags": [
+        "wood",
+        "structural",
+        "fuel"
+      ],
+      "drops": "oak_log"
+    },
+    {
+      "id": 52,
+      "name": "Oak Planks",
+      "category": "wood",
+      "hardness": 1.4,
+      "transparent": false,
+      "texture": "oak_planks",
+      "tags": [
+        "wood",
+        "building",
+        "crafting"
+      ],
+      "drops": "oak_planks"
+    },
+    {
+      "id": 53,
+      "name": "Oak Leaves",
+      "category": "foliage",
+      "hardness": 0.2,
+      "transparent": true,
+      "texture": "oak_leaves",
+      "tags": [
+        "foliage",
+        "transparent"
+      ],
+      "drops": "oak_leaves"
+    },
+    {
+      "id": 54,
+      "name": "Oak Sapling",
+      "category": "flora",
+      "hardness": 0.1,
+      "transparent": true,
+      "texture": "oak_sapling",
+      "tags": [
+        "plant",
+        "cultivation"
+      ],
+      "drops": "oak_sapling"
+    },
+    {
+      "id": 55,
+      "name": "Birch Log",
+      "category": "wood",
+      "hardness": 1.8,
+      "transparent": false,
+      "texture": "birch_log",
+      "tags": [
+        "wood",
+        "structural",
+        "fuel"
+      ],
+      "drops": "birch_log"
+    },
+    {
+      "id": 56,
+      "name": "Birch Planks",
+      "category": "wood",
+      "hardness": 1.4,
+      "transparent": false,
+      "texture": "birch_planks",
+      "tags": [
+        "wood",
+        "building",
+        "crafting"
+      ],
+      "drops": "birch_planks"
+    },
+    {
+      "id": 57,
+      "name": "Birch Leaves",
+      "category": "foliage",
+      "hardness": 0.2,
+      "transparent": true,
+      "texture": "birch_leaves",
+      "tags": [
+        "foliage",
+        "transparent"
+      ],
+      "drops": "birch_leaves"
+    },
+    {
+      "id": 58,
+      "name": "Birch Sapling",
+      "category": "flora",
+      "hardness": 0.1,
+      "transparent": true,
+      "texture": "birch_sapling",
+      "tags": [
+        "plant",
+        "cultivation"
+      ],
+      "drops": "birch_sapling"
+    },
+    {
+      "id": 59,
+      "name": "Pine Log",
+      "category": "wood",
+      "hardness": 1.8,
+      "transparent": false,
+      "texture": "pine_log",
+      "tags": [
+        "wood",
+        "structural",
+        "fuel"
+      ],
+      "drops": "pine_log"
+    },
+    {
+      "id": 60,
+      "name": "Pine Planks",
+      "category": "wood",
+      "hardness": 1.4,
+      "transparent": false,
+      "texture": "pine_planks",
+      "tags": [
+        "wood",
+        "building",
+        "crafting"
+      ],
+      "drops": "pine_planks"
+    },
+    {
+      "id": 61,
+      "name": "Pine Leaves",
+      "category": "foliage",
+      "hardness": 0.2,
+      "transparent": true,
+      "texture": "pine_leaves",
+      "tags": [
+        "foliage",
+        "transparent"
+      ],
+      "drops": "pine_leaves"
+    },
+    {
+      "id": 62,
+      "name": "Pine Sapling",
+      "category": "flora",
+      "hardness": 0.1,
+      "transparent": true,
+      "texture": "pine_sapling",
+      "tags": [
+        "plant",
+        "cultivation"
+      ],
+      "drops": "pine_sapling"
+    },
+    {
+      "id": 63,
+      "name": "Willow Log",
+      "category": "wood",
+      "hardness": 1.8,
+      "transparent": false,
+      "texture": "willow_log",
+      "tags": [
+        "wood",
+        "structural",
+        "fuel"
+      ],
+      "drops": "willow_log"
+    },
+    {
+      "id": 64,
+      "name": "Willow Planks",
+      "category": "wood",
+      "hardness": 1.4,
+      "transparent": false,
+      "texture": "willow_planks",
+      "tags": [
+        "wood",
+        "building",
+        "crafting"
+      ],
+      "drops": "willow_planks"
+    },
+    {
+      "id": 65,
+      "name": "Willow Leaves",
+      "category": "foliage",
+      "hardness": 0.2,
+      "transparent": true,
+      "texture": "willow_leaves",
+      "tags": [
+        "foliage",
+        "transparent"
+      ],
+      "drops": "willow_leaves"
+    },
+    {
+      "id": 66,
+      "name": "Willow Sapling",
+      "category": "flora",
+      "hardness": 0.1,
+      "transparent": true,
+      "texture": "willow_sapling",
+      "tags": [
+        "plant",
+        "cultivation"
+      ],
+      "drops": "willow_sapling"
+    },
+    {
+      "id": 67,
+      "name": "Cedar Log",
+      "category": "wood",
+      "hardness": 1.8,
+      "transparent": false,
+      "texture": "cedar_log",
+      "tags": [
+        "wood",
+        "structural",
+        "fuel"
+      ],
+      "drops": "cedar_log"
+    },
+    {
+      "id": 68,
+      "name": "Cedar Planks",
+      "category": "wood",
+      "hardness": 1.4,
+      "transparent": false,
+      "texture": "cedar_planks",
+      "tags": [
+        "wood",
+        "building",
+        "crafting"
+      ],
+      "drops": "cedar_planks"
+    },
+    {
+      "id": 69,
+      "name": "Cedar Leaves",
+      "category": "foliage",
+      "hardness": 0.2,
+      "transparent": true,
+      "texture": "cedar_leaves",
+      "tags": [
+        "foliage",
+        "transparent"
+      ],
+      "drops": "cedar_leaves"
+    },
+    {
+      "id": 70,
+      "name": "Cedar Sapling",
+      "category": "flora",
+      "hardness": 0.1,
+      "transparent": true,
+      "texture": "cedar_sapling",
+      "tags": [
+        "plant",
+        "cultivation"
+      ],
+      "drops": "cedar_sapling"
+    },
+    {
+      "id": 71,
+      "name": "Baobab Log",
+      "category": "wood",
+      "hardness": 1.8,
+      "transparent": false,
+      "texture": "baobab_log",
+      "tags": [
+        "wood",
+        "structural",
+        "fuel"
+      ],
+      "drops": "baobab_log"
+    },
+    {
+      "id": 72,
+      "name": "Baobab Planks",
+      "category": "wood",
+      "hardness": 1.4,
+      "transparent": false,
+      "texture": "baobab_planks",
+      "tags": [
+        "wood",
+        "building",
+        "crafting"
+      ],
+      "drops": "baobab_planks"
+    },
+    {
+      "id": 73,
+      "name": "Baobab Leaves",
+      "category": "foliage",
+      "hardness": 0.2,
+      "transparent": true,
+      "texture": "baobab_leaves",
+      "tags": [
+        "foliage",
+        "transparent"
+      ],
+      "drops": "baobab_leaves"
+    },
+    {
+      "id": 74,
+      "name": "Baobab Sapling",
+      "category": "flora",
+      "hardness": 0.1,
+      "transparent": true,
+      "texture": "baobab_sapling",
+      "tags": [
+        "plant",
+        "cultivation"
+      ],
+      "drops": "baobab_sapling"
+    },
+    {
+      "id": 75,
+      "name": "Ebony Log",
+      "category": "wood",
+      "hardness": 1.8,
+      "transparent": false,
+      "texture": "ebony_log",
+      "tags": [
+        "wood",
+        "structural",
+        "fuel"
+      ],
+      "drops": "ebony_log"
+    },
+    {
+      "id": 76,
+      "name": "Ebony Planks",
+      "category": "wood",
+      "hardness": 1.4,
+      "transparent": false,
+      "texture": "ebony_planks",
+      "tags": [
+        "wood",
+        "building",
+        "crafting"
+      ],
+      "drops": "ebony_planks"
+    },
+    {
+      "id": 77,
+      "name": "Ebony Leaves",
+      "category": "foliage",
+      "hardness": 0.2,
+      "transparent": true,
+      "texture": "ebony_leaves",
+      "tags": [
+        "foliage",
+        "transparent"
+      ],
+      "drops": "ebony_leaves"
+    },
+    {
+      "id": 78,
+      "name": "Ebony Sapling",
+      "category": "flora",
+      "hardness": 0.1,
+      "transparent": true,
+      "texture": "ebony_sapling",
+      "tags": [
+        "plant",
+        "cultivation"
+      ],
+      "drops": "ebony_sapling"
+    },
+    {
+      "id": 79,
+      "name": "Cypress Log",
+      "category": "wood",
+      "hardness": 1.8,
+      "transparent": false,
+      "texture": "cypress_log",
+      "tags": [
+        "wood",
+        "structural",
+        "fuel"
+      ],
+      "drops": "cypress_log"
+    },
+    {
+      "id": 80,
+      "name": "Cypress Planks",
+      "category": "wood",
+      "hardness": 1.4,
+      "transparent": false,
+      "texture": "cypress_planks",
+      "tags": [
+        "wood",
+        "building",
+        "crafting"
+      ],
+      "drops": "cypress_planks"
+    },
+    {
+      "id": 81,
+      "name": "Cypress Leaves",
+      "category": "foliage",
+      "hardness": 0.2,
+      "transparent": true,
+      "texture": "cypress_leaves",
+      "tags": [
+        "foliage",
+        "transparent"
+      ],
+      "drops": "cypress_leaves"
+    },
+    {
+      "id": 82,
+      "name": "Cypress Sapling",
+      "category": "flora",
+      "hardness": 0.1,
+      "transparent": true,
+      "texture": "cypress_sapling",
+      "tags": [
+        "plant",
+        "cultivation"
+      ],
+      "drops": "cypress_sapling"
+    },
+    {
+      "id": 83,
+      "name": "Fieldstone Rubble",
+      "category": "architecture",
+      "hardness": 1.6,
+      "transparent": false,
+      "texture": "fieldstone",
+      "tags": [
+        "stone",
+        "masonry"
+      ],
+      "drops": "fieldstone_rubble"
+    },
+    {
+      "id": 84,
+      "name": "Cobblestone Pavement",
+      "category": "architecture",
+      "hardness": 1.8,
+      "transparent": false,
+      "texture": "cobblestone",
+      "tags": [
+        "stone",
+        "road"
+      ],
+      "drops": "cobblestone_pavement"
+    },
+    {
+      "id": 85,
+      "name": "Chiseled Ashlar Blocks",
+      "category": "architecture",
+      "hardness": 2.2,
+      "transparent": false,
+      "texture": "ashlar_stone",
+      "tags": [
+        "stone",
+        "monumental"
+      ],
+      "drops": "chiseled_ashlar_blocks"
+    },
+    {
+      "id": 86,
+      "name": "Cut Stone Bricks",
+      "category": "architecture",
+      "hardness": 2.0,
+      "transparent": false,
+      "texture": "stone_bricks",
+      "tags": [
+        "stone",
+        "wall",
+        "fort"
+      ],
+      "drops": "cut_stone_bricks"
+    },
+    {
+      "id": 87,
+      "name": "Sun-dried Mud Bricks",
+      "category": "architecture",
+      "hardness": 1.2,
+      "transparent": false,
+      "texture": "mud_bricks",
+      "tags": [
+        "brick",
+        "insulating"
+      ],
+      "drops": "sun-dried_mud_bricks"
+    },
+    {
+      "id": 88,
+      "name": "Kiln-fired Clay Bricks",
+      "category": "architecture",
+      "hardness": 1.9,
+      "transparent": false,
+      "texture": "clay_bricks",
+      "tags": [
+        "brick",
+        "structural"
+      ],
+      "drops": "kiln-fired_clay_bricks"
+    },
+    {
+      "id": 89,
+      "name": "Glazed Ceramic Tiles",
+      "category": "architecture",
+      "hardness": 1.5,
+      "transparent": false,
+      "texture": "ceramic_tile",
+      "tags": [
+        "roofing",
+        "ornate"
+      ],
+      "drops": "glazed_ceramic_tiles"
+    },
+    {
+      "id": 90,
+      "name": "Thatch Straw Roof",
+      "category": "architecture",
+      "hardness": 0.4,
+      "transparent": false,
+      "texture": "thatch",
+      "tags": [
+        "roofing",
+        "insulating"
+      ],
+      "drops": "thatch_straw_roof"
+    },
+    {
+      "id": 91,
+      "name": "Timber Framing Beam",
+      "category": "architecture",
+      "hardness": 1.5,
+      "transparent": false,
+      "texture": "timber_frame",
+      "tags": [
+        "wood",
+        "housing"
+      ],
+      "drops": "timber_framing_beam"
+    },
+    {
+      "id": 92,
+      "name": "Wattle and Daub Wall",
+      "category": "architecture",
+      "hardness": 1.1,
+      "transparent": false,
+      "texture": "wattle_daub",
+      "tags": [
+        "wall",
+        "traditional"
+      ],
+      "drops": "wattle_and_daub_wall"
+    },
+    {
+      "id": 93,
+      "name": "Woven Reed Matting",
+      "category": "architecture",
+      "hardness": 0.3,
+      "transparent": false,
+      "texture": "reed_mat",
+      "tags": [
+        "decorative",
+        "carpet"
+      ],
+      "drops": "woven_reed_matting"
+    },
+    {
+      "id": 94,
+      "name": "Oak Wooden Fence",
+      "category": "architecture",
+      "hardness": 1.2,
+      "transparent": true,
+      "texture": "oak_fence",
+      "tags": [
+        "barrier",
+        "enclosure"
+      ],
+      "drops": "oak_wooden_fence"
+    },
+    {
+      "id": 95,
+      "name": "Carved Stone Column",
+      "category": "architecture",
+      "hardness": 2.5,
+      "transparent": false,
+      "texture": "stone_column",
+      "tags": [
+        "support",
+        "temple"
+      ],
+      "drops": "carved_stone_column"
+    },
+    {
+      "id": 96,
+      "name": "Granite Fortress Wall",
+      "category": "architecture",
+      "hardness": 3.0,
+      "transparent": false,
+      "texture": "fortress_wall",
+      "tags": [
+        "defense",
+        "military"
+      ],
+      "drops": "granite_fortress_wall"
+    },
+    {
+      "id": 97,
+      "name": "Iron Grate Portcullis",
+      "category": "architecture",
+      "hardness": 3.5,
+      "transparent": true,
+      "texture": "iron_grate",
+      "tags": [
+        "metal",
+        "barrier"
+      ],
+      "drops": "iron_grate_portcullis"
+    },
+    {
+      "id": 98,
+      "name": "Hand-Blown Glass Pane",
+      "category": "architecture",
+      "hardness": 0.3,
+      "transparent": true,
+      "texture": "glass_pane",
+      "tags": [
+        "window",
+        "transparent"
+      ],
+      "drops": "hand-blown_glass_pane"
+    },
+    {
+      "id": 99,
+      "name": "Stained Temple Glass",
+      "category": "architecture",
+      "hardness": 0.3,
+      "transparent": true,
+      "texture": "stained_glass",
+      "tags": [
+        "decorative",
+        "shrine"
+      ],
+      "drops": "stained_temple_glass"
+    },
+    {
+      "id": 100,
+      "name": "Town Archive Bookshelf",
+      "category": "architecture",
+      "hardness": 1.2,
+      "transparent": false,
+      "texture": "bookshelf",
+      "tags": [
+        "furniture",
+        "lore",
+        "library"
+      ],
+      "drops": "town_archive_bookshelf"
+    },
+    {
+      "id": 101,
+      "name": "Scholar Lectern",
+      "category": "architecture",
+      "hardness": 1.3,
+      "transparent": false,
+      "texture": "lectern",
+      "tags": [
+        "furniture",
+        "reading"
+      ],
+      "drops": "scholar_lectern"
+    },
+    {
+      "id": 102,
+      "name": "Village Water Well Rim",
+      "category": "architecture",
+      "hardness": 2.0,
+      "transparent": false,
+      "texture": "well_rim",
+      "tags": [
+        "water",
+        "communal"
+      ],
+      "drops": "village_water_well_rim"
+    },
+    {
+      "id": 103,
+      "name": "Smithy Stone Anvil",
+      "category": "architecture",
+      "hardness": 4.0,
+      "transparent": false,
+      "texture": "stone_anvil",
+      "tags": [
+        "workshop",
+        "smithing"
+      ],
+      "drops": "smithy_stone_anvil"
+    },
+    {
+      "id": 104,
+      "name": "Baking Hearth Stone",
+      "category": "architecture",
+      "hardness": 2.2,
+      "transparent": false,
+      "texture": "hearth_stone",
+      "tags": [
+        "domestic",
+        "cooking"
+      ],
+      "drops": "baking_hearth_stone"
+    },
+    {
+      "id": 105,
+      "name": "Market Stall Counter",
+      "category": "architecture",
+      "hardness": 1.1,
+      "transparent": false,
+      "texture": "market_stall",
+      "tags": [
+        "commerce",
+        "trade"
+      ],
+      "drops": "market_stall_counter"
+    },
+    {
+      "id": 106,
+      "name": "Shrine Offering Altar",
+      "category": "architecture",
+      "hardness": 2.5,
+      "transparent": false,
+      "texture": "offering_altar",
+      "tags": [
+        "sacred",
+        "religion"
+      ],
+      "drops": "shrine_offering_altar"
+    },
+    {
+      "id": 107,
+      "name": "Wooden Palisade Spike",
+      "category": "architecture",
+      "hardness": 1.6,
+      "transparent": true,
+      "texture": "palisade_spike",
+      "tags": [
+        "defense",
+        "deterrent"
+      ],
+      "drops": "wooden_palisade_spike"
+    },
+    {
+      "id": 108,
+      "name": "Wild Golden Wheat",
+      "category": "flora",
+      "hardness": 0.1,
+      "transparent": true,
+      "texture": "crop_wheat",
+      "tags": [
+        "crop",
+        "food",
+        "agriculture"
+      ],
+      "drops": "wild_golden_wheat"
+    },
+    {
+      "id": 109,
+      "name": "Wild Rye Grain",
+      "category": "flora",
+      "hardness": 0.1,
+      "transparent": true,
+      "texture": "crop_rye",
+      "tags": [
+        "crop",
+        "food"
+      ],
+      "drops": "wild_rye_grain"
+    },
+    {
+      "id": 110,
+      "name": "Cultivated Barley",
+      "category": "flora",
+      "hardness": 0.1,
+      "transparent": true,
+      "texture": "crop_barley",
+      "tags": [
+        "crop",
+        "food",
+        "brewing"
+      ],
+      "drops": "cultivated_barley"
+    },
+    {
+      "id": 111,
+      "name": "Blue Flax Stalks",
+      "category": "flora",
+      "hardness": 0.1,
+      "transparent": true,
+      "texture": "flax",
+      "tags": [
+        "crop",
+        "textile",
+        "linen"
+      ],
+      "drops": "blue_flax_stalks"
+    },
+    {
+      "id": 112,
+      "name": "Purple Mountain Heather",
+      "category": "flora",
+      "hardness": 0.1,
+      "transparent": true,
+      "texture": "heather",
+      "tags": [
+        "flower",
+        "alpine"
+      ],
+      "drops": "purple_mountain_heather"
+    },
+    {
+      "id": 113,
+      "name": "Forest Maidenhair Fern",
+      "category": "flora",
+      "hardness": 0.1,
+      "transparent": true,
+      "texture": "fern",
+      "tags": [
+        "foliage",
+        "shade"
+      ],
+      "drops": "forest_maidenhair_fern"
+    },
+    {
+      "id": 114,
+      "name": "Highland Thistle",
+      "category": "flora",
+      "hardness": 0.1,
+      "transparent": true,
+      "texture": "thistle",
+      "tags": [
+        "wildflower"
+      ],
+      "drops": "highland_thistle"
+    },
+    {
+      "id": 115,
+      "name": "Wild Briar Rose",
+      "category": "flora",
+      "hardness": 0.1,
+      "transparent": true,
+      "texture": "wild_rose",
+      "tags": [
+        "flower",
+        "medicinal"
+      ],
+      "drops": "wild_briar_rose"
+    },
+    {
+      "id": 116,
+      "name": "Aromatic Lavender",
+      "category": "flora",
+      "hardness": 0.1,
+      "transparent": true,
+      "texture": "lavender",
+      "tags": [
+        "herb",
+        "fragrant"
+      ],
+      "drops": "aromatic_lavender"
+    },
+    {
+      "id": 117,
+      "name": "Crimson Poppy",
+      "category": "flora",
+      "hardness": 0.1,
+      "transparent": true,
+      "texture": "poppy",
+      "tags": [
+        "flower"
+      ],
+      "drops": "crimson_poppy"
+    },
+    {
+      "id": 118,
+      "name": "Sunny Golden Marigold",
+      "category": "flora",
+      "hardness": 0.1,
+      "transparent": true,
+      "texture": "marigold",
+      "tags": [
+        "flower"
+      ],
+      "drops": "sunny_golden_marigold"
+    },
+    {
+      "id": 119,
+      "name": "Wetland Cattails",
+      "category": "flora",
+      "hardness": 0.1,
+      "transparent": true,
+      "texture": "cattails",
+      "tags": [
+        "marsh",
+        "reed"
+      ],
+      "drops": "wetland_cattails"
+    },
+    {
+      "id": 120,
+      "name": "River Marsh Reeds",
+      "category": "flora",
+      "hardness": 0.1,
+      "transparent": true,
+      "texture": "river_reeds",
+      "tags": [
+        "marsh",
+        "thatching"
+      ],
+      "drops": "river_marsh_reeds"
+    },
+    {
+      "id": 121,
+      "name": "Velvet Forest Moss",
+      "category": "flora",
+      "hardness": 0.2,
+      "transparent": true,
+      "texture": "moss",
+      "tags": [
+        "ground_cover"
+      ],
+      "drops": "velvet_forest_moss"
+    },
+    {
+      "id": 122,
+      "name": "Tundra Rock Lichen",
+      "category": "flora",
+      "hardness": 0.2,
+      "transparent": true,
+      "texture": "lichen",
+      "tags": [
+        "ground_cover",
+        "arctic"
+      ],
+      "drops": "tundra_rock_lichen"
+    },
+    {
+      "id": 123,
+      "name": "Brown Forest Bolete",
+      "category": "flora",
+      "hardness": 0.1,
+      "transparent": true,
+      "texture": "mushroom_brown",
+      "tags": [
+        "fungi",
+        "edible"
+      ],
+      "drops": "brown_forest_bolete"
+    },
+    {
+      "id": 124,
+      "name": "Red Fly Agaric",
+      "category": "flora",
+      "hardness": 0.1,
+      "transparent": true,
+      "texture": "mushroom_red",
+      "tags": [
+        "fungi",
+        "toxic"
+      ],
+      "drops": "red_fly_agaric"
+    },
+    {
+      "id": 125,
+      "name": "Prickly Arid Cactus",
+      "category": "flora",
+      "hardness": 0.4,
+      "transparent": true,
+      "texture": "cactus",
+      "tags": [
+        "desert",
+        "succulent"
+      ],
+      "drops": "prickly_arid_cactus"
+    },
+    {
+      "id": 126,
+      "name": "Desert Dry Scrub",
+      "category": "flora",
+      "hardness": 0.1,
+      "transparent": true,
+      "texture": "dry_scrub",
+      "tags": [
+        "desert",
+        "kindling"
+      ],
+      "drops": "desert_dry_scrub"
+    },
+    {
+      "id": 127,
+      "name": "Deep Cave Glow Fungi",
+      "category": "flora",
+      "hardness": 0.1,
+      "transparent": true,
+      "texture": "glow_fungi",
+      "tags": [
+        "luminescent",
+        "subterranean"
+      ],
+      "drops": "deep_cave_glow_fungi"
+    },
+    {
+      "id": 128,
+      "name": "Fresh River Water",
+      "category": "fluid",
+      "hardness": 100.0,
+      "transparent": true,
+      "texture": "water_fresh",
+      "tags": [
+        "fluid",
+        "drinking",
+        "irrigation"
+      ],
+      "drops": "fresh_river_water"
+    },
+    {
+      "id": 129,
+      "name": "Deep Ocean Water",
+      "category": "fluid",
+      "hardness": 100.0,
+      "transparent": true,
+      "texture": "water_ocean",
+      "tags": [
+        "fluid",
+        "marine",
+        "salt"
+      ],
+      "drops": "deep_ocean_water"
+    },
+    {
+      "id": 130,
+      "name": "Stagnant Swamp Water",
+      "category": "fluid",
+      "hardness": 100.0,
+      "transparent": true,
+      "texture": "water_swamp",
+      "tags": [
+        "fluid",
+        "murky"
+      ],
+      "drops": "stagnant_swamp_water"
+    },
+    {
+      "id": 131,
+      "name": "Molten Basaltic Magma",
+      "category": "fluid",
+      "hardness": 100.0,
+      "transparent": false,
+      "texture": "magma",
+      "tags": [
+        "fluid",
+        "thermal",
+        "danger"
+      ],
+      "drops": "molten_basaltic_magma"
+    }
+  ]
+}

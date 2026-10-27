@@ -1,0 +1,550 @@
+{
+  "name": "craft_smithy",
+  "size": {
+    "width": 6,
+    "height": 4,
+    "depth": 5
+  },
+  "blocks": [
+    {
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "block": "Basalt"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 0,
+      "block": "Basalt"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 0,
+      "block": "Basalt"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 0,
+      "block": "Basalt"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 0,
+      "block": "Basalt"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 0,
+      "block": "Basalt"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 1,
+      "block": "Basalt"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 1,
+      "block": "Basalt"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 1,
+      "block": "Basalt"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 1,
+      "block": "Basalt"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 1,
+      "block": "Basalt"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 1,
+      "block": "Basalt"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 2,
+      "block": "Basalt"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 2,
+      "block": "Basalt"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 2,
+      "block": "Basalt"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 2,
+      "block": "Basalt"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 2,
+      "block": "Basalt"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 2,
+      "block": "Basalt"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 3,
+      "block": "Basalt"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 3,
+      "block": "Basalt"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 3,
+      "block": "Basalt"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 3,
+      "block": "Basalt"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 3,
+      "block": "Basalt"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 3,
+      "block": "Basalt"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 4,
+      "block": "Basalt"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 4,
+      "block": "Basalt"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 4,
+      "block": "Basalt"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 4,
+      "block": "Basalt"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 4,
+      "block": "Basalt"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 4,
+      "block": "Basalt"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 0,
+      "block": "Cut Stone Bricks"
+    },
+    {
+      "x": 5,
+      "y": 1,
+      "z": 0,
+      "block": "Cut Stone Bricks"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 1,
+      "block": "Cut Stone Bricks"
+    },
+    {
+      "x": 5,
+      "y": 1,
+      "z": 1,
+      "block": "Cut Stone Bricks"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 2,
+      "block": "Cut Stone Bricks"
+    },
+    {
+      "x": 2,
+      "y": 1,
+      "z": 2,
+      "block": "Smithy Stone Anvil"
+    },
+    {
+      "x": 5,
+      "y": 1,
+      "z": 2,
+      "block": "Cut Stone Bricks"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 3,
+      "block": "Cut Stone Bricks"
+    },
+    {
+      "x": 4,
+      "y": 1,
+      "z": 3,
+      "block": "Baking Hearth Stone"
+    },
+    {
+      "x": 5,
+      "y": 1,
+      "z": 3,
+      "block": "Cut Stone Bricks"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 4,
+      "block": "Cut Stone Bricks"
+    },
+    {
+      "x": 1,
+      "y": 1,
+      "z": 4,
+      "block": "Cut Stone Bricks"
+    },
+    {
+      "x": 2,
+      "y": 1,
+      "z": 4,
+      "block": "Cut Stone Bricks"
+    },
+    {
+      "x": 3,
+      "y": 1,
+      "z": 4,
+      "block": "Cut Stone Bricks"
+    },
+    {
+      "x": 4,
+      "y": 1,
+      "z": 4,
+      "block": "Cut Stone Bricks"
+    },
+    {
+      "x": 5,
+      "y": 1,
+      "z": 4,
+      "block": "Cut Stone Bricks"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "z": 0,
+      "block": "Cut Stone Bricks"
+    },
+    {
+      "x": 5,
+      "y": 2,
+      "z": 0,
+      "block": "Cut Stone Bricks"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "z": 1,
+      "block": "Cut Stone Bricks"
+    },
+    {
+      "x": 5,
+      "y": 2,
+      "z": 1,
+      "block": "Cut Stone Bricks"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "z": 2,
+      "block": "Cut Stone Bricks"
+    },
+    {
+      "x": 5,
+      "y": 2,
+      "z": 2,
+      "block": "Cut Stone Bricks"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "z": 3,
+      "block": "Cut Stone Bricks"
+    },
+    {
+      "x": 5,
+      "y": 2,
+      "z": 3,
+      "block": "Cut Stone Bricks"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "z": 4,
+      "block": "Cut Stone Bricks"
+    },
+    {
+      "x": 1,
+      "y": 2,
+      "z": 4,
+      "block": "Cut Stone Bricks"
+    },
+    {
+      "x": 2,
+      "y": 2,
+      "z": 4,
+      "block": "Cut Stone Bricks"
+    },
+    {
+      "x": 3,
+      "y": 2,
+      "z": 4,
+      "block": "Cut Stone Bricks"
+    },
+    {
+      "x": 4,
+      "y": 2,
+      "z": 4,
+      "block": "Cut Stone Bricks"
+    },
+    {
+      "x": 5,
+      "y": 2,
+      "z": 4,
+      "block": "Cut Stone Bricks"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "z": 0,
+      "block": "Slate"
+    },
+    {
+      "x": 1,
+      "y": 3,
+      "z": 0,
+      "block": "Slate"
+    },
+    {
+      "x": 2,
+      "y": 3,
+      "z": 0,
+      "block": "Slate"
+    },
+    {
+      "x": 3,
+      "y": 3,
+      "z": 0,
+      "block": "Slate"
+    },
+    {
+      "x": 4,
+      "y": 3,
+      "z": 0,
+      "block": "Slate"
+    },
+    {
+      "x": 5,
+      "y": 3,
+      "z": 0,
+      "block": "Slate"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "z": 1,
+      "block": "Slate"
+    },
+    {
+      "x": 1,
+      "y": 3,
+      "z": 1,
+      "block": "Slate"
+    },
+    {
+      "x": 2,
+      "y": 3,
+      "z": 1,
+      "block": "Slate"
+    },
+    {
+      "x": 3,
+      "y": 3,
+      "z": 1,
+      "block": "Slate"
+    },
+    {
+      "x": 4,
+      "y": 3,
+      "z": 1,
+      "block": "Slate"
+    },
+    {
+      "x": 5,
+      "y": 3,
+      "z": 1,
+      "block": "Slate"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "z": 2,
+      "block": "Slate"
+    },
+    {
+      "x": 1,
+      "y": 3,
+      "z": 2,
+      "block": "Slate"
+    },
+    {
+      "x": 2,
+      "y": 3,
+      "z": 2,
+      "block": "Slate"
+    },
+    {
+      "x": 3,
+      "y": 3,
+      "z": 2,
+      "block": "Slate"
+    },
+    {
+      "x": 4,
+      "y": 3,
+      "z": 2,
+      "block": "Slate"
+    },
+    {
+      "x": 5,
+      "y": 3,
+      "z": 2,
+      "block": "Slate"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "z": 3,
+      "block": "Slate"
+    },
+    {
+      "x": 1,
+      "y": 3,
+      "z": 3,
+      "block": "Slate"
+    },
+    {
+      "x": 2,
+      "y": 3,
+      "z": 3,
+      "block": "Slate"
+    },
+    {
+      "x": 3,
+      "y": 3,
+      "z": 3,
+      "block": "Slate"
+    },
+    {
+      "x": 4,
+      "y": 3,
+      "z": 3,
+      "block": "Slate"
+    },
+    {
+      "x": 5,
+      "y": 3,
+      "z": 3,
+      "block": "Slate"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "z": 4,
+      "block": "Slate"
+    },
+    {
+      "x": 1,
+      "y": 3,
+      "z": 4,
+      "block": "Slate"
+    },
+    {
+      "x": 2,
+      "y": 3,
+      "z": 4,
+      "block": "Slate"
+    },
+    {
+      "x": 3,
+      "y": 3,
+      "z": 4,
+      "block": "Slate"
+    },
+    {
+      "x": 4,
+      "y": 3,
+      "z": 4,
+      "block": "Slate"
+    },
+    {
+      "x": 5,
+      "y": 3,
+      "z": 4,
+      "block": "Slate"
+    }
+  ]
+}

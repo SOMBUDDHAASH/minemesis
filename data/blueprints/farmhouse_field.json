@@ -1,0 +1,742 @@
+{
+  "name": "farmhouse_field",
+  "size": {
+    "width": 7,
+    "height": 4,
+    "depth": 7
+  },
+  "blocks": [
+    {
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 0,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 0,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 0,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 0,
+      "block": "Loam Dirt"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 0,
+      "block": "Loam Dirt"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "z": 0,
+      "block": "Loam Dirt"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 1,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 1,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 1,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 1,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 1,
+      "block": "Loam Dirt"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 1,
+      "block": "Loam Dirt"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "z": 1,
+      "block": "Loam Dirt"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 2,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 2,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 2,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 2,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 2,
+      "block": "Loam Dirt"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 2,
+      "block": "Loam Dirt"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "z": 2,
+      "block": "Loam Dirt"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 3,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 3,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 3,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 3,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 3,
+      "block": "Loam Dirt"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 3,
+      "block": "Loam Dirt"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "z": 3,
+      "block": "Loam Dirt"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 4,
+      "block": "Loam Dirt"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 4,
+      "block": "Loam Dirt"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 4,
+      "block": "Loam Dirt"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 4,
+      "block": "Loam Dirt"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 4,
+      "block": "Loam Dirt"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 4,
+      "block": "Loam Dirt"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "z": 4,
+      "block": "Loam Dirt"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 5,
+      "block": "Loam Dirt"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 5,
+      "block": "Loam Dirt"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 5,
+      "block": "Loam Dirt"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 5,
+      "block": "Loam Dirt"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 5,
+      "block": "Loam Dirt"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 5,
+      "block": "Loam Dirt"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "z": 5,
+      "block": "Loam Dirt"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 6,
+      "block": "Loam Dirt"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 6,
+      "block": "Loam Dirt"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 6,
+      "block": "Loam Dirt"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 6,
+      "block": "Loam Dirt"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 6,
+      "block": "Loam Dirt"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 6,
+      "block": "Loam Dirt"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "z": 6,
+      "block": "Loam Dirt"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 0,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 1,
+      "y": 1,
+      "z": 0,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 2,
+      "y": 1,
+      "z": 0,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 3,
+      "y": 1,
+      "z": 0,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 4,
+      "y": 1,
+      "z": 0,
+      "block": "Wild Golden Wheat"
+    },
+    {
+      "x": 5,
+      "y": 1,
+      "z": 0,
+      "block": "Cultivated Barley"
+    },
+    {
+      "x": 6,
+      "y": 1,
+      "z": 0,
+      "block": "Oak Wooden Fence"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 1,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 3,
+      "y": 1,
+      "z": 1,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 4,
+      "y": 1,
+      "z": 1,
+      "block": "Cultivated Barley"
+    },
+    {
+      "x": 5,
+      "y": 1,
+      "z": 1,
+      "block": "Wild Golden Wheat"
+    },
+    {
+      "x": 6,
+      "y": 1,
+      "z": 1,
+      "block": "Oak Wooden Fence"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 2,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 3,
+      "y": 1,
+      "z": 2,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 4,
+      "y": 1,
+      "z": 2,
+      "block": "Wild Golden Wheat"
+    },
+    {
+      "x": 5,
+      "y": 1,
+      "z": 2,
+      "block": "Cultivated Barley"
+    },
+    {
+      "x": 6,
+      "y": 1,
+      "z": 2,
+      "block": "Oak Wooden Fence"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 3,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 1,
+      "y": 1,
+      "z": 3,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 2,
+      "y": 1,
+      "z": 3,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 3,
+      "y": 1,
+      "z": 3,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 4,
+      "y": 1,
+      "z": 3,
+      "block": "Cultivated Barley"
+    },
+    {
+      "x": 5,
+      "y": 1,
+      "z": 3,
+      "block": "Wild Golden Wheat"
+    },
+    {
+      "x": 6,
+      "y": 1,
+      "z": 3,
+      "block": "Oak Wooden Fence"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 4,
+      "block": "Wild Golden Wheat"
+    },
+    {
+      "x": 1,
+      "y": 1,
+      "z": 4,
+      "block": "Cultivated Barley"
+    },
+    {
+      "x": 2,
+      "y": 1,
+      "z": 4,
+      "block": "Wild Golden Wheat"
+    },
+    {
+      "x": 3,
+      "y": 1,
+      "z": 4,
+      "block": "Cultivated Barley"
+    },
+    {
+      "x": 4,
+      "y": 1,
+      "z": 4,
+      "block": "Wild Golden Wheat"
+    },
+    {
+      "x": 5,
+      "y": 1,
+      "z": 4,
+      "block": "Cultivated Barley"
+    },
+    {
+      "x": 6,
+      "y": 1,
+      "z": 4,
+      "block": "Oak Wooden Fence"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 5,
+      "block": "Cultivated Barley"
+    },
+    {
+      "x": 1,
+      "y": 1,
+      "z": 5,
+      "block": "Wild Golden Wheat"
+    },
+    {
+      "x": 2,
+      "y": 1,
+      "z": 5,
+      "block": "Cultivated Barley"
+    },
+    {
+      "x": 3,
+      "y": 1,
+      "z": 5,
+      "block": "Wild Golden Wheat"
+    },
+    {
+      "x": 4,
+      "y": 1,
+      "z": 5,
+      "block": "Cultivated Barley"
+    },
+    {
+      "x": 5,
+      "y": 1,
+      "z": 5,
+      "block": "Wild Golden Wheat"
+    },
+    {
+      "x": 6,
+      "y": 1,
+      "z": 5,
+      "block": "Oak Wooden Fence"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 6,
+      "block": "Oak Wooden Fence"
+    },
+    {
+      "x": 1,
+      "y": 1,
+      "z": 6,
+      "block": "Oak Wooden Fence"
+    },
+    {
+      "x": 2,
+      "y": 1,
+      "z": 6,
+      "block": "Oak Wooden Fence"
+    },
+    {
+      "x": 3,
+      "y": 1,
+      "z": 6,
+      "block": "Oak Wooden Fence"
+    },
+    {
+      "x": 4,
+      "y": 1,
+      "z": 6,
+      "block": "Oak Wooden Fence"
+    },
+    {
+      "x": 5,
+      "y": 1,
+      "z": 6,
+      "block": "Oak Wooden Fence"
+    },
+    {
+      "x": 6,
+      "y": 1,
+      "z": 6,
+      "block": "Oak Wooden Fence"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "z": 0,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 1,
+      "y": 2,
+      "z": 0,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 2,
+      "y": 2,
+      "z": 0,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 3,
+      "y": 2,
+      "z": 0,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "z": 1,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 3,
+      "y": 2,
+      "z": 1,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "z": 2,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 3,
+      "y": 2,
+      "z": 2,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "z": 3,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 1,
+      "y": 2,
+      "z": 3,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 2,
+      "y": 2,
+      "z": 3,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 3,
+      "y": 2,
+      "z": 3,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "z": 0,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 1,
+      "y": 3,
+      "z": 0,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 2,
+      "y": 3,
+      "z": 0,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 3,
+      "y": 3,
+      "z": 0,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "z": 1,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 1,
+      "y": 3,
+      "z": 1,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 2,
+      "y": 3,
+      "z": 1,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 3,
+      "y": 3,
+      "z": 1,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "z": 2,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 1,
+      "y": 3,
+      "z": 2,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 2,
+      "y": 3,
+      "z": 2,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 3,
+      "y": 3,
+      "z": 2,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "z": 3,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 1,
+      "y": 3,
+      "z": 3,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 2,
+      "y": 3,
+      "z": 3,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 3,
+      "y": 3,
+      "z": 3,
+      "block": "Thatch Straw Roof"
+    }
+  ]
+}

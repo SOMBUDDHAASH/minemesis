@@ -1,0 +1,502 @@
+{
+  "name": "peasant_cottage",
+  "size": {
+    "width": 5,
+    "height": 4,
+    "depth": 5
+  },
+  "blocks": [
+    {
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 0,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 0,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 0,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 0,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 1,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 1,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 1,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 1,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 1,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 2,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 2,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 2,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 2,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 2,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 3,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 3,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 3,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 3,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 3,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 4,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 4,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 4,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 4,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 4,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 0,
+      "block": "Wattle and Daub Wall"
+    },
+    {
+      "x": 1,
+      "y": 1,
+      "z": 0,
+      "block": "Timber Framing Beam"
+    },
+    {
+      "x": 3,
+      "y": 1,
+      "z": 0,
+      "block": "Timber Framing Beam"
+    },
+    {
+      "x": 4,
+      "y": 1,
+      "z": 0,
+      "block": "Wattle and Daub Wall"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 1,
+      "block": "Timber Framing Beam"
+    },
+    {
+      "x": 4,
+      "y": 1,
+      "z": 1,
+      "block": "Timber Framing Beam"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 2,
+      "block": "Wattle and Daub Wall"
+    },
+    {
+      "x": 4,
+      "y": 1,
+      "z": 2,
+      "block": "Wattle and Daub Wall"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 3,
+      "block": "Timber Framing Beam"
+    },
+    {
+      "x": 3,
+      "y": 1,
+      "z": 3,
+      "block": "Baking Hearth Stone"
+    },
+    {
+      "x": 4,
+      "y": 1,
+      "z": 3,
+      "block": "Timber Framing Beam"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 4,
+      "block": "Wattle and Daub Wall"
+    },
+    {
+      "x": 1,
+      "y": 1,
+      "z": 4,
+      "block": "Timber Framing Beam"
+    },
+    {
+      "x": 2,
+      "y": 1,
+      "z": 4,
+      "block": "Wattle and Daub Wall"
+    },
+    {
+      "x": 3,
+      "y": 1,
+      "z": 4,
+      "block": "Timber Framing Beam"
+    },
+    {
+      "x": 4,
+      "y": 1,
+      "z": 4,
+      "block": "Wattle and Daub Wall"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "z": 0,
+      "block": "Wattle and Daub Wall"
+    },
+    {
+      "x": 1,
+      "y": 2,
+      "z": 0,
+      "block": "Timber Framing Beam"
+    },
+    {
+      "x": 2,
+      "y": 2,
+      "z": 0,
+      "block": "Wattle and Daub Wall"
+    },
+    {
+      "x": 3,
+      "y": 2,
+      "z": 0,
+      "block": "Timber Framing Beam"
+    },
+    {
+      "x": 4,
+      "y": 2,
+      "z": 0,
+      "block": "Wattle and Daub Wall"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "z": 1,
+      "block": "Timber Framing Beam"
+    },
+    {
+      "x": 4,
+      "y": 2,
+      "z": 1,
+      "block": "Timber Framing Beam"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "z": 2,
+      "block": "Wattle and Daub Wall"
+    },
+    {
+      "x": 4,
+      "y": 2,
+      "z": 2,
+      "block": "Wattle and Daub Wall"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "z": 3,
+      "block": "Timber Framing Beam"
+    },
+    {
+      "x": 4,
+      "y": 2,
+      "z": 3,
+      "block": "Timber Framing Beam"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "z": 4,
+      "block": "Wattle and Daub Wall"
+    },
+    {
+      "x": 1,
+      "y": 2,
+      "z": 4,
+      "block": "Timber Framing Beam"
+    },
+    {
+      "x": 2,
+      "y": 2,
+      "z": 4,
+      "block": "Wattle and Daub Wall"
+    },
+    {
+      "x": 3,
+      "y": 2,
+      "z": 4,
+      "block": "Timber Framing Beam"
+    },
+    {
+      "x": 4,
+      "y": 2,
+      "z": 4,
+      "block": "Wattle and Daub Wall"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "z": 0,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 1,
+      "y": 3,
+      "z": 0,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 2,
+      "y": 3,
+      "z": 0,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 3,
+      "y": 3,
+      "z": 0,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 4,
+      "y": 3,
+      "z": 0,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "z": 1,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 1,
+      "y": 3,
+      "z": 1,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 2,
+      "y": 3,
+      "z": 1,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 3,
+      "y": 3,
+      "z": 1,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 4,
+      "y": 3,
+      "z": 1,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "z": 2,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 1,
+      "y": 3,
+      "z": 2,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 2,
+      "y": 3,
+      "z": 2,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 3,
+      "y": 3,
+      "z": 2,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 4,
+      "y": 3,
+      "z": 2,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "z": 3,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 1,
+      "y": 3,
+      "z": 3,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 2,
+      "y": 3,
+      "z": 3,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 3,
+      "y": 3,
+      "z": 3,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 4,
+      "y": 3,
+      "z": 3,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "z": 4,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 1,
+      "y": 3,
+      "z": 4,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 2,
+      "y": 3,
+      "z": 4,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 3,
+      "y": 3,
+      "z": 4,
+      "block": "Thatch Straw Roof"
+    },
+    {
+      "x": 4,
+      "y": 3,
+      "z": 4,
+      "block": "Thatch Straw Roof"
+    }
+  ]
+}

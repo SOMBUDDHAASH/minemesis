@@ -83,17 +83,17 @@ def verify_engine_exe(exe_path: Path) -> None:
     print(f"[*] Output: {res_ver.stdout.strip()}")
     assert res_ver.returncode == 0, f"Version check failed: {res_ver.stderr}"
 
-    # 2. Benchmark check (spinning cube spike, 60 frames, headless)
-    shot_path = ROOT_DIR / "reports" / "screens" / "stage_e0_exe_spike.png"
+    # 2. Benchmark check (Stage E1 world meshing & rendering, 30 frames, headless)
+    shot_path = ROOT_DIR / "reports" / "screens" / "stage_e1_exe_benchmark.png"
     t1 = time.perf_counter()
-    cmd_bench = [str(exe_path), "--benchmark", "60", "--headless", "--screenshot", str(shot_path)]
-    res_bench = subprocess.run(cmd_bench, capture_output=True, text=True, timeout=25)
+    cmd_bench = [str(exe_path), "--benchmark", "30", "--headless", "--screenshot", str(shot_path)]
+    res_bench = subprocess.run(cmd_bench, capture_output=True, text=True, timeout=60)
     t_bench = time.perf_counter() - t1
-    print(f"[*] Benchmark 60-frame run time: {t_bench:.3f} s")
+    print(f"[*] Benchmark 30-frame run time: {t_bench:.3f} s")
     print(res_bench.stdout)
     assert res_bench.returncode == 0, f"Benchmark failed: {res_bench.stderr}"
     assert shot_path.exists(), f"Screenshot {shot_path} was not created!"
-    print(f"[SUCCESS] Stage E0 Spike Executable Verified 100% Operational!")
+    print(f"[SUCCESS] Stage E1 Engine Executable Verified 100% Operational!")
 
 
 def main() -> None:

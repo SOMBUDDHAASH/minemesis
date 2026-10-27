@@ -1,0 +1,598 @@
+{
+  "name": "watchtower_palisade",
+  "size": {
+    "width": 5,
+    "height": 8,
+    "depth": 5
+  },
+  "blocks": [
+    {
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "block": "Oak Log"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 0,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 0,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 0,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 0,
+      "block": "Oak Log"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 1,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 1,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 1,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 1,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 1,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 2,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 2,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 2,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 2,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 2,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 3,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 3,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 3,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 3,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 3,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 4,
+      "block": "Oak Log"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 4,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 4,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 4,
+      "block": "Fieldstone Rubble"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 4,
+      "block": "Oak Log"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 0,
+      "block": "Oak Log"
+    },
+    {
+      "x": 1,
+      "y": 1,
+      "z": 0,
+      "block": "Wooden Palisade Spike"
+    },
+    {
+      "x": 2,
+      "y": 1,
+      "z": 0,
+      "block": "Wooden Palisade Spike"
+    },
+    {
+      "x": 3,
+      "y": 1,
+      "z": 0,
+      "block": "Wooden Palisade Spike"
+    },
+    {
+      "x": 4,
+      "y": 1,
+      "z": 0,
+      "block": "Oak Log"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 1,
+      "block": "Wooden Palisade Spike"
+    },
+    {
+      "x": 4,
+      "y": 1,
+      "z": 1,
+      "block": "Wooden Palisade Spike"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 2,
+      "block": "Wooden Palisade Spike"
+    },
+    {
+      "x": 4,
+      "y": 1,
+      "z": 2,
+      "block": "Wooden Palisade Spike"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 3,
+      "block": "Wooden Palisade Spike"
+    },
+    {
+      "x": 4,
+      "y": 1,
+      "z": 3,
+      "block": "Wooden Palisade Spike"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 4,
+      "block": "Oak Log"
+    },
+    {
+      "x": 1,
+      "y": 1,
+      "z": 4,
+      "block": "Wooden Palisade Spike"
+    },
+    {
+      "x": 2,
+      "y": 1,
+      "z": 4,
+      "block": "Wooden Palisade Spike"
+    },
+    {
+      "x": 3,
+      "y": 1,
+      "z": 4,
+      "block": "Wooden Palisade Spike"
+    },
+    {
+      "x": 4,
+      "y": 1,
+      "z": 4,
+      "block": "Oak Log"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "z": 0,
+      "block": "Oak Log"
+    },
+    {
+      "x": 4,
+      "y": 2,
+      "z": 0,
+      "block": "Oak Log"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "z": 4,
+      "block": "Oak Log"
+    },
+    {
+      "x": 4,
+      "y": 2,
+      "z": 4,
+      "block": "Oak Log"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "z": 0,
+      "block": "Oak Log"
+    },
+    {
+      "x": 4,
+      "y": 3,
+      "z": 0,
+      "block": "Oak Log"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "z": 4,
+      "block": "Oak Log"
+    },
+    {
+      "x": 4,
+      "y": 3,
+      "z": 4,
+      "block": "Oak Log"
+    },
+    {
+      "x": 0,
+      "y": 4,
+      "z": 0,
+      "block": "Oak Log"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "z": 0,
+      "block": "Oak Log"
+    },
+    {
+      "x": 0,
+      "y": 4,
+      "z": 4,
+      "block": "Oak Log"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "z": 4,
+      "block": "Oak Log"
+    },
+    {
+      "x": 0,
+      "y": 5,
+      "z": 0,
+      "block": "Oak Log"
+    },
+    {
+      "x": 4,
+      "y": 5,
+      "z": 0,
+      "block": "Oak Log"
+    },
+    {
+      "x": 0,
+      "y": 5,
+      "z": 4,
+      "block": "Oak Log"
+    },
+    {
+      "x": 4,
+      "y": 5,
+      "z": 4,
+      "block": "Oak Log"
+    },
+    {
+      "x": 0,
+      "y": 6,
+      "z": 0,
+      "block": "Oak Log"
+    },
+    {
+      "x": 1,
+      "y": 6,
+      "z": 0,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 2,
+      "y": 6,
+      "z": 0,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 3,
+      "y": 6,
+      "z": 0,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 4,
+      "y": 6,
+      "z": 0,
+      "block": "Oak Log"
+    },
+    {
+      "x": 0,
+      "y": 6,
+      "z": 1,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 1,
+      "y": 6,
+      "z": 1,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 2,
+      "y": 6,
+      "z": 1,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 3,
+      "y": 6,
+      "z": 1,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 4,
+      "y": 6,
+      "z": 1,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 0,
+      "y": 6,
+      "z": 2,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 1,
+      "y": 6,
+      "z": 2,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 2,
+      "y": 6,
+      "z": 2,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 3,
+      "y": 6,
+      "z": 2,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 4,
+      "y": 6,
+      "z": 2,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 0,
+      "y": 6,
+      "z": 3,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 1,
+      "y": 6,
+      "z": 3,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 2,
+      "y": 6,
+      "z": 3,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 3,
+      "y": 6,
+      "z": 3,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 4,
+      "y": 6,
+      "z": 3,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 0,
+      "y": 6,
+      "z": 4,
+      "block": "Oak Log"
+    },
+    {
+      "x": 1,
+      "y": 6,
+      "z": 4,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 2,
+      "y": 6,
+      "z": 4,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 3,
+      "y": 6,
+      "z": 4,
+      "block": "Oak Planks"
+    },
+    {
+      "x": 4,
+      "y": 6,
+      "z": 4,
+      "block": "Oak Log"
+    },
+    {
+      "x": 0,
+      "y": 7,
+      "z": 0,
+      "block": "Oak Log"
+    },
+    {
+      "x": 1,
+      "y": 7,
+      "z": 0,
+      "block": "Oak Wooden Fence"
+    },
+    {
+      "x": 2,
+      "y": 7,
+      "z": 0,
+      "block": "Oak Wooden Fence"
+    },
+    {
+      "x": 3,
+      "y": 7,
+      "z": 0,
+      "block": "Oak Wooden Fence"
+    },
+    {
+      "x": 4,
+      "y": 7,
+      "z": 0,
+      "block": "Oak Log"
+    },
+    {
+      "x": 0,
+      "y": 7,
+      "z": 1,
+      "block": "Oak Wooden Fence"
+    },
+    {
+      "x": 4,
+      "y": 7,
+      "z": 1,
+      "block": "Oak Wooden Fence"
+    },
+    {
+      "x": 0,
+      "y": 7,
+      "z": 2,
+      "block": "Oak Wooden Fence"
+    },
+    {
+      "x": 4,
+      "y": 7,
+      "z": 2,
+      "block": "Oak Wooden Fence"
+    },
+    {
+      "x": 0,
+      "y": 7,
+      "z": 3,
+      "block": "Oak Wooden Fence"
+    },
+    {
+      "x": 4,
+      "y": 7,
+      "z": 3,
+      "block": "Oak Wooden Fence"
+    },
+    {
+      "x": 0,
+      "y": 7,
+      "z": 4,
+      "block": "Oak Log"
+    },
+    {
+      "x": 1,
+      "y": 7,
+      "z": 4,
+      "block": "Oak Wooden Fence"
+    },
+    {
+      "x": 2,
+      "y": 7,
+      "z": 4,
+      "block": "Oak Wooden Fence"
+    },
+    {
+      "x": 3,
+      "y": 7,
+      "z": 4,
+      "block": "Oak Wooden Fence"
+    },
+    {
+      "x": 4,
+      "y": 7,
+      "z": 4,
+      "block": "Oak Log"
+    }
+  ]
+}

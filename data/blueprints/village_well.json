@@ -1,0 +1,388 @@
+{
+  "name": "village_well",
+  "size": {
+    "width": 7,
+    "height": 3,
+    "depth": 7
+  },
+  "blocks": [
+    {
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 0,
+      "block": "Market Stall Counter"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 0,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 0,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 0,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 3,
+      "y": 1,
+      "z": 0,
+      "block": "Market Stall Counter"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 0,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 0,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "z": 0,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 6,
+      "y": 1,
+      "z": 0,
+      "block": "Market Stall Counter"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 1,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 1,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 1,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 1,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 1,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 1,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "z": 1,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 2,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 2,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 2,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 2,
+      "y": 1,
+      "z": 2,
+      "block": "Village Water Well Rim"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 2,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 2,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 4,
+      "y": 1,
+      "z": 2,
+      "block": "Village Water Well Rim"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 2,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "z": 2,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 3,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 3,
+      "block": "Market Stall Counter"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 3,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 3,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 3,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 3,
+      "block": "Fresh River Water"
+    },
+    {
+      "x": 3,
+      "y": 1,
+      "z": 3,
+      "block": "Fresh River Water"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 3,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 3,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "z": 3,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 6,
+      "y": 1,
+      "z": 3,
+      "block": "Market Stall Counter"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 4,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 4,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 4,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 2,
+      "y": 1,
+      "z": 4,
+      "block": "Village Water Well Rim"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 4,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 4,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 4,
+      "y": 1,
+      "z": 4,
+      "block": "Village Water Well Rim"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 4,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "z": 4,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 5,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 5,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 5,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 5,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 5,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 5,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "z": 5,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 6,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 6,
+      "block": "Market Stall Counter"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 6,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 6,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 6,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 3,
+      "y": 1,
+      "z": 6,
+      "block": "Market Stall Counter"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 6,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 6,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "z": 6,
+      "block": "Cobblestone Pavement"
+    },
+    {
+      "x": 6,
+      "y": 1,
+      "z": 6,
+      "block": "Market Stall Counter"
+    }
+  ]
+}
