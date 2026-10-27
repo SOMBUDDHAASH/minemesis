@@ -143,19 +143,34 @@ class InteractionEngine:
             if npc.health <= 0:
                 npc.alive = False
                 resp = f"FATAL BLOW! You struck down {npc.name}! The settlement cries out in agony! (Standing: {title})"
+                # Dispatch real death to History Simulation
+                if app and hasattr(app, "bridge"):
+                    sim_res = app.bridge.kill_character_in_simulation(npc.character_id, killer_id="player", app=app)
+                    if sim_res and sim_res.get("successor_name"):
+                        resp += f"\nSUCCESSION: {sim_res['successor_name']} rises as new Chief of {npc.settlement_name}!"
             else:
                 npc.is_hostile = True
                 resp = f"You struck {npc.name} (Health: {npc.health:.1f}/20)! They brandish steel!"
 
             self.dialogue_history.append(resp)
 
-            # Trigger family grief & witness vengeance in app
+            # Trigger family grief & witness vengeance in app across kin and local witnesses
             if app:
                 player_pos = (player.x, player.y, player.z)
                 for other in getattr(app, "npcs", []):
-                    if other.settlement_id == npc.settlement_id:
+                    is_local = (other.settlement_id == npc.settlement_id)
+                    is_kin = (
+                        other.character_id == npc.spouse_id or
+                        other.character_id in npc.children_ids or
+                        other.father_id == npc.character_id or
+                        other.mother_id == npc.character_id or
+                        other.character_id in npc.sibling_ids or
+                        npc.character_id in other.children_ids or
+                        other.family_id == npc.family_id
+                    )
+                    if is_local or is_kin:
                         witness_cry = other.kin_react_to_violence(npc, player_pos)
-                        if witness_cry:
+                        if witness_cry and is_local:
                             self.dialogue_history.append(witness_cry)
 
                 # Record murder/crime to historical chronicle

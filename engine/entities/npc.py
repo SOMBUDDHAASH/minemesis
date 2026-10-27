@@ -217,7 +217,7 @@ class NPC:
             return f"{self.name} screams: 'NO! My beloved {victim.name} is slain!'"
 
         # 2. Child reaction (witnessing parent killed)
-        if self.character_id in victim.children_ids:
+        if (self.character_id in victim.children_ids) or (self.father_id == victim.character_id) or (self.mother_id == victim.character_id):
             self.affinity_to_player = -100.0
             self.grief_state = f"Traumatized: Parent {victim.name} murdered!"
             self.current_activity = f"Fleeing in terror from murderer of parent {victim.name}!"
@@ -226,7 +226,7 @@ class NPC:
             return f"{self.name} weeps in terror: 'Mother! Father! The stranger murdered {victim.name}!'"
 
         # 3. Parent reaction (witnessing child killed)
-        if victim.character_id in self.children_ids:
+        if (victim.character_id in self.children_ids) or (victim.father_id == self.character_id) or (victim.mother_id == self.character_id):
             self.affinity_to_player = -100.0
             self.grief_state = f"Heartbroken: Child {victim.name} slain!"
             self.current_activity = f"Cursing the heavens over slain child {victim.name}!"
@@ -235,7 +235,10 @@ class NPC:
             return f"{self.name} cries out in agonizing grief: 'My child {victim.name}! Blood will answer for blood!'"
 
         # 4. Sibling reaction
-        if victim.character_id in self.sibling_ids:
+        if (victim.character_id in self.sibling_ids) or (self.character_id in victim.sibling_ids) or (
+            (self.father_id and self.father_id == victim.father_id) or
+            (self.mother_id and self.mother_id == victim.mother_id)
+        ):
             self.affinity_to_player = -100.0
             self.grief_state = f"Vengeful: Sibling {victim.name} murdered!"
             self.current_activity = f"Seeking blood-vengeance for sibling {victim.name}!"

@@ -104,6 +104,87 @@ class SimulationBridge:
         for _ in range(max(1, ticks_to_advance)):
             self._step_simulation_tick(app)
 
+    def kill_character_in_simulation(
+        self,
+        victim_id: str,
+        killer_id: str = "player",
+        app: any = None,
+    ) -> Optional[dict]:
+        """
+        Dispatches a violent death directly into the Minemesis history simulation.
+        Triggers:
+        1. EventType.DEATH logged in simulation event log with causal payload.
+        2. Simulation step to propagate perception, grief, and memories to all kin.
+        3. Succession crisis / Chief changed if victim was the settlement leader.
+        4. Scribe biography & chronicle penned in town archives.
+        5. Updates visible NPC entities and promotes successor.
+        """
+        c = self.simulation.characters.get(victim_id)
+        if not c:
+            return None
+
+        c.alive = False
+        c.death_tick = self.simulation.tick
+
+        from minemesis.core.types import EventType, Intent, Scale
+        death_evt = self.simulation.event_log.append(
+            tick=self.simulation.tick,
+            location=c.settlement_id,
+            event_type=EventType.DEATH,
+            participants={"actor": killer_id, "target": c.id, "deceased": c.id},
+            causes=[],
+            intent=Intent.INTENTIONAL,
+            scale=Scale.INDIVIDUAL,
+            payload={
+                "cause_of_death": "Assassinated by traveler",
+                "murder": True,
+                "violent": True,
+            },
+        )
+        c.death_event_id = death_evt.id
+
+        # Step simulation month to trigger perception, kinship grief, succession, and lore
+        self.simulation.step_month()
+        self.total_simulated_ticks = self.simulation.tick
+        year = (self.total_simulated_ticks // 12) + 1
+
+        # Check succession
+        settlement = self.simulation.settlements.get(c.settlement_id)
+        old_chief_id = victim_id
+        new_chief_id = settlement.leader_id if settlement else None
+        successor_name = None
+
+        if settlement and new_chief_id and new_chief_id != old_chief_id:
+            successor_char = self.simulation.characters.get(new_chief_id)
+            successor_name = successor_char.name if successor_char else new_chief_id
+            self.recent_chronicle_events.append(
+                f"[Year {year}] SUCCESSION: Following the assassination of Chief {c.name}, "
+                f"{successor_name} has risen as the new Chief of {settlement.name}!"
+            )
+            # Update app NPC
+            if app and hasattr(app, "npcs"):
+                for npc in app.npcs:
+                    if npc.character_id == new_chief_id:
+                        npc.profession = "Chief"
+                        npc.current_activity = f"Ruling {settlement.name} from Great Hall (Successor)"
+
+        # Check recently penned books
+        new_books = []
+        if self.simulation.lore_engine:
+            s_books = self.simulation.lore_engine.get_settlement_books(c.settlement_id)
+            if s_books:
+                new_books = [b.title for b in s_books[-3:]]
+
+        return {
+            "victim_id": c.id,
+            "victim_name": c.name,
+            "death_event_id": death_evt.id,
+            "settlement_id": c.settlement_id,
+            "new_chief_id": new_chief_id,
+            "successor_name": successor_name,
+            "recent_books": new_books,
+        }
+
     def record_combat_encounter(
         self,
         victim_npc: any,

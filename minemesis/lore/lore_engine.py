@@ -220,7 +220,7 @@ class LoreEngine:
 
             # 1.3 Notable Death: Biography and Personal Journals
             elif evt.type == EventType.DEATH:
-                deceased_id = evt.participants_dict.get("deceased") or (
+                deceased_id = evt.participants_dict.get("deceased") or evt.participants_dict.get("target") or (
                     evt.participants[0][1] if evt.participants else None
                 )
                 if deceased_id and deceased_id in characters:

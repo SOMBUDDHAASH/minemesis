@@ -212,7 +212,21 @@ class EngineApp:
 
             # Target 22 visible villagers for spawn settlement set_0 (and 12 for others)
             target_count = 22 if s.id == "set_0" else 12
-            selected_chars = sim_chars[:target_count]
+
+            # Always ensure the actual simulated settlement leader (Chief) is spawned
+            sim_settlement = sim.settlements.get(s.id)
+            chief_char = sim_chars_by_id.get(sim_settlement.leader_id) if sim_settlement else None
+
+            selected_chars = []
+            if chief_char:
+                chief_char.profession = "Chief"
+                selected_chars.append(chief_char)
+
+            for c in sim_chars:
+                if c not in selected_chars:
+                    selected_chars.append(c)
+                if len(selected_chars) >= target_count:
+                    break
 
             # Ensure essential roles are represented
             has_guard = any(c.profession in ("Guard", "Soldier") for c in selected_chars)
@@ -225,7 +239,7 @@ class EngineApp:
                     selected_chars[-2].profession = "Guard"
             if not has_smith and len(selected_chars) > 1:
                 selected_chars[1].profession = "Blacksmith"
-            if not has_priest and len(selected_chars) > 0:
+            if not has_priest and len(selected_chars) > 0 and selected_chars[0] != chief_char:
                 selected_chars[0].profession = "Scholar"
 
             # Common settlement landmarks
@@ -276,6 +290,17 @@ class EngineApp:
                 other_clans = [cn for cn in clan_names if cn != c.last_name]
                 rival_names = [other_clans[0]] if other_clans else []
 
+                # Resolve true religion from ReligionEngine
+                char_faith = "Sacred Way"
+                if sim.religion_engine and sim.religion_engine.enabled:
+                    rel_obj = sim.religion_engine.get_character_religion(c.id)
+                    if rel_obj:
+                        char_faith = rel_obj.name
+                    else:
+                        set_rel = sim.religion_engine.get_settlement_religion(s.id)
+                        if set_rel:
+                            char_faith = set_rel.name
+
                 npc = NPC(
                     character_id=c.id,
                     name=c.name,
@@ -285,7 +310,7 @@ class EngineApp:
                     age_years=c.age_years,
                     sex=c.sex,
                     profession=c.profession,
-                    faith="Sacred Way",
+                    faith=char_faith,
                     settlement_id=s.id,
                     settlement_name=s.name,
                     spouse_id=c.spouse_id,
