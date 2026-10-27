@@ -71,8 +71,25 @@ class PlacesTab(BaseTab):
         self.profile_box = tk.Frame(self.right_frame, bg=c["panel_bg"], padx=16, pady=12, relief=tk.FLAT)
         self.profile_box.pack(fill=tk.X, pady=(0, 10))
 
-        self.lbl_name = tk.Label(self.profile_box, text="Select a Settlement", font=("Segoe UI", 16, "bold"), fg=c["fg"], bg=c["panel_bg"])
-        self.lbl_name.pack(anchor="w")
+        top_row = tk.Frame(self.profile_box, bg=c["panel_bg"])
+        top_row.pack(fill=tk.X)
+
+        self.lbl_name = tk.Label(top_row, text="Select a Settlement", font=("Segoe UI", 16, "bold"), fg=c["fg"], bg=c["panel_bg"])
+        self.lbl_name.pack(side=tk.LEFT)
+
+        self.btn_voxel = tk.Button(
+            top_row,
+            text="🎮 Explore in 3D Voxel Mode",
+            command=self._launch_voxel,
+            bg="#059669",
+            fg="#ffffff",
+            font=("Segoe UI", 8, "bold"),
+            relief=tk.FLAT,
+            padx=10,
+            pady=3,
+            cursor="hand2",
+        )
+        self.btn_voxel.pack(side=tk.RIGHT)
 
         self.lbl_details = tk.Label(self.profile_box, text="--", font=("Segoe UI", 9), fg=c["fg_muted"], bg=c["panel_bg"])
         self.lbl_details.pack(anchor="w", pady=(2, 0))
@@ -164,3 +181,9 @@ class PlacesTab(BaseTab):
         # Library Books
         books = session.db.get_books(settlement_id=set_id)
         self.lib_table.set_items(books)
+
+    def _launch_voxel(self) -> None:
+        if self.selected_set_id:
+            bus.publish("voxel:launch", settlement_id=self.selected_set_id)
+        else:
+            bus.publish("voxel:launch")

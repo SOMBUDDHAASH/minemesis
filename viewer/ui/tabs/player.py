@@ -46,7 +46,21 @@ class PlayerTab(BaseTab):
             bg=c["panel_bg"],
             justify=tk.LEFT,
         )
-        self.lbl_player_info.pack(anchor="w", pady=(0, 12))
+        self.lbl_player_info.pack(anchor="w", pady=(0, 8))
+
+        self.btn_play_3d = tk.Button(
+            left_frame,
+            text="🎮 Launch 3D Voxel Sandbox",
+            font=("Segoe UI", 9, "bold"),
+            bg="#059669",
+            fg="#ffffff",
+            relief=tk.FLAT,
+            padx=10,
+            pady=6,
+            cursor="hand2",
+            command=lambda: bus.publish("voxel:launch"),
+        )
+        self.btn_play_3d.pack(fill=tk.X, pady=(0, 14))
 
         # Command Section
         tk.Label(

@@ -54,6 +54,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Minemesis Historical Archive Viewer V2")
     parser.add_argument("file", nargs="?", default=None, help="Path to .minemesis database file to open")
     parser.add_argument("--version", action="store_true", help="Show viewer version and exit")
+    parser.add_argument("--voxel", action="store_true", help="Launch directly into 3D Voxel Sandbox mode")
     parser.add_argument("--simulate", action="store_true", help="Run simulation headlessly and export to .minemesis")
     parser.add_argument("--world-seed", type=int, default=42, help="World Seed for simulation")
     parser.add_argument("--history-seed", type=int, default=1337, help="History Seed for simulation")
@@ -73,6 +74,8 @@ def main() -> int:
     from viewer.app import StoryViewerApp
 
     app = StoryViewerApp(initial_file=args.file)
+    if args.voxel:
+        app.after(200, lambda: app._launch_voxel_world())
     app.mainloop()
     return 0
 

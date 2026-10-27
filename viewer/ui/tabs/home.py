@@ -53,6 +53,20 @@ class HomeTab(BaseTab):
         title_lbl = tk.Label(hdr, text="Minemesis Historical Archive", font=("Segoe UI", 18, "bold"), fg=c["fg"], bg=c["bg"])
         title_lbl.pack(side=tk.LEFT)
 
+        btn_voxel = tk.Button(
+            hdr,
+            text="🎮 Launch Voxel Sandbox",
+            command=lambda: bus.publish("voxel:launch"),
+            bg="#059669",
+            fg="#ffffff",
+            font=("Segoe UI", 9, "bold"),
+            relief=tk.FLAT,
+            padx=12,
+            pady=6,
+            cursor="hand2",
+        )
+        btn_voxel.pack(side=tk.RIGHT, padx=(0, 10))
+
         btn_new_run = tk.Button(
             hdr,
             text="+ Run New Simulation",

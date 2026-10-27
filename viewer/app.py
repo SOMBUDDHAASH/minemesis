@@ -246,10 +246,42 @@ class StoryViewerApp(tk.Tk):
 
         bus.subscribe("tab:switch", self._switch_to_tab)
         bus.subscribe("entity:selected", self._on_entity_selected)
+        bus.subscribe("voxel:launch", lambda settlement_id=None, **kw: self._launch_voxel_world(settlement_id))
 
-        # Open file if passed via command line
+        # Open file if passed via command line, or auto-load default sample
         if initial_file:
             self.after(100, lambda: self.load_file(initial_file))
+        else:
+            self.after(100, self._auto_load_default_sample)
+
+    def _auto_load_default_sample(self) -> None:
+        """Automatically loads default sample database on startup so viewer is never blank."""
+        import sys
+        candidates = [
+            Path("samples/sample_100yr_large.minemesis"),
+            Path("samples/sample_30yr_medium.minemesis"),
+            Path("releases/samples/sample_100yr_large.minemesis"),
+            Path(sys.executable).parent / "samples" / "sample_100yr_large.minemesis",
+            Path(sys.executable).parent / "samples" / "sample_30yr_medium.minemesis",
+            Path(__file__).parent.parent / "samples" / "sample_100yr_large.minemesis",
+            Path(__file__).parent.parent / "samples" / "sample_30yr_medium.minemesis",
+        ]
+        if hasattr(sys, "_MEIPASS"):
+            candidates.append(Path(sys._MEIPASS) / "samples" / "sample_100yr_large.minemesis")
+            candidates.append(Path(sys._MEIPASS) / "samples" / "sample_30yr_medium.minemesis")
+
+        for p in candidates:
+            if p.exists():
+                self.load_file(p)
+                return
+
+        # Fallback: scan any .minemesis in samples/
+        for sdir in [Path("samples"), Path("releases/samples")]:
+            if sdir.is_dir():
+                found = list(sdir.glob("*.minemesis"))
+                if found:
+                    self.load_file(found[0])
+                    return
 
     def _build_ui(self) -> None:
         c = theme.colors
@@ -270,7 +302,21 @@ class StoryViewerApp(tk.Tk):
             pady=3,
             cursor="hand2",
         )
-        self.btn_open.pack(side=tk.LEFT, padx=(0, 8))
+        self.btn_open.pack(side=tk.LEFT, padx=(0, 6))
+
+        self.btn_voxel = tk.Button(
+            self.toolbar,
+            text="🎮 Launch Voxel World",
+            command=self._launch_voxel_world,
+            bg="#059669",
+            fg="#ffffff",
+            font=("Segoe UI", 8, "bold"),
+            relief=tk.FLAT,
+            padx=10,
+            pady=3,
+            cursor="hand2",
+        )
+        self.btn_voxel.pack(side=tk.LEFT, padx=(0, 10))
 
         # Navigation History (Back / Forward)
         self.btn_back = tk.Button(
@@ -384,6 +430,16 @@ class StoryViewerApp(tk.Tk):
         self.bind("<Alt-Right>", lambda e: self._on_forward())
         self.bind("<Control-o>", lambda e: self._on_open_file())
         self.bind("<Control-b>", lambda e: self._toggle_detail_panel())
+        self.bind("<Control-v>", lambda e: self._launch_voxel_world())
+        self.bind("<Control-g>", lambda e: self._launch_voxel_world())
+
+    def _launch_voxel_world(self, settlement_id: Optional[str] = None) -> None:
+        try:
+            from viewer.ui.voxel_window import open_voxel_window
+            open_voxel_window(parent=self, settlement_id=settlement_id)
+        except Exception as e:
+            log_error("Failed to launch 3D voxel sandbox", e)
+            messagebox.showerror("Voxel Mode Error", f"Could not launch Voxel Sandbox:\n{e}")
 
     def _on_tab_changed(self, event: tk.Event) -> None:
         sel = self.notebook.select()

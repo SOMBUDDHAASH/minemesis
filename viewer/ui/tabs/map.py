@@ -272,6 +272,29 @@ class MapTab(BaseTab):
         )
         self.lbl_endowments.pack(anchor="w")
 
+        # Playable 3D Voxel Sandbox Section
+        tk.Label(
+            self.frame_inspector,
+            text="Interactive 3D Voxel Sandbox",
+            font=("Segoe UI", 10, "bold"),
+            fg=c["fg"],
+            bg=c["panel_bg"],
+        ).pack(anchor="w", pady=(12, 4))
+
+        self.btn_play_voxel = tk.Button(
+            self.frame_inspector,
+            text="🎮 Explore in 3D Voxel Mode",
+            font=("Segoe UI", 9, "bold"),
+            bg="#059669",
+            fg="#ffffff",
+            relief=tk.FLAT,
+            padx=10,
+            pady=6,
+            cursor="hand2",
+            command=self._launch_settlement_in_voxel,
+        )
+        self.btn_play_voxel.pack(fill=tk.X, pady=(2, 8))
+
         # Minecraft Voxel Export Section
         tk.Label(
             self.frame_inspector,
@@ -543,6 +566,15 @@ class MapTab(BaseTab):
             )
 
         self._render_map_view()
+
+    def _launch_settlement_in_voxel(self) -> None:
+        """Launches the 3D Voxel Sandbox positioned directly at the selected settlement."""
+        idx = self.cb_settlement.current()
+        if 0 <= idx < len(self.settlements):
+            s = self.settlements[idx]
+            bus.publish("voxel:launch", settlement_id=s.id)
+        else:
+            bus.publish("voxel:launch")
 
     def _export_settlement_region(self) -> None:
         """Triggers Milestone T1 Voxel Exporter for cropped settlement region."""

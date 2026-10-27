@@ -58,6 +58,7 @@ def build_pyinstaller() -> tuple[Path, Path, Path]:
         "--add-data", f"viewer{os.pathsep}viewer",
         "--add-data", f"minemesis{os.pathsep}minemesis",
         "--add-data", f"translators{os.pathsep}translators",
+        "--add-data", f"samples{os.pathsep}samples",
     ]
 
     # 1. Build Onedir Distribution (Portable Folder)
@@ -101,6 +102,12 @@ def build_pyinstaller() -> tuple[Path, Path, Path]:
     if built_onefile.exists():
         shutil.copy2(built_onefile, target_onefile)
         print(f"[SUCCESS] Copied single-file exe to: {target_onefile}")
+        if samples_dir.exists():
+            rel_samples = releases_dir / "samples"
+            if rel_samples.exists():
+                shutil.rmtree(rel_samples)
+            shutil.copytree(samples_dir, rel_samples)
+            print(f"[SUCCESS] Copied samples to releases folder: {rel_samples}")
     else:
         print(f"[ERROR] Expected exe {built_onefile} not found!")
         sys.exit(1)

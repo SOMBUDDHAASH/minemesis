@@ -1,11 +1,11 @@
 # Minemesis Viewer V2 - Release Notes
 
 **Build Tag:** `viewer-v2`  
-**Single-File Executable:** `MinemesisViewer-v2.exe` (15.16 MB)  
-**Portable Folder Archive:** `MinemesisViewer-v2-portable.zip` (24.74 MB)  
+**Single-File Executable:** `MinemesisViewer-v2.exe` (24.17 MB)  
+**Portable Folder Archive:** `MinemesisViewer-v2-portable.zip` (34.02 MB)  
 **Measured Startup Times:**  
-- Portable Folder: `0.204s` (Target: < 1.0s)  
-- Single-File Exe: `1.826s` (Target: < 3.0s)  
+- Portable Folder: `0.389s` (Target: < 1.0s)  
+- Single-File Exe: `2.673s` (Target: < 3.0s)  
 
 ---
 
