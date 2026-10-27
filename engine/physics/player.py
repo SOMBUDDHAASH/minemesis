@@ -38,7 +38,8 @@ class PlayerController:
     on_ground: bool = False
     in_water: bool = False
     is_sprinting: bool = False
-    fly_mode: bool = False  # Strictly False by default (Player Bound by Gravity)
+    fly_mode: bool = False  # Controlled via [F8]
+    creative_mode: bool = False  # Controlled via [F9] (Instant mining & infinite blocks)
 
     # Kinetic Game Feel (Luanti / Quake View Bobbing & Landing Shock)
     bob_cycle: float = 0.0
@@ -105,6 +106,7 @@ class PlayerController:
         dt: float = 0.02,
         move_fwd: float = 0.0,
         move_strafe: float = 0.0,
+        move_up: float = 0.0,
     ) -> None:
         # Check water status
         block_at_feet = chunk_mgr.get_block_at(int(self.x), int(self.y), int(self.z))
@@ -112,18 +114,20 @@ class PlayerController:
         self.in_water = (b_def is not None and b_def.category == "fluid")
 
         # -----------------------------------------------------------------
-        # Debug Fly Mode (Bypasses Gravity and Ground Collision)
+        # Debug Fly Mode [F8] (3D 6-DOF Free Flight & Fast Travel)
         # -----------------------------------------------------------------
         if self.fly_mode:
-            speed = (self.SPRINT_SPEED * 2.5) if self.is_sprinting else (self.WALK_SPEED * 2.0)
+            fly_speed = 42.0 if self.is_sprinting else 16.0
+            dx, dy, dz = self.get_look_vector()
             yaw_rad = math.radians(self.yaw)
-            fwd_x = -math.sin(yaw_rad)
-            fwd_z = math.cos(yaw_rad)
             right_x = math.cos(yaw_rad)
             right_z = math.sin(yaw_rad)
 
-            self.vx = (fwd_x * move_fwd + right_x * move_strafe) * speed
-            self.vz = (fwd_z * move_fwd + right_z * move_strafe) * speed
+            # 3D Look-direction travel + lateral strafing + dedicated up/down lift
+            self.vx = (dx * move_fwd + right_x * move_strafe) * fly_speed
+            self.vy = (dy * move_fwd + move_up) * fly_speed
+            self.vz = (dz * move_fwd + right_z * move_strafe) * fly_speed
+
             self.x += self.vx * dt
             self.y += self.vy * dt
             self.z += self.vz * dt
@@ -298,6 +302,14 @@ class PlayerController:
         # Trigger punch swing cadence
         self.trigger_punch()
 
+        # Creative Mode [F9]: Instant 1-click block break (Zero delay)
+        if self.creative_mode:
+            chunk_mgr.set_block_at(bx, by, bz, 0)
+            self.inventory.add_item(bid, 1)
+            self.dig_target = None
+            self.dig_progress = 0.0
+            return (bx, by, bz, bid)
+
         if self.dig_target != (bx, by, bz):
             self.dig_target = (bx, by, bz)
             self.dig_progress = 0.0
@@ -467,7 +479,8 @@ class PlayerController:
         if not active_item or active_item.count <= 0:
             return None
 
-        bid = self.inventory.consume_active_item()
+        # Creative Mode [F9]: Infinite blocks (placing does not consume stack)
+        bid = active_item.block_id if self.creative_mode else self.inventory.consume_active_item()
         if bid is not None:
             chunk_mgr.set_block_at(tx, ty, tz, bid)
             self.trigger_punch()

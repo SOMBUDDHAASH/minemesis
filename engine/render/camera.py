@@ -95,3 +95,38 @@ class Camera3D:
     @property
     def projection_matrix(self) -> np.ndarray:
         return self._proj_matrix
+
+    def world_to_screen(
+        self,
+        wx: float, wy: float, wz: float,
+        screen_w: int, screen_h: int,
+    ) -> Optional[Tuple[float, float, float]]:
+        """
+        Projects 3D world coordinate to 2D screen coordinate (x_pixel, y_pixel, depth_distance).
+        Returns None if point is behind the camera or outside the viewing frustum.
+        """
+        pos_world = np.array([wx, wy, wz, 1.0], dtype=np.float32)
+        view = self.get_view_matrix()
+        proj = self.projection_matrix
+
+        pos_view = np.matmul(view, pos_world)
+        if pos_view[2] >= -0.1:  # Behind camera
+            return None
+
+        pos_clip = np.matmul(proj, pos_view)
+        w = float(pos_clip[3])
+        if w <= 0.001:
+            return None
+
+        ndc_x = float(pos_clip[0] / w)
+        ndc_y = float(pos_clip[1] / w)
+
+        # Frustum margin check
+        if abs(ndc_x) > 1.25 or abs(ndc_y) > 1.25:
+            return None
+
+        screen_x = (ndc_x + 1.0) * 0.5 * screen_w
+        screen_y = (1.0 - ndc_y) * 0.5 * screen_h
+        dist = math.sqrt((wx - self.x) ** 2 + (wy - self.y) ** 2 + (wz - self.z) ** 2)
+
+        return screen_x, screen_y, dist

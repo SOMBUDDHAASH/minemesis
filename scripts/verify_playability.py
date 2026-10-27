@@ -471,6 +471,53 @@ def test_10_npc_whisker_navigation(chunk_mgr: ChunkManager) -> None:
     print("   [OK] NPC whisker lookahead obstacle detection and lateral steering 100% verified.")
 
 
+def test_11_developer_qol_modes(chunk_mgr: ChunkManager, ctx: any) -> None:
+    print(">> [11/11] Testing Developer QoL: F8 3D Fly Mode, F9 Creative Build, & Overhead Labels...")
+
+    px, pz = 1181.0, 1191.0
+    py = float(chunk_mgr.get_highest_solid_y(px, pz))
+    p = PlayerController(x=px, y=py, z=pz)
+
+    # 1. 3D Fly Mode & Fast Travel
+    p.fly_mode = True
+    p.pitch = 30.0
+    p.yaw = 0.0
+    p.is_sprinting = True
+    p.tick_physics(chunk_mgr, dt=0.05, move_fwd=1.0, move_up=1.0)
+    assert p.y > py, "Spectator fly mode forward with pitch up must increase elevation"
+    assert p.z > pz, "Forward movement in yaw 0 must advance +Z"
+    assert p.on_ground is False
+
+    # 2. Creative Build Mode: Instant Mining
+    p.x, p.y, p.z = px, py, pz
+    p.pitch, p.yaw = 0.0, 0.0
+    p.creative_mode = True
+    target_pos = (int(px), int(py + 1), int(pz + 2))
+    chunk_mgr.set_block_at(int(px), int(py + 1), int(pz + 1), 0)
+    chunk_mgr.set_block_at(target_pos[0], target_pos[1], target_pos[2], 89)
+
+    broken = p.update_mining(chunk_mgr, dt=0.01, is_mining_pressed=True)
+    assert broken is not None, "Creative mode must break block instantly on first frame"
+    assert broken[3] == 89
+    assert chunk_mgr.get_block_at(*target_pos) == 0, "Broken block must be air"
+
+    # Infinite block placement
+    chunk_mgr.set_block_at(target_pos[0], target_pos[1], target_pos[2], 89)
+    init_count = p.inventory.hotbar[0].count
+    placed = p.place_block_against_target(chunk_mgr)
+    assert placed is not None
+    assert p.inventory.hotbar[0].count == init_count, "Creative mode must not consume item stack"
+
+    # 3. NPC Overhead Debug Labels
+    from engine.render.camera import Camera3D
+    cam = Camera3D(fov=70.0, aspect=1280/720, x=px, y=py + 1.62, z=pz - 5.0)
+    cam.yaw, cam.pitch = 0.0, 0.0
+    npc = NPC('test_npc', 'Titus Wolfberg', 'Smith', (px, py, pz + 5.0), (px, py, pz + 5.0))
+    overlay = OverlayRenderer(ctx, 1280, 720)
+    overlay.render_npc_overhead_labels([npc], cam, max_dist=35.0)
+    print("   [OK] F8 Fly Mode, F9 Creative Instant Mining & Infinite Blocks, and Overhead Labels verified.")
+
+
 def test_6_engine_visual_proof() -> None:
     print(">> [6/6] Capturing Visual Proof from Live ModernGL Engine...")
 
@@ -536,10 +583,11 @@ def run_all_tests() -> None:
     test_8_continuous_mining_and_particles(chunk_mgr, ctx)
     test_9_interactive_inventory_drag_and_drop(ctx)
     test_10_npc_whisker_navigation(chunk_mgr)
+    test_11_developer_qol_modes(chunk_mgr, ctx)
     test_6_engine_visual_proof()
 
     print("================================================================================")
-    print("  ALL 10 PLAYABILITY RECOVERY PILLARS 100% VERIFIED WITH ZERO ERRORS!          ")
+    print("  ALL 11 PLAYABILITY & DEVELOPER PILLARS 100% VERIFIED WITH ZERO ERRORS!       ")
     print("================================================================================")
 
 

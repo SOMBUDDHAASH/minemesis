@@ -384,6 +384,82 @@ class OverlayRenderer:
 
         self.ctx.enable(moderngl.DEPTH_TEST)
 
+    def render_npc_overhead_labels(self, npcs: list, camera: any, max_dist: float = 35.0) -> None:
+        """
+        Renders floating 3D overhead debug labels above all embodied citizens:
+        - Line 1: Name (Gold)
+        - Line 2: Family Clan & Profession (Cyan)
+        - Line 3: Current AI Schedule Task (Light Green)
+        """
+        if not npcs:
+            return
+
+        bg_verts: list[float] = []
+        text_verts: list[float] = []
+
+        line_h = 16.0
+        cw = self.font.char_w
+
+        for npc in npcs:
+            if not getattr(npc, "alive", True):
+                continue
+
+            # Position label 2.2m above feet (directly above head)
+            proj = camera.world_to_screen(npc.x, npc.y + 2.2, npc.z, self.width, self.height)
+            if not proj:
+                continue
+
+            sx, sy, dist = proj
+            if dist > max_dist:
+                continue
+
+            lines = [
+                f"[{npc.name}]",
+                f"Clan {npc.last_name} | {npc.profession}",
+                f"{npc.current_activity}",
+            ]
+
+            max_len = max(len(l) for l in lines)
+            box_w = max_len * cw + 14.0
+            box_h = len(lines) * line_h + 8.0
+            bx = sx - box_w * 0.5
+            by = sy - box_h
+
+            # Border & background
+            border_col = (0.35, 0.85, 1.0, 0.95) if dist < 12.0 else (0.25, 0.35, 0.5, 0.75)
+            self.draw_rect(bg_verts, bx - 1.0, by - 1.0, box_w + 2.0, box_h + 2.0, border_col)
+            self.draw_rect(bg_verts, bx, by, box_w, box_h, (0.04, 0.06, 0.10, 0.88))
+
+            # Lines text
+            self.draw_text(text_verts, lines[0], bx + 7.0, by + 4.0, (1.0, 0.88, 0.25, 1.0))
+            self.draw_text(text_verts, lines[1], bx + 7.0, by + 4.0 + line_h, (0.75, 0.90, 1.0, 1.0))
+            self.draw_text(text_verts, lines[2], bx + 7.0, by + 4.0 + line_h * 2, (0.55, 0.95, 0.60, 1.0))
+
+        if not bg_verts and not text_verts:
+            return
+
+        self.ctx.disable(moderngl.DEPTH_TEST)
+        self.ctx.enable(moderngl.BLEND)
+
+        if bg_verts:
+            if "u_is_text" in self.program:
+                self.program["u_is_text"].value = 0
+            raw_bg = np.array(bg_verts, dtype=np.float32).tobytes()
+            self.vbo.write(raw_bg)
+            self.vao.render(moderngl.TRIANGLES, vertices=len(bg_verts) // 8)
+
+        if text_verts:
+            self.font.bind(unit=1)
+            if "u_font_tex" in self.program:
+                self.program["u_font_tex"].value = 1
+            if "u_is_text" in self.program:
+                self.program["u_is_text"].value = 1
+            raw_text = np.array(text_verts, dtype=np.float32).tobytes()
+            self.vbo.write(raw_text)
+            self.vao.render(moderngl.TRIANGLES, vertices=len(text_verts) // 8)
+
+        self.ctx.enable(moderngl.DEPTH_TEST)
+
     def render_settings_menu(self, settings: any) -> None:
         """Renders the Settings Menu for mouse sensitivity, smoothing, FOV, and fly mode."""
         lines = [

@@ -681,10 +681,14 @@ class EngineApp:
             self.show_settings = True
             self.window.set_mouse_capture(False)
 
-        # Direct Fly Mode Toggle [F]
-        if inp.is_key_pressed(glfw.KEY_F):
+        # Direct Fly Mode Toggle [F8] (or [F])
+        if inp.is_key_pressed(glfw.KEY_F8) or inp.is_key_pressed(glfw.KEY_F):
             self.settings.toggle_fly_mode()
             self.player.fly_mode = self.settings.fly_mode
+
+        # Direct Creative Build Mode Toggle [F9] (Infinite blocks & instant 1-click mining)
+        if inp.is_key_pressed(glfw.KEY_F9):
+            self.player.creative_mode = not self.player.creative_mode
 
         # Advance diurnal time cycle [T] (+6 hours: Dawn -> Work -> Tavern -> Night Curfew)
         if inp.is_key_pressed(glfw.KEY_T):
@@ -719,9 +723,10 @@ class EngineApp:
             p.yaw = (p.yaw - dx_val * sens) % 360.0
             p.pitch = max(-89.0, min(89.0, p.pitch - dy_val * sens * inv_factor))
 
-        # Keyboard movement
+        # Keyboard movement (with 3D Spectator Flight & Lift)
         move_fwd = 0.0
         move_strafe = 0.0
+        move_up = 0.0
         if inp.is_key_down(glfw.KEY_W):
             move_fwd += 1.0
         if inp.is_key_down(glfw.KEY_S):
@@ -732,8 +737,15 @@ class EngineApp:
             move_strafe += 1.0
 
         p.is_sprinting = inp.is_key_down(glfw.KEY_LEFT_SHIFT)
-        if inp.is_key_pressed(glfw.KEY_SPACE):
-            p.jump()
+        if p.fly_mode:
+            # Fly Mode vertical lift & descent
+            if inp.is_key_down(glfw.KEY_SPACE):
+                move_up += 1.0
+            if inp.is_key_down(glfw.KEY_LEFT_CONTROL) or inp.is_key_down(glfw.KEY_C) or inp.is_key_down(glfw.KEY_Q):
+                move_up -= 1.0
+        else:
+            if inp.is_key_pressed(glfw.KEY_SPACE):
+                p.jump()
 
         # Hotbar selection 1-9
         for k in range(glfw.KEY_1, glfw.KEY_9 + 1):
@@ -786,7 +798,7 @@ class EngineApp:
             self.book_reader.open_book(book_data)
 
         # 1. Physics Tick
-        p.tick_physics(self.chunk_mgr, dt=dt, move_fwd=move_fwd, move_strafe=move_strafe)
+        p.tick_physics(self.chunk_mgr, dt=dt, move_fwd=move_fwd, move_strafe=move_strafe, move_up=move_up)
 
         # 2. Update Camera to Player's Eye
         eye_x, eye_y, eye_z = p.get_eye_position()
@@ -871,10 +883,11 @@ class EngineApp:
                     break
             standing = self.interaction.reputation.get_title(active_set_id)
             rep_score = self.interaction.reputation.get_score(active_set_id)
-            fly_str = " | FLY MODE: [ON]" if p.fly_mode else ""
+            fly_str = " | FLY MODE: [ON] (F8)" if p.fly_mode else ""
+            creat_str = " | CREATIVE: [ON] (F9)" if p.creative_mode else ""
 
             lines = [
-                f"MINEMESIS | LIVING CIVILIZATION SANDBOX | FPS: {self.timer.fps:.1f}{fly_str}",
+                f"MINEMESIS | LIVING CIVILIZATION SANDBOX | FPS: {self.timer.fps:.1f}{fly_str}{creat_str}",
                 f"World Clock: Year {sim_year} | Time: {hour:02d}:{minute:02d} [{time_phase}] [Press T to Advance]",
                 f"Social Standing: {standing} ({rep_score:+.0f}) in {near_set}",
                 f"Camera XYZ: {self.camera.x:.2f} / {self.camera.y:.2f} / {self.camera.z:.2f} | Ground: {p.on_ground} | Chunks Rendered: {self.chunk_mgr.chunks_rendered}",
@@ -890,8 +903,12 @@ class EngineApp:
                 )
             elif action_prompt:
                 lines.append(action_prompt)
-            lines.append("Controls: [WASD] Move [Space] Jump [I] Inventory [O] Settings [F] Fly [E] Speak [T] Time [J] Chronicle [F4] Wireframe [F3] HUD")
+            lines.append("Controls: [WASD] Move [Space] Jump/Lift [F8] Fly [F9] Creative [E] Speak [I] Inv [F3] HUD [Esc] Pause")
             self.overlay.render_overlay(lines)
+
+        # 8. Render Floating Overhead NPC Debug Labels (Name, Family, Job, Current Task)
+        if not self.paused and not self.book_reader.is_reading and not self.interaction.menu_open and not self.show_chronicle and not self.show_world_map and not self.show_inventory and not self.show_settings:
+            self.overlay.render_npc_overhead_labels(self.npcs, self.camera, max_dist=35.0)
 
         # Crosshair in first-person gameplay
         if not self.paused and not self.book_reader.is_reading and not self.interaction.menu_open and not self.show_chronicle and not self.show_world_map and not self.show_inventory and not self.show_settings:
