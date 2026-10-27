@@ -25,6 +25,8 @@ from engine.physics.player import PlayerController
 from engine.render.context import RenderContext
 from engine.render.camera import Camera3D
 from engine.render.highlight import BlockHighlightRenderer
+from engine.render.particles import ParticleSystem
+from engine.render.hand import FirstPersonHandRenderer
 from engine.render.shader import (
     ShaderProgram,
     BASIC_VOXEL_VERTEX_SHADER,
@@ -90,6 +92,8 @@ class EngineApp:
         self.smooth_dx: float = 0.0
         self.smooth_dy: float = 0.0
         self.highlight_renderer = BlockHighlightRenderer(self.ctx)
+        self.particles = ParticleSystem(self.ctx)
+        self.hand_renderer = FirstPersonHandRenderer(self.ctx, self.atlas)
 
         # Window resize binding
         self.window.resize_callback = self._on_resize
@@ -511,8 +515,21 @@ class EngineApp:
                 if inp.is_key_pressed(k):
                     p.selected_slot = k - glfw.KEY_1
 
+            # Mouse slot interactions: Left-click (Pick/Drop/Swap), Right-click (Split/Drop 1), Shift-click (Quick Move)
+            is_shift = inp.is_key_down(glfw.KEY_LEFT_SHIFT) or inp.is_key_down(glfw.KEY_RIGHT_SHIFT)
+            if inp.is_mouse_pressed(glfw.MOUSE_BUTTON_LEFT):
+                slot = self.overlay.get_inventory_slot_under_cursor(inp.mouse_x, inp.mouse_y)
+                if slot:
+                    slot_type, slot_id = slot
+                    p.inventory.handle_slot_click(slot_type, slot_id, button=1, shift=is_shift)
+            elif inp.is_mouse_pressed(glfw.MOUSE_BUTTON_RIGHT):
+                slot = self.overlay.get_inventory_slot_under_cursor(inp.mouse_x, inp.mouse_y)
+                if slot:
+                    slot_type, slot_id = slot
+                    p.inventory.handle_slot_click(slot_type, slot_id, button=2, shift=is_shift)
+
             self._render_3d_scene(p)
-            self.overlay.render_inventory_gui(p.inventory)
+            self.overlay.render_inventory_gui(p.inventory, inp.mouse_x, inp.mouse_y)
             return
 
         # Handle modal states: Settings Menu [O]
@@ -727,12 +744,26 @@ class EngineApp:
         if inp.scroll_delta != 0.0:
             p.selected_slot = int(p.selected_slot - inp.scroll_delta) % len(p.hotbar)
 
-        # Block breaking / placing
+        # Block breaking / placing (Continuous mining accumulator & particle burst)
         if inp.mouse_captured:
-            if inp.is_mouse_pressed(glfw.MOUSE_BUTTON_LEFT):
-                p.break_targeted_block(self.chunk_mgr)
-            elif inp.is_mouse_pressed(glfw.MOUSE_BUTTON_RIGHT):
+            is_mining = inp.is_mouse_down(glfw.MOUSE_BUTTON_LEFT)
+            broken = p.update_mining(self.chunk_mgr, dt, is_mining)
+            if broken:
+                bx, by, bz, bid = broken
+                self.particles.spawn_block_break(bx, by, bz, bid)
+
+            if inp.is_mouse_pressed(glfw.MOUSE_BUTTON_RIGHT):
                 p.place_block_against_target(self.chunk_mgr)
+        else:
+            p.update_mining(self.chunk_mgr, dt, False)
+
+        # Update dynamic particle kinematics
+        self.particles.update(dt)
+
+        # Dynamic Sprint FOV interpolation (Luanti/Minecraft camera expansion)
+        target_fov = (self.settings.fov + 8.0) if p.is_sprinting else self.settings.fov
+        self.camera.fov = self.camera.fov * max(0.0, 1.0 - 10.0 * dt) + target_fov * (10.0 * dt)
+        self.camera.update_projection(self.width / float(self.height))
 
         # Proximity interaction checking (NPCs and Bookshelves/Lecterns)
         nearest_npc = None
@@ -900,14 +931,36 @@ class EngineApp:
                 if dist < float(self.view_distance * 16):
                     npc.render(self.humanoid_mesh, self.shader, self.camera)
 
-        # 3. Render Block Highlight Outline, Face Normal, and Ghost Preview (if not wireframe)
+        # 3. Render Block Highlight Outline, Face Normal, Ghost Preview, and Mining Cracks
         if not self.chunk_mgr.wireframe:
             hit = p.raycast_block(self.chunk_mgr, 5.0)
             if hit:
                 (hx, hy, hz), (nx, ny, nz), _ = hit
                 active_item = p.inventory.get_active_item()
                 preview_bid = active_item.block_id if active_item else None
-                self.highlight_renderer.render_highlight(self.camera, (hx, hy, hz), (nx, ny, nz), preview_bid)
+                self.highlight_renderer.render_highlight(
+                    self.camera,
+                    (hx, hy, hz),
+                    (nx, ny, nz),
+                    preview_bid,
+                    dig_progress=p.dig_progress,
+                )
+
+        # 4. Render 3D Voxel Debris Particle Burst
+        self.particles.render(self.camera)
+
+        # 5. Render First-Person Embodied Arm & Held Item with Punch Swing
+        if not self.chunk_mgr.wireframe:
+            active_item = p.inventory.get_active_item()
+            held_bid = active_item.block_id if active_item else None
+            is_moving = p.on_ground and (abs(p.vx) + abs(p.vz) > 0.1)
+            self.hand_renderer.render(
+                self.camera,
+                punch_progress=p.punch_anim_timer,
+                bob_cycle=p.bob_cycle,
+                is_moving=is_moving,
+                held_block_id=held_bid,
+            )
 
         return draw_calls
 

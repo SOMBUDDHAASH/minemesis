@@ -1,5 +1,6 @@
 """
-Player Entity Physics, AABB Voxel Collision Resolution, and 3D DDA Raycaster with Soft Cone.
+Player Entity Physics, Quake/Luanti Acceleration, Swept Wall-Sliding,
+Dynamic View Bobbing, and Continuous Hardness Mining with Soft Cone.
 """
 
 from __future__ import annotations
@@ -16,8 +17,8 @@ from engine.world.chunk_manager import ChunkManager
 @dataclass
 class PlayerController:
     """
-    3D Player Controller with Continuous Physics, Swept AABB Collision,
-    1.1m Slope Stepping, and Soft Cone Block Targeting.
+    3D Player Controller with Quake/Luanti Acceleration, Continuous Gravity,
+    Swept Wall-Sliding, 1.1m Slope Stepping, View Bobbing, and Progressive Hardness Mining.
     """
     x: float = 1200.0
     y: float = 85.0
@@ -38,6 +39,18 @@ class PlayerController:
     in_water: bool = False
     is_sprinting: bool = False
     fly_mode: bool = False  # Strictly False by default (Player Bound by Gravity)
+
+    # Kinetic Game Feel (Luanti / Quake View Bobbing & Landing Shock)
+    bob_cycle: float = 0.0
+    bob_y: float = 0.0
+    bob_roll: float = 0.0
+    landing_dip: float = 0.0
+
+    # Continuous Mining Feel (Block Hardness Accumulator & Punch Swing)
+    dig_target: Optional[Tuple[int, int, int]] = None
+    dig_progress: float = 0.0
+    dig_time_required: float = 0.8
+    punch_anim_timer: float = 0.0
 
     # Minemesis Inventory v1
     inventory: Inventory = field(default_factory=Inventory)
@@ -72,7 +85,8 @@ class PlayerController:
                 self.inventory.hotbar[i] = None
 
     def get_eye_position(self) -> Tuple[float, float, float]:
-        return self.x, self.y + self.eye_height, self.z
+        """Returns eye position with dynamic stride bobbing and landing impact dip."""
+        return self.x, self.y + self.eye_height + self.bob_y + self.landing_dip, self.z
 
     def get_look_vector(self) -> Tuple[float, float, float]:
         yaw_rad = math.radians(self.yaw)
@@ -117,53 +131,95 @@ class PlayerController:
             return
 
         # -----------------------------------------------------------------
-        # Standard Terrestrial Voxel Physics
+        # Standard Terrestrial Voxel Physics (Quake / Luanti Model)
         # -----------------------------------------------------------------
-        speed = self.SPRINT_SPEED if self.is_sprinting else self.WALK_SPEED
         yaw_rad = math.radians(self.yaw)
-
-        # Forward & Strafe vectors
         fwd_x = -math.sin(yaw_rad)
         fwd_z = math.cos(yaw_rad)
         right_x = math.cos(yaw_rad)
         right_z = math.sin(yaw_rad)
 
-        target_vx = (fwd_x * move_fwd + right_x * move_strafe) * speed
-        target_vz = (fwd_z * move_fwd + right_z * move_strafe) * speed
+        # 1. Quake / Luanti Ground Friction & Air Drag
+        h_speed = math.sqrt(self.vx * self.vx + self.vz * self.vz)
+        if self.on_ground:
+            FRICTION = 9.0
+            drop = h_speed * FRICTION * dt
+            new_speed = max(0.0, h_speed - drop)
+            if h_speed > 0.001:
+                scale = new_speed / h_speed
+                self.vx *= scale
+                self.vz *= scale
+            else:
+                self.vx = 0.0
+                self.vz = 0.0
+        else:
+            AIR_DRAG = 0.4
+            self.vx *= max(0.0, 1.0 - AIR_DRAG * dt)
+            self.vz *= max(0.0, 1.0 - AIR_DRAG * dt)
 
-        friction = 0.60 if self.on_ground else 0.90
-        self.vx = self.vx * friction + target_vx * (1.0 - friction)
-        self.vz = self.vz * friction + target_vz * (1.0 - friction)
+        # 2. Wishdir vector projection & acceleration
+        wish_speed = self.SPRINT_SPEED if self.is_sprinting else self.WALK_SPEED
+        input_len = math.sqrt(move_fwd * move_fwd + move_strafe * move_strafe)
+        if input_len > 0.001:
+            nfwd = move_fwd / input_len
+            nstr = move_strafe / input_len
+            wish_x = fwd_x * nfwd + right_x * nstr
+            wish_z = fwd_z * nfwd + right_z * nstr
 
-        # Gravity & vertical velocity
+            current_speed = self.vx * wish_x + self.vz * wish_z
+            add_speed = wish_speed - current_speed
+            if add_speed > 0.0:
+                accel = 12.0 if self.on_ground else 2.8
+                accel_speed = min(add_speed, accel * wish_speed * dt)
+                self.vx += wish_x * accel_speed
+                self.vz += wish_z * accel_speed
+
+        # 3. Dynamic View Bobbing & Landing Shock Absorption
+        h_speed = math.sqrt(self.vx * self.vx + self.vz * self.vz)
+        if self.on_ground and h_speed > 0.15:
+            step_rate = 9.0 if self.is_sprinting else 6.5
+            self.bob_cycle += dt * step_rate
+            self.bob_y = math.sin(self.bob_cycle) * (0.04 if self.is_sprinting else 0.025)
+            self.bob_roll = math.cos(self.bob_cycle * 0.5) * (0.55 if self.is_sprinting else 0.3)
+        else:
+            self.bob_y *= max(0.0, 1.0 - 10.0 * dt)
+            self.bob_roll *= max(0.0, 1.0 - 10.0 * dt)
+
+        # Decay landing compression
+        self.landing_dip *= max(0.0, 1.0 - 12.0 * dt)
+
+        # 4. Gravity & vertical velocity
+        was_on_ground = self.on_ground
+        prev_vy = self.vy
         if self.in_water:
             self.vy = max(-3.5, self.vy - 10.0 * dt)
         else:
             self.vy = max(-36.0, self.vy - self.GRAVITY * dt)
 
-        # Swept AABB collision resolution per axis
+        # 5. Swept AABB Collision Resolution with Wall Sliding
         dx = self.vx * dt
         dy = self.vy * dt
         dz = self.vz * dt
 
-        # 1. Y Axis (Continuous gravity resolution)
+        # 5.1 Y Axis (Continuous gravity resolution + landing shock)
         self.y += dy
         self.on_ground = False
         if self._check_collision(chunk_mgr, self.x, self.y, self.z):
             if dy < 0:
                 self.y = math.ceil(self.y)
                 self.on_ground = True
+                if not was_on_ground and abs(prev_vy) > 3.0:
+                    self.landing_dip = -min(0.18, abs(prev_vy) * 0.012)
                 self.vy = 0.0
             elif dy > 0:
                 self.y = math.floor(self.y) - 0.01
                 self.vy = 0.0
 
-        # 2. X Axis (with auto-step 1.1m for 1-block slopes)
+        # 5.2 X Axis (with auto-step 1.1m and wall sliding)
         self.x += dx
         if self._check_collision(chunk_mgr, self.x, self.y, self.z):
             if self.on_ground and not self._check_collision(chunk_mgr, self.x, self.y + 1.1, self.z):
                 self.y += 1.1
-                # Settle down to obstacle top
                 for _ in range(11):
                     if not self._check_collision(chunk_mgr, self.x, self.y - 0.1, self.z):
                         self.y -= 0.1
@@ -172,13 +228,13 @@ class PlayerController:
             else:
                 self.x -= dx
                 self.vx = 0.0
+                # vz is preserved: player smoothly slides along Z wall face!
 
-        # 3. Z Axis (with auto-step 1.1m for 1-block slopes)
+        # 5.3 Z Axis (with auto-step 1.1m and wall sliding)
         self.z += dz
         if self._check_collision(chunk_mgr, self.x, self.y, self.z):
             if self.on_ground and not self._check_collision(chunk_mgr, self.x, self.y + 1.1, self.z):
                 self.y += 1.1
-                # Settle down to obstacle top
                 for _ in range(11):
                     if not self._check_collision(chunk_mgr, self.x, self.y - 0.1, self.z):
                         self.y -= 0.1
@@ -187,6 +243,7 @@ class PlayerController:
             else:
                 self.z -= dz
                 self.vz = 0.0
+                # vx is preserved: player smoothly slides along X wall face!
 
     def jump(self) -> bool:
         if self.fly_mode:
@@ -200,6 +257,64 @@ class PlayerController:
             self.vy = 4.5
             return True
         return False
+
+    def trigger_punch(self) -> None:
+        """Triggers first-person arm punch swing animation."""
+        if self.punch_anim_timer <= 0.05:
+            self.punch_anim_timer = 1.0
+
+    def update_mining(
+        self,
+        chunk_mgr: ChunkManager,
+        dt: float,
+        is_mining_pressed: bool,
+    ) -> Optional[Tuple[int, int, int, int]]:
+        """
+        Continuous Mining Feel (Blatantly copied from Luanti/Minecraft):
+        - Accumulates dig_progress against block hardness while button held.
+        - Triggers hand punch swing animation.
+        - Returns (bx, by, bz, bid) on completion.
+        """
+        if self.punch_anim_timer > 0.0:
+            self.punch_anim_timer = max(0.0, self.punch_anim_timer - dt * 3.8)
+
+        if not is_mining_pressed:
+            self.dig_target = None
+            self.dig_progress = 0.0
+            return None
+
+        hit = self.raycast_block(chunk_mgr, self.BLOCK_REACH)
+        if not hit:
+            self.dig_target = None
+            self.dig_progress = 0.0
+            return None
+
+        (bx, by, bz), _, bid = hit
+        if bid == 2:  # Basalt bedrock unbreakable
+            self.dig_target = None
+            self.dig_progress = 0.0
+            return None
+
+        # Trigger punch swing cadence
+        self.trigger_punch()
+
+        if self.dig_target != (bx, by, bz):
+            self.dig_target = (bx, by, bz)
+            self.dig_progress = 0.0
+            b_def = registry.get_by_id(bid)
+            base_hardness = b_def.hardness if b_def else 1.0
+            self.dig_time_required = max(0.20, base_hardness * 0.75)
+
+        self.dig_progress += dt / self.dig_time_required
+
+        if self.dig_progress >= 1.0:
+            self.dig_progress = 0.0
+            self.dig_target = None
+            chunk_mgr.set_block_at(bx, by, bz, 0)
+            self.inventory.add_item(bid, 1)
+            return (bx, by, bz, bid)
+
+        return None
 
     def _check_collision(self, chunk_mgr: ChunkManager, px: float, py: float, pz: float) -> bool:
         hw = self.width / 2.0
@@ -282,10 +397,6 @@ class PlayerController:
         chunk_mgr: ChunkManager,
         max_dist: float = 5.0,
     ) -> Optional[Tuple[Tuple[int, int, int], Tuple[int, int, int], int]]:
-        """
-        Raycasts along camera look vector with soft target volume / cone of inquiry.
-        Returns ((hit_x, hit_y, hit_z), (normal_x, normal_y, normal_z), block_id) or None.
-        """
         ox, oy, oz = self.get_eye_position()
         dx, dy, dz = self.get_look_vector()
 
@@ -322,6 +433,7 @@ class PlayerController:
         return best_hit
 
     def break_targeted_block(self, chunk_mgr: ChunkManager) -> Optional[Tuple[int, int, int, int]]:
+        """Instant single-click break fallback (e.g. creative/test mode)."""
         hit = self.raycast_block(chunk_mgr, self.BLOCK_REACH)
         if not hit:
             return None
@@ -330,6 +442,7 @@ class PlayerController:
             return None  # Unbreakable
         chunk_mgr.set_block_at(bx, by, bz, 0)
         self.inventory.add_item(bid, 1)
+        self.trigger_punch()
         return (bx, by, bz, bid)
 
     def place_block_against_target(self, chunk_mgr: ChunkManager) -> Optional[Tuple[int, int, int]]:
@@ -357,6 +470,7 @@ class PlayerController:
         bid = self.inventory.consume_active_item()
         if bid is not None:
             chunk_mgr.set_block_at(tx, ty, tz, bid)
+            self.trigger_punch()
             return (tx, ty, tz)
 
         return None

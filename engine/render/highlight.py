@@ -73,6 +73,7 @@ class BlockHighlightRenderer:
         hit_pos: Tuple[int, int, int],
         face_normal: Tuple[int, int, int],
         preview_block_id: Optional[int] = None,
+        dig_progress: float = 0.0,
     ) -> None:
         bx, by, bz = hit_pos
         nx, ny, nz = face_normal
@@ -170,9 +171,55 @@ class BlockHighlightRenderer:
             add_line((px1, py1, pz1), (px0, py1, pz1), gcol)
             add_line((px0, py1, pz1), (px0, py1, pz0), gcol)
             add_line((px0, py0, pz0), (px0, py1, pz0), gcol)
-            add_line((px1, py0, pz0), (px1, py1, pz0), gcol)
-            add_line((px1, py0, pz1), (px1, py1, pz1), gcol)
-            add_line((px0, py0, pz1), (px0, py1, pz1), gcol)
+            add_line((px1, py0, p0 := z0), (px1, py1, p0), gcol)
+            add_line((px1, py0, p1 := z1), (px1, py1, p1), gcol)
+            add_line((px0, py0, p1), (px0, py1, p1), gcol)
+
+        # -------------------------------------------------------------
+        # 4. Progressive Mining Crack Lines (if dig_progress > 0.05)
+        # -------------------------------------------------------------
+        if dig_progress > 0.05:
+            crk_col = (0.05, 0.05, 0.05, 0.98)
+            if ny > 0:  # Top
+                c0, c1, c2, c3 = (x0, y1 + f_eps, z0), (x1, y1 + f_eps, z0), (x1, y1 + f_eps, z1), (x0, y1 + f_eps, z1)
+            elif ny < 0:  # Bottom
+                c0, c1, c2, c3 = (x0, y0 - f_eps, z1), (x1, y0 - f_eps, z1), (x1, y0 - f_eps, z0), (x0, y0 - f_eps, z0)
+            elif nx > 0:  # East
+                c0, c1, c2, c3 = (x1 + f_eps, y0, z0), (x1 + f_eps, y0, z1), (x1 + f_eps, y1, z1), (x1 + f_eps, y1, z0)
+            elif nx < 0:  # West
+                c0, c1, c2, c3 = (x0 - f_eps, y0, z1), (x0 - f_eps, y0, z0), (x0 - f_eps, y1, z0), (x0 - f_eps, y1, z1)
+            elif nz > 0:  # North
+                c0, c1, c2, c3 = (x1, y0, z1 + f_eps), (x0, y0, z1 + f_eps), (x0, y1, z1 + f_eps), (x1, y1, z1 + f_eps)
+            else:  # South
+                c0, c1, c2, c3 = (x0, y0, z0 - f_eps), (x1, y0, z0 - f_eps), (x1, y1, z0 - f_eps), (x0, y1, z0 - f_eps)
+
+            cx = (c0[0] + c1[0] + c2[0] + c3[0]) * 0.25
+            cy = (c0[1] + c1[1] + c2[1] + c3[1]) * 0.25
+            cz = (c0[2] + c1[2] + c2[2] + c3[2]) * 0.25
+            fc = (cx, cy, cz)
+
+            f_scale = min(1.0, dig_progress * 1.2)
+            for corner in (c0, c1, c2, c3):
+                target_pt = (
+                    cx + (corner[0] - cx) * 0.65 * f_scale,
+                    cy + (corner[1] - cy) * 0.65 * f_scale,
+                    cz + (corner[2] - cz) * 0.65 * f_scale,
+                )
+                add_line(fc, target_pt, crk_col)
+
+            if dig_progress > 0.40:
+                m0 = ((c0[0] + c1[0]) * 0.5, (c0[1] + c1[1]) * 0.5, (c0[2] + c1[2]) * 0.5)
+                m1 = ((c1[0] + c2[0]) * 0.5, (c1[1] + c2[1]) * 0.5, (c1[2] + c2[2]) * 0.5)
+                m2 = ((c2[0] + c3[0]) * 0.5, (c2[1] + c3[1]) * 0.5, (c2[2] + c3[2]) * 0.5)
+                m3 = ((c3[0] + c0[0]) * 0.5, (c3[1] + c0[1]) * 0.5, (c3[2] + c0[2]) * 0.5)
+                add_line(fc, m0, crk_col)
+                add_line(fc, m1, crk_col)
+                add_line(fc, m2, crk_col)
+                add_line(fc, m3, crk_col)
+
+            if dig_progress > 0.70:
+                add_line(c0, c2, crk_col)
+                add_line(c1, c3, crk_col)
 
         # -------------------------------------------------------------
         # OpenGL Render Passes

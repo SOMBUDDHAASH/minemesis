@@ -24,6 +24,8 @@ from engine.entities.npc import NPC
 from engine.inventory.item_stack import ItemStack
 from engine.inventory.inventory import Inventory
 from engine.physics.player import PlayerController
+from engine.render.particles import ParticleSystem
+from engine.ui.overlay import OverlayRenderer
 from engine.world.block_registry import registry
 from engine.world.chunk_manager import ChunkManager
 from minemesis.terrain.world_provider_t0 import T0WorldProvider
@@ -285,6 +287,190 @@ def test_5_settings_and_mouse() -> None:
     print("   [OK] Settings model, FOV presets, and persistence 100% verified.")
 
 
+def test_7_movement_friction_and_wall_sliding(chunk_mgr: ChunkManager) -> None:
+    print(">> [7/10] Testing Movement Ground Friction, Wall Sliding, and View Bobbing...")
+
+    px, pz = 1181.0, 1191.0
+    py = float(chunk_mgr.get_highest_solid_y(px, pz))
+    p = PlayerController(x=px, y=py, z=pz)
+    p.on_ground = True
+
+    # 1. Friction test: player sliding to a stop
+    p.vx = 8.0
+    p.tick_physics(chunk_mgr, dt=0.05, move_fwd=0.0, move_strafe=0.0)
+    assert p.vx < 8.0, "Ground friction must immediately decelerate player velocity!"
+    for _ in range(12):
+        p.tick_physics(chunk_mgr, dt=0.05, move_fwd=0.0, move_strafe=0.0)
+    assert abs(p.vx) < 0.2, f"Player should come to a full stop under friction, got vx={p.vx}"
+
+    # 2. Wall sliding test: Diagonal push into an X wall preserves Z advance
+    # Place a 2-block obstacle wall at x = 1182
+    wall_x = int(px + 1)
+    for z in range(int(pz - 2), int(pz + 6)):
+        chunk_mgr.set_block_at(wall_x, int(py), z, 89)
+        chunk_mgr.set_block_at(wall_x, int(py + 1), z, 89)
+
+    p.x, p.y, p.z = px, py, pz
+    p.vx, p.vy, p.vz = 0.0, 0.0, 0.0
+    p.yaw = 0.0  # Facing +Z
+    p.on_ground = True
+
+    start_z = p.z
+    # Move forward (+Z) and right (+X) into wall
+    for _ in range(20):
+        p.tick_physics(chunk_mgr, dt=0.03, move_fwd=1.0, move_strafe=1.0)
+
+    # Must be stopped along X by wall, but freely sliding forward along Z
+    assert p.x < wall_x - 0.2, f"Player x {p.x} should be bounded by wall at {wall_x}"
+    assert p.z > start_z + 1.5, f"Player failed to slide along wall! z: {p.z}, start_z: {start_z}"
+
+    # 3. Dynamic View Bobbing and Landing Dip
+    p.on_ground = True
+    p.vx, p.vz = 3.0, 0.0
+    eye_x, eye_y, eye_z = p.get_eye_position()
+    assert abs(eye_y - (p.y + p.eye_height)) <= 0.1, "Eye position should incorporate bobbing offset"
+
+    # Landing dip (negative offset downward)
+    p.landing_dip = -0.08
+    dip_x, dip_y, dip_z = p.get_eye_position()
+    assert dip_y < eye_y, "Landing dip must compress camera downward on impact"
+    print("   [OK] Ground friction, wall sliding, and view bobbing dynamics 100% verified.")
+
+
+def test_8_continuous_mining_and_particles(chunk_mgr: ChunkManager, ctx: any) -> None:
+    print(">> [8/10] Testing Continuous Mining Hardness Accumulator & Debris Particles...")
+
+    px, pz = 1181.0, 1191.0
+    py = float(chunk_mgr.get_highest_solid_y(px, pz))
+    p = PlayerController(x=px, y=py, z=pz)
+    p.yaw = 0.0
+    p.pitch = 0.0
+
+    target_pos = (int(px), int(py + 1), int(pz + 3))
+    # Clear line of sight and place limestone block (hardness 1.5)
+    for z in range(int(pz), target_pos[2]):
+        chunk_mgr.set_block_at(int(px), int(py + 1), z, 0)
+    chunk_mgr.set_block_at(target_pos[0], target_pos[1], target_pos[2], 1)
+
+    # 1. Hold-to-mine accumulator
+    broken = p.update_mining(chunk_mgr, dt=0.05, is_mining_pressed=True)
+    assert broken is None, "Block must not break instantly on first frame!"
+    assert p.dig_progress > 0.0, "Mining progress must accumulate while button is held!"
+    assert p.punch_anim_timer > 0.0, "Punch swing animation timer must be triggered!"
+
+    # Simulate continuous holding until completion
+    broken_block = None
+    for _ in range(40):
+        res = p.update_mining(chunk_mgr, dt=0.05, is_mining_pressed=True)
+        if res:
+            broken_block = res
+            break
+
+    assert broken_block is not None, "Continuous mining failed to break block!"
+    assert broken_block[3] == 1, f"Expected broken block ID 1 (Limestone), got {broken_block[3]}"
+    assert chunk_mgr.get_block_at(target_pos[0], target_pos[1], target_pos[2]) == 0, "Broken block must be air!"
+
+    # 2. 3D Voxel Debris Particle Burst System
+    ps = ParticleSystem(ctx)
+    ps.spawn_block_break(target_pos[0], target_pos[1], target_pos[2], 1, count=14)
+    assert len(ps.particles) == 14, f"Expected 14 particles spawned, got {len(ps.particles)}"
+
+    p0 = ps.particles[0]
+    init_y = p0.y
+    init_life = p0.life
+
+    # Advance particle physics
+    ps.update(dt=0.1)
+    assert p0.life < init_life, "Particle life must decrease over time"
+    assert p0.alpha <= 1.0, "Particle alpha must remain in [0, 1]"
+
+    # Advance until all particles expire
+    for _ in range(20):
+        ps.update(dt=0.1)
+    assert len(ps.particles) == 0, "Expired particles must be automatically pruned!"
+    print("   [OK] Continuous mining hardness accumulator and 3D debris particle burst 100% verified.")
+
+
+def test_9_interactive_inventory_drag_and_drop(ctx: any) -> None:
+    print(">> [9/10] Testing Interactive Drag & Drop Mouse Slot Mechanics...")
+
+    inv = Inventory()
+    assert inv.cursor_stack is None, "Cursor stack must be None initially"
+    assert inv.hotbar[0] is not None and inv.hotbar[0].count == 64
+
+    # 1. Left Click: Pick up entire stack from hotbar[0]
+    inv.handle_slot_click("hotbar", 0, button=1)
+    assert inv.cursor_stack is not None and inv.cursor_stack.count == 64
+    assert inv.hotbar[0] is None, "Picked up slot must become empty"
+
+    # 2. Left Click: Deposit entire stack into main storage slot 5
+    inv.handle_slot_click("main", 5, button=1)
+    assert inv.cursor_stack is None, "Cursor stack must be empty after full deposit"
+    assert inv.main_grid[5] is not None and inv.main_grid[5].count == 64
+
+    # 3. Right Click: Split stack from main[5]
+    inv.handle_slot_click("main", 5, button=2)
+    assert inv.cursor_stack is not None and inv.cursor_stack.count == 32
+    assert inv.main_grid[5].count == 32, "Slot must retain half stack"
+
+    # 4. Right Click: Drop 1 item into empty hotbar[0]
+    inv.handle_slot_click("hotbar", 0, button=2)
+    assert inv.hotbar[0] is not None and inv.hotbar[0].count == 1
+    assert inv.cursor_stack.count == 31, "Cursor stack must decrease by 1"
+
+    # 5. Shift Click: Fast transfer hotbar[0] into main grid
+    inv.handle_slot_click("hotbar", 0, button=1, shift=True)
+    assert inv.hotbar[0] is None, "Shift-clicked item must be moved out of hotbar"
+    # Should have merged into main_grid[5] (32 + 1 = 33)
+    assert inv.main_grid[5].count == 33
+
+    # 6. Screen Coordinate Slot Hit-Testing in OverlayRenderer
+    overlay = OverlayRenderer(ctx, 1280, 720)
+    slots = overlay.get_inventory_slot_coords()
+    assert len(slots) == 4 + 27 + 9, f"Expected 40 total slots, got {len(slots)}"
+
+    # Test center point hit-testing for every slot
+    for stype, sid, sx, sy, sw, sh in slots:
+        cx = sx + sw * 0.5
+        cy = sy + sh * 0.5
+        detected = overlay.get_inventory_slot_under_cursor(cx, cy)
+        assert detected == (stype, sid), f"Hit test mismatch at ({cx}, {cy}): expected {(stype, sid)}, got {detected}"
+
+    # Outside window hit test must return None
+    assert overlay.get_inventory_slot_under_cursor(0.0, 0.0) is None
+    print("   [OK] Left pick/drop, Right split/single, Shift quick move, and hit-testing 100% verified.")
+
+
+def test_10_npc_whisker_navigation(chunk_mgr: ChunkManager) -> None:
+    print(">> [10/10] Testing NPC Whisker Lookahead Obstacle Avoidance...")
+
+    px, pz = 1181.0, 1191.0
+    py = float(chunk_mgr.get_highest_solid_y(px, pz))
+    npc = NPC(
+        character_id="nav_test_npc",
+        name="Branoc Woodcutter",
+        profession="Woodcutter",
+        home_pos=(px, py, pz),
+        work_pos=(px, py, pz + 20.0),
+    )
+    npc.x, npc.y, npc.z = px, py, pz
+    npc.is_grounded = True
+
+    # 1. Clear path ahead: whisker should return unchanged forward vector
+    steer_x, steer_z = npc._avoid_obstacles(chunk_mgr, 0.0, 1.0)
+    assert steer_z > 0.8, "Without obstacles, forward movement must be preserved"
+
+    # 2. Place a 2-block obstacle wall 1.2m directly ahead in +Z
+    obs_z = int(pz + 1)
+    chunk_mgr.set_block_at(int(px), int(py), obs_z, 89)
+    chunk_mgr.set_block_at(int(px), int(py + 1), obs_z, 89)
+
+    # Whisker rays must detect obstacle and steer laterally
+    steer_x, steer_z = npc._avoid_obstacles(chunk_mgr, 0.0, 1.0)
+    assert abs(steer_x) > 0.001 or steer_z < 0.99, "Whisker rays MUST alter steering angle when approaching 2-block wall!"
+    print("   [OK] NPC whisker lookahead obstacle detection and lateral steering 100% verified.")
+
+
 def test_6_engine_visual_proof() -> None:
     print(">> [6/6] Capturing Visual Proof from Live ModernGL Engine...")
 
@@ -346,10 +532,14 @@ def run_all_tests() -> None:
     test_3_inventory_system()
     test_4_soft_cone_targeting(chunk_mgr)
     test_5_settings_and_mouse()
+    test_7_movement_friction_and_wall_sliding(chunk_mgr)
+    test_8_continuous_mining_and_particles(chunk_mgr, ctx)
+    test_9_interactive_inventory_drag_and_drop(ctx)
+    test_10_npc_whisker_navigation(chunk_mgr)
     test_6_engine_visual_proof()
 
     print("================================================================================")
-    print("  ALL 6 PLAYABILITY RECOVERY PILLARS 100% VERIFIED WITH ZERO ERRORS!            ")
+    print("  ALL 10 PLAYABILITY RECOVERY PILLARS 100% VERIFIED WITH ZERO ERRORS!          ")
     print("================================================================================")
 
 

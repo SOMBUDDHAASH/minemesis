@@ -260,6 +260,39 @@ class NPC:
 
         return ""
 
+    def _avoid_obstacles(self, chunk_mgr: any, dir_x: float, dir_z: float) -> Tuple[float, float]:
+        """Whisker Obstacle Avoidance (Veloren / Luanti steering model)."""
+        if chunk_mgr is None:
+            return dir_x, dir_z
+
+        ahead_x = self.x + dir_x * 1.2
+        ahead_z = self.z + dir_z * 1.2
+        ahead_y = chunk_mgr.get_highest_solid_y(ahead_x, ahead_z)
+
+        # If blocked by obstacle taller than step height (e.g. 2-block wall, tree, cottage)
+        if ahead_y - self.y > self.STEP_HEIGHT:
+            base_angle = math.atan2(dir_z, dir_x)
+            # Whisker Left (+40 deg)
+            w_left_a = base_angle + 0.70
+            wl_x = self.x + math.cos(w_left_a) * 1.2
+            wl_z = self.z + math.sin(w_left_a) * 1.2
+            wl_y = chunk_mgr.get_highest_solid_y(wl_x, wl_z)
+
+            # Whisker Right (-40 deg)
+            w_right_a = base_angle - 0.70
+            wr_x = self.x + math.cos(w_right_a) * 1.2
+            wr_z = self.z + math.sin(w_right_a) * 1.2
+            wr_y = chunk_mgr.get_highest_solid_y(wr_x, wr_z)
+
+            if wl_y - self.y <= self.STEP_HEIGHT:
+                return math.cos(w_left_a), math.sin(w_left_a)
+            elif wr_y - self.y <= self.STEP_HEIGHT:
+                return math.cos(w_right_a), math.sin(w_right_a)
+            else:
+                return math.cos(base_angle + 1.57), math.sin(base_angle + 1.57)
+
+        return dir_x, dir_z
+
     def update_physics(self, chunk_mgr: any, dt: float) -> None:
         """
         Conforms NPC position to voxel terrain:
@@ -377,7 +410,7 @@ class NPC:
                     self.current_activity = "Socializing & drinking ale at Village Tavern"
                     self.target_pos = self.tavern_pos
 
-        # Move smoothly toward target position
+        # Move smoothly toward target position with whisker lookahead obstacle avoidance
         tx, ty, tz = self.target_pos
         dx = tx - self.x
         dz = tz - self.z
@@ -385,9 +418,15 @@ class NPC:
 
         if dist > 0.6:
             move_speed = 3.5 * dt if (self.is_fleeing or self.is_hostile) else 1.8 * dt
-            self.x += (dx / dist) * min(move_speed, dist)
-            self.z += (dz / dist) * min(move_speed, dist)
-            self.yaw = math.degrees(math.atan2(-dx, dz))
+            dir_x = dx / dist
+            dir_z = dz / dist
+
+            # Whisker Obstacle Avoidance (Veloren / Luanti steering model)
+            dir_x, dir_z = self._avoid_obstacles(chunk_mgr, dir_x, dir_z)
+
+            self.x += dir_x * min(move_speed, dist)
+            self.z += dir_z * min(move_speed, dist)
+            self.yaw = math.degrees(math.atan2(-dir_x, dir_z))
 
         # Terrain physics conform
         if chunk_mgr is not None:

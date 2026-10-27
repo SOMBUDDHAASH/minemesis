@@ -125,6 +125,103 @@ class Inventory:
         list_a[slot_a] = item_b
         list_b[slot_b] = item_a
 
+    def get_slot_item(self, slot_type: str, slot_id: any) -> Optional[ItemStack]:
+        if slot_type == "hotbar" and 0 <= int(slot_id) < self.HOTBAR_SIZE:
+            return self.hotbar[int(slot_id)]
+        elif slot_type == "main" and 0 <= int(slot_id) < self.MAIN_GRID_SIZE:
+            return self.main_grid[int(slot_id)]
+        elif slot_type == "equipment" and str(slot_id) in self.equipment:
+            return self.equipment[str(slot_id)]
+        return None
+
+    def set_slot_item(self, slot_type: str, slot_id: any, item: Optional[ItemStack]) -> None:
+        if slot_type == "hotbar" and 0 <= int(slot_id) < self.HOTBAR_SIZE:
+            self.hotbar[int(slot_id)] = item
+        elif slot_type == "main" and 0 <= int(slot_id) < self.MAIN_GRID_SIZE:
+            self.main_grid[int(slot_id)] = item
+        elif slot_type == "equipment" and str(slot_id) in self.equipment:
+            self.equipment[str(slot_id)] = item
+
+    def handle_slot_click(self, slot_type: str, slot_id: any, button: int = 1, shift: bool = False) -> None:
+        """
+        Interactive Mouse Drag & Drop handler (Blatantly copied from Luanti / Minecraft):
+        - button 1 (Left click): Pick up / Drop entire stack
+        - button 2 (Right click): Split half stack (if empty cursor) or drop 1 item (if holding cursor stack)
+        - shift + click: Quick transfer between hotbar and main storage
+        """
+        current_item = self.get_slot_item(slot_type, slot_id)
+
+        # 1. Shift-Click Quick Move between hotbar and main storage
+        if shift and current_item:
+            if slot_type == "hotbar":
+                rem = self.add_to_list(self.main_grid, current_item)
+                if rem == 0:
+                    self.set_slot_item(slot_type, slot_id, None)
+            elif slot_type == "main":
+                rem = self.add_to_list(self.hotbar, current_item)
+                if rem == 0:
+                    self.set_slot_item(slot_type, slot_id, None)
+            return
+
+        # 2. Left Click (Button 1): Full stack pickup / deposit / swap
+        if button == 1:
+            if self.cursor_stack is None:
+                if current_item is not None:
+                    self.cursor_stack = current_item
+                    self.set_slot_item(slot_type, slot_id, None)
+            else:
+                if current_item is None:
+                    self.set_slot_item(slot_type, slot_id, self.cursor_stack)
+                    self.cursor_stack = None
+                elif self.cursor_stack.can_stack_with(current_item):
+                    rem = current_item.add(self.cursor_stack.count)
+                    if rem == 0:
+                        self.cursor_stack = None
+                    else:
+                        self.cursor_stack.count = rem
+                else:
+                    self.set_slot_item(slot_type, slot_id, self.cursor_stack)
+                    self.cursor_stack = current_item
+
+        # 3. Right Click (Button 2): Split or single item drop
+        elif button == 2:
+            if self.cursor_stack is None:
+                if current_item and current_item.count > 1:
+                    half = current_item.count // 2
+                    self.cursor_stack = current_item.split(half)
+                elif current_item:
+                    self.cursor_stack = current_item
+                    self.set_slot_item(slot_type, slot_id, None)
+            else:
+                if current_item is None:
+                    single = self.cursor_stack.split(1)
+                    self.set_slot_item(slot_type, slot_id, single)
+                    if self.cursor_stack.count <= 0:
+                        self.cursor_stack = None
+                elif self.cursor_stack.can_stack_with(current_item):
+                    rem = current_item.add(1)
+                    if rem == 0:
+                        self.cursor_stack.count -= 1
+                        if self.cursor_stack.count <= 0:
+                            self.cursor_stack = None
+
+    def add_to_list(self, target_list: List[Optional[ItemStack]], item: ItemStack) -> int:
+        rem = item.count
+        for s in target_list:
+            if s and s.can_stack_with(item):
+                rem = s.add(rem)
+                if rem <= 0:
+                    return 0
+        for i in range(len(target_list)):
+            if target_list[i] is None:
+                to_place = min(64, rem)
+                target_list[i] = ItemStack(block_id=item.block_id, count=to_place, metadata=dict(item.metadata))
+                rem -= to_place
+                if rem <= 0:
+                    return 0
+        item.count = rem
+        return rem
+
     def to_dict(self) -> dict:
         return {
             "selected_slot": self.selected_slot,
