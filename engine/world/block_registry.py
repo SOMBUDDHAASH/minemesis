@@ -55,7 +55,12 @@ class BlockRegistry:
         return self.blocks_by_name.get(name)
 
     def is_solid(self, block_id: int) -> bool:
-        return block_id in self.solid_ids
+        if block_id == 0:
+            return False
+        b = self.get_by_id(block_id)
+        if not b:
+            return False
+        return b.category not in ("fluid", "flora", "special")
 
     def is_transparent(self, block_id: int) -> bool:
         return block_id == 0 or block_id in self.transparent_ids

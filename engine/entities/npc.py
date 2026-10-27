@@ -185,10 +185,15 @@ class NPC:
         self.patrol_index: int = 0
         self.patrol_timer: float = 0.0
 
-        # Physical location
+        # Physical location & Terrain Physics
         self.x = home_pos[0]
         self.y = home_pos[1]
         self.z = home_pos[2]
+        self.vy: float = 0.0
+        self.is_grounded: bool = True
+        self.GRAVITY: float = 24.0          # m/s^2
+        self.STEP_HEIGHT: float = 1.1       # Can step up 1.1m slopes/steps
+        self.SNAP_DISTANCE: float = 0.15    # Foot snap threshold to ground surface
         self.yaw: float = 0.0
         self.target_pos = work_pos
 
@@ -255,8 +260,58 @@ class NPC:
 
         return ""
 
-    def update_schedule(self, time_of_day_progress: float, dt: float) -> None:
-        """Evaluates diurnal schedule, curfew, grief, and moves toward current goal."""
+    def update_physics(self, chunk_mgr: any, dt: float) -> None:
+        """
+        Conforms NPC position to voxel terrain:
+        - Downward gravity acceleration when in air
+        - Auto-stepping up to 1.1m slopes
+        - Precise foot-snapping to ground surface
+        - Absolute prevention of floating or falling through terrain
+        """
+        if not self.alive or chunk_mgr is None:
+            return
+
+        ground_y = chunk_mgr.get_highest_solid_y(self.x, self.z, max_y=int(self.y + 4))
+
+        # Check step-up condition (walking up a 1-block slope/ledge <= 1.1m)
+        delta_y = ground_y - self.y
+        if 0.0 < delta_y <= self.STEP_HEIGHT:
+            self.y = ground_y
+            self.vy = 0.0
+            self.is_grounded = True
+            return
+
+        # Check step-down condition (walking down a 1-block slope/ledge <= 1.1m while grounded)
+        if self.is_grounded and 0.0 <= -delta_y <= self.STEP_HEIGHT:
+            self.y = ground_y
+            self.vy = 0.0
+            self.is_grounded = True
+            return
+
+        # Air physics (falling under gravity off ledge > 1.1m)
+        if self.y > ground_y + self.SNAP_DISTANCE:
+            self.vy = max(-30.0, self.vy - self.GRAVITY * dt)
+            next_y = self.y + self.vy * dt
+            if next_y <= ground_y:
+                self.y = ground_y
+                self.vy = 0.0
+                self.is_grounded = True
+            else:
+                self.y = next_y
+                self.is_grounded = False
+        else:
+            # On ground or within snap distance or sunken into slope
+            self.y = ground_y
+            self.vy = 0.0
+            self.is_grounded = True
+
+    def update_schedule(
+        self,
+        time_of_day_progress: float,
+        dt: float,
+        chunk_mgr: Optional[any] = None,
+    ) -> None:
+        """Evaluates diurnal schedule, curfew, grief, and moves toward current goal with terrain physics."""
         if not self.alive:
             return
 
@@ -333,6 +388,10 @@ class NPC:
             self.x += (dx / dist) * min(move_speed, dist)
             self.z += (dz / dist) * min(move_speed, dist)
             self.yaw = math.degrees(math.atan2(-dx, dz))
+
+        # Terrain physics conform
+        if chunk_mgr is not None:
+            self.update_physics(chunk_mgr, dt)
 
     def render(
         self,

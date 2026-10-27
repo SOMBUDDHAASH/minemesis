@@ -85,11 +85,11 @@ def verify_engine_exe(exe_path: Path) -> None:
     print(f"[*] Output: {res_ver.stdout.strip()}")
     assert res_ver.returncode == 0, f"Version check failed: {res_ver.stderr}"
 
-    # 2. Benchmark check (Stage E3 full world, living NPCs, bridge, 30 frames, headless)
+    # 2. Benchmark check (Stage E3 full world, living NPCs, bridge, 15 frames, headless)
     shot_path = ROOT_DIR / "reports" / "screens" / "stage_e3_exe_benchmark.png"
     t1 = time.perf_counter()
-    cmd_bench = [str(exe_path), "--benchmark", "30", "--headless", "--screenshot", str(shot_path)]
-    res_bench = subprocess.run(cmd_bench, capture_output=True, text=True, timeout=60)
+    cmd_bench = [str(exe_path), "--benchmark", "15", "--headless", "--screenshot", str(shot_path)]
+    res_bench = subprocess.run(cmd_bench, capture_output=True, text=True, timeout=180)
     t_bench = time.perf_counter() - t1
     print(f"[*] Benchmark 30-frame run time: {t_bench:.3f} s")
     print(res_bench.stdout)

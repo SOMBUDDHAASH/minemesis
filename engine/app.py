@@ -16,6 +16,7 @@ from PIL import Image
 
 from engine.core.window import Window
 from engine.core.timer import FrameTimer
+from engine.core.settings import GameSettings
 from engine.core.process_bridge import SimulationBridge
 from engine.entities.npc import NPC, VoxelHumanoidMesh
 from engine.entities.interaction import InteractionEngine
@@ -23,6 +24,7 @@ from engine.entities.book_reader import BookReader
 from engine.physics.player import PlayerController
 from engine.render.context import RenderContext
 from engine.render.camera import Camera3D
+from engine.render.highlight import BlockHighlightRenderer
 from engine.render.shader import (
     ShaderProgram,
     BASIC_VOXEL_VERTEX_SHADER,
@@ -83,13 +85,19 @@ class EngineApp:
         # 6. Sky & Day/Night Cycle
         self.sky = SkyLighting()
 
+        # 7. Game Settings & Smoothing
+        self.settings = GameSettings.load()
+        self.smooth_dx: float = 0.0
+        self.smooth_dy: float = 0.0
+        self.highlight_renderer = BlockHighlightRenderer(self.ctx)
+
         # Window resize binding
         self.window.resize_callback = self._on_resize
 
-        # 7. World Spec & Voxel Pipeline
+        # 8. World Spec & Voxel Pipeline
         if self.spike_mode:
             # Stage E0 Spike Mode: Spinning textured cube
-            self.camera = Camera3D(fov=65.0, aspect=width / float(height), near=0.1, far=500.0, x=0.0, y=1.2, z=-3.2)
+            self.camera = Camera3D(fov=self.settings.fov, aspect=width / float(height), near=0.1, far=500.0, x=0.0, y=1.2, z=-3.2)
             self.cube_mesh = VoxelCubeMesh(self.ctx, self.atlas)
             self.cube_vao = self.cube_mesh.create_vao(self.shader.program)
             self.cube_rot_x: float = 0.0
@@ -111,22 +119,23 @@ class EngineApp:
                 view_distance=view_distance,
             )
 
-            # Player Controller
+            # Player Controller (Grounded, Fly Mode False by default)
             self.player = PlayerController()
+            self.player.fly_mode = self.settings.fly_mode
 
-            # Spawn player at the first settlement
+            # Spawn player at the first settlement flush on highest solid voxel
             if self.world_spec.settlements:
                 s0 = self.world_spec.settlements[0]
                 sp_x = s0.x * 8 + 4
                 sp_z = s0.y * 8 + 4
-                sp_y = float(self.chunk_mgr.generator.get_interpolated_height(sp_x, sp_z) + 3)
+                sp_y = float(self.chunk_mgr.get_highest_solid_y(sp_x, sp_z) + 1.0)
                 self.player.x = float(sp_x)
                 self.player.y = sp_y
                 self.player.z = float(sp_z)
 
             # Camera
             self.camera = Camera3D(
-                fov=70.0,
+                fov=self.settings.fov,
                 aspect=width / float(height),
                 near=0.1,
                 far=600.0,
@@ -147,6 +156,8 @@ class EngineApp:
             self.paused: bool = False
             self.show_chronicle: bool = False
             self.show_world_map: bool = False
+            self.show_inventory: bool = False
+            self.show_settings: bool = False
             self.save_message: str = ""
 
             # Stage E2: Living Entities, Schedules, and Book Archives
@@ -199,7 +210,7 @@ class EngineApp:
             for c in sim_chars:
                 family_clans.setdefault(c.last_name, []).append(c)
 
-            # Assign distinct home coordinates per family clan
+            # Assign distinct home coordinates per family clan flush on top of solid voxel
             family_homes: dict[str, tuple[float, float, float]] = {}
             clan_names = list(family_clans.keys())
             for idx, cname in enumerate(clan_names):
@@ -207,7 +218,7 @@ class EngineApp:
                 dist = 14.0 + (idx % 3) * 6.0
                 hx = bx + math.cos(angle) * dist
                 hz = bz + math.sin(angle) * dist
-                hy = float(self.chunk_mgr.generator.get_interpolated_height(int(hx), int(hz)) + 1)
+                hy = float(self.chunk_mgr.get_highest_solid_y(hx, hz))
                 family_homes[cname] = (hx, hy, hz)
 
             # Target 22 visible villagers for spawn settlement set_0 (and 12 for others)
@@ -242,19 +253,27 @@ class EngineApp:
             if not has_priest and len(selected_chars) > 0 and selected_chars[0] != chief_char:
                 selected_chars[0].profession = "Scholar"
 
-            # Common settlement landmarks
-            well_pos = (bx, by, bz)
-            shrine_pos = (bx + 16.0, by, bz + 12.0)
-            tavern_pos = (bx - 12.0, by, bz + 10.0)
-            guard_patrols = [
-                (bx + 22.0, by, bz + 22.0),
-                (bx - 22.0, by, bz + 22.0),
-                (bx - 22.0, by, bz - 22.0),
-                (bx + 22.0, by, bz - 22.0),
-            ]
+            # Common settlement landmarks with precise surface grounding
+            well_y = float(self.chunk_mgr.get_highest_solid_y(bx, bz))
+            well_pos = (bx, well_y, bz)
+
+            sh_x, sh_z = bx + 16.0, bz + 12.0
+            shrine_pos = (sh_x, float(self.chunk_mgr.get_highest_solid_y(sh_x, sh_z)), sh_z)
+
+            tav_x, tav_z = bx - 12.0, bz + 10.0
+            tavern_pos = (tav_x, float(self.chunk_mgr.get_highest_solid_y(tav_x, tav_z)), tav_z)
+
+            guard_patrols = []
+            for gx, gz in [
+                (bx + 22.0, bz + 22.0),
+                (bx - 22.0, bz + 22.0),
+                (bx - 22.0, bz - 22.0),
+                (bx + 22.0, bz - 22.0),
+            ]:
+                guard_patrols.append((gx, float(self.chunk_mgr.get_highest_solid_y(gx, gz)), gz))
 
             for c_idx, c in enumerate(selected_chars):
-                home = family_homes.get(c.last_name, (bx, by, bz))
+                home = family_homes.get(c.last_name, (bx, well_y, bz))
 
                 # Determine workplace based on actual profession
                 if c.profession in ("Smith", "Blacksmith"):
@@ -271,6 +290,10 @@ class EngineApp:
                     work = (bx, by, bz - 12.0)
                 else:
                     work = (bx + ((c_idx % 4) * 4.0 - 6.0), by, bz + ((c_idx % 3) * 4.0 - 4.0))
+
+                # Ground workplace elevation
+                wx, _, wz = work
+                work = (wx, float(self.chunk_mgr.get_highest_solid_y(wx, wz)), wz)
 
                 # Identify spouse name
                 spouse_name = None
@@ -327,6 +350,10 @@ class EngineApp:
                     well_pos=well_pos,
                     guard_patrol_points=guard_patrols,
                 )
+
+                # Ensure NPC spawn feet are grounded flush on solid surface
+                npc.y = float(self.chunk_mgr.get_highest_solid_y(npc.x, npc.z))
+                npc.is_grounded = True
 
                 # Cache living kin names for fast lookup
                 for kid in list(c.children_ids) + sibling_ids + ([c.spouse_id] if c.spouse_id else []):
@@ -473,6 +500,45 @@ class EngineApp:
             self.overlay.render_centered_overlay(map_lines)
             return
 
+        # Handle modal states: Inventory Panel [I / Tab]
+        if self.show_inventory:
+            if inp.is_key_pressed(glfw.KEY_ESCAPE) or inp.is_key_pressed(glfw.KEY_I) or inp.is_key_pressed(glfw.KEY_TAB):
+                self.show_inventory = False
+                self.window.set_mouse_capture(True)
+
+            # Hotbar slot selection 1-9 in inventory
+            for k in range(glfw.KEY_1, glfw.KEY_9 + 1):
+                if inp.is_key_pressed(k):
+                    p.selected_slot = k - glfw.KEY_1
+
+            self._render_3d_scene(p)
+            self.overlay.render_inventory_gui(p.inventory)
+            return
+
+        # Handle modal states: Settings Menu [O]
+        if self.show_settings:
+            if inp.is_key_pressed(glfw.KEY_ESCAPE) or inp.is_key_pressed(glfw.KEY_O):
+                self.show_settings = False
+                self.settings.save()
+                self.window.set_mouse_capture(True)
+            elif inp.is_key_pressed(glfw.KEY_1):
+                self.settings.cycle_sensitivity()
+            elif inp.is_key_pressed(glfw.KEY_2):
+                self.settings.toggle_smoothing()
+            elif inp.is_key_pressed(glfw.KEY_3):
+                self.settings.cycle_fov()
+                self.camera.fov = self.settings.fov
+                self.camera.update_projection(self.width / float(self.height))
+            elif inp.is_key_pressed(glfw.KEY_4):
+                self.settings.toggle_invert_y()
+            elif inp.is_key_pressed(glfw.KEY_5):
+                self.settings.toggle_fly_mode()
+                self.player.fly_mode = self.settings.fly_mode
+
+            self._render_3d_scene(p)
+            self.overlay.render_settings_menu(self.settings)
+            return
+
         # Handle modal states: Pause Menu
         if self.paused:
             if inp.is_key_pressed(glfw.KEY_ESCAPE) or inp.is_key_pressed(glfw.KEY_1):
@@ -490,6 +556,9 @@ class EngineApp:
             elif inp.is_key_pressed(glfw.KEY_5):
                 self.bridge.skip_time(8.0, self)
                 self.save_message = "Slept until sunrise (06:00). History and crops advanced!"
+            elif inp.is_key_pressed(glfw.KEY_6):
+                self.paused = False
+                self.show_settings = True
 
             self._render_3d_scene(p)
             pause_lines = [
@@ -501,6 +570,7 @@ class EngineApp:
                 "[3] Historical Chronicle (J)",
                 "[4] Quick Save World State",
                 "[5] Sleep Until Morning (Advance 8h)",
+                "[6] Game & Input Settings (O)",
                 "[Esc] Resume Game",
                 "--------------------------------------------------",
             ]
@@ -586,6 +656,19 @@ class EngineApp:
             self.show_world_map = True
             self.window.set_mouse_capture(False)
 
+        # Inventory [I / Tab] and Settings [O]
+        if inp.is_key_pressed(glfw.KEY_I) or inp.is_key_pressed(glfw.KEY_TAB):
+            self.show_inventory = True
+            self.window.set_mouse_capture(False)
+        elif inp.is_key_pressed(glfw.KEY_O):
+            self.show_settings = True
+            self.window.set_mouse_capture(False)
+
+        # Direct Fly Mode Toggle [F]
+        if inp.is_key_pressed(glfw.KEY_F):
+            self.settings.toggle_fly_mode()
+            self.player.fly_mode = self.settings.fly_mode
+
         # Advance diurnal time cycle [T] (+6 hours: Dawn -> Work -> Tavern -> Night Curfew)
         if inp.is_key_pressed(glfw.KEY_T):
             self.sky.time_of_day = (self.sky.time_of_day + 300.0) % 1200.0
@@ -602,11 +685,22 @@ class EngineApp:
         if inp.is_key_pressed(glfw.KEY_F5):
             self.chunk_mgr.chunk_debug_colors = not self.chunk_mgr.chunk_debug_colors
 
-        # Mouse look
+        # Mouse look with Raw Input & Exponential Smoothing
         if inp.mouse_captured:
-            sensitivity = 0.15
-            p.yaw = (p.yaw - inp.delta_x * sensitivity) % 360.0
-            p.pitch = max(-89.0, min(89.0, p.pitch - inp.delta_y * sensitivity))
+            sens = self.settings.mouse_sensitivity
+            if self.settings.camera_smoothing:
+                smooth = self.settings.smoothing_factor
+                self.smooth_dx = self.smooth_dx * (1.0 - smooth) + inp.delta_x * smooth
+                self.smooth_dy = self.smooth_dy * (1.0 - smooth) + inp.delta_y * smooth
+                dx_val = self.smooth_dx
+                dy_val = self.smooth_dy
+            else:
+                dx_val = inp.delta_x
+                dy_val = inp.delta_y
+
+            inv_factor = -1.0 if self.settings.invert_y else 1.0
+            p.yaw = (p.yaw - dx_val * sens) % 360.0
+            p.pitch = max(-89.0, min(89.0, p.pitch - dy_val * sens * inv_factor))
 
         # Keyboard movement
         move_fwd = 0.0
@@ -677,11 +771,11 @@ class EngineApp:
         # 4. Advance Day & Night Cycle
         self.sky.tick(dt)
 
-        # 5. Advance NPC Schedules and AI
+        # 5. Advance NPC Schedules and AI with Terrain Physics
         for npc in self.npcs:
             d = math.sqrt((p.x - npc.x) ** 2 + (p.z - npc.z) ** 2)
             if d < 120.0:
-                npc.update_schedule(self.sky.progress, dt)
+                npc.update_schedule(self.sky.progress, dt, self.chunk_mgr)
 
         # 6. Render 3D Scene
         draw_calls = self._render_3d_scene(p)
@@ -707,11 +801,10 @@ class EngineApp:
             if nearest_npc:
                 action_prompt = f" >> PRESS [E] TO SPEAK WITH {nearest_npc.name.upper()} ({nearest_npc.profession}) <<"
 
-            # Active Hotbar Block
-            sel_bid = p.hotbar[p.selected_slot]
-            sel_bdef = registry.get_by_id(sel_bid)
-            sel_name = sel_bdef.name if sel_bdef else f"Item #{sel_bid}"
-            sel_count = p.inventory.get(sel_bid, 0)
+            # Active Hotbar Item
+            active_item = p.inventory.get_active_item()
+            sel_name = active_item.name if active_item else "Empty Slot"
+            sel_count = active_item.count if active_item else 0
 
             # Nearest Settlement
             near_set = "Wilderness"
@@ -747,33 +840,34 @@ class EngineApp:
                     break
             standing = self.interaction.reputation.get_title(active_set_id)
             rep_score = self.interaction.reputation.get_score(active_set_id)
+            fly_str = " | FLY MODE: [ON]" if p.fly_mode else ""
 
             lines = [
-                f"MINEMESIS | LIVING CIVILIZATION SANDBOX | FPS: {self.timer.fps:.1f}",
+                f"MINEMESIS | LIVING CIVILIZATION SANDBOX | FPS: {self.timer.fps:.1f}{fly_str}",
                 f"World Clock: Year {sim_year} | Time: {hour:02d}:{minute:02d} [{time_phase}] [Press T to Advance]",
                 f"Social Standing: {standing} ({rep_score:+.0f}) in {near_set}",
-                f"Camera XYZ: {self.camera.x:.2f} / {self.camera.y:.2f} / {self.camera.z:.2f} | Chunks Rendered: {self.chunk_mgr.chunks_rendered}",
+                f"Camera XYZ: {self.camera.x:.2f} / {self.camera.y:.2f} / {self.camera.z:.2f} | Ground: {p.on_ground} | Chunks Rendered: {self.chunk_mgr.chunks_rendered}",
                 f"Targeting: {target_str}",
                 f"Hand: {sel_name} ({sel_count}x) | Location: {near_set}",
             ]
             if nearest_npc:
                 lines.append(
-                    f" >> CITIZEN: {nearest_npc.name} (Clan {nearest_npc.last_name}, {nearest_npc.profession}) <<"
+                    f" >> CITIZEN: {nearest_npc.name} (Clan {nearest_npc.last_name}, {nearest_npc.profession}) [Grounded: {nearest_npc.is_grounded}] <<"
                 )
                 lines.append(
                     f"    Activity: {nearest_npc.current_activity} | Press [E] to Speak / Help / Attack"
                 )
             elif action_prompt:
                 lines.append(action_prompt)
-            lines.append("Controls: [WASD] Move [Space] Jump [E] Speak [T] Advance Time [J] Chronicle [F4] Wireframe [F3] HUD")
+            lines.append("Controls: [WASD] Move [Space] Jump [I] Inventory [O] Settings [F] Fly [E] Speak [T] Time [J] Chronicle [F4] Wireframe [F3] HUD")
             self.overlay.render_overlay(lines)
 
         # Crosshair in first-person gameplay
-        if not self.paused and not self.book_reader.is_reading and not self.interaction.menu_open and not self.show_chronicle and not self.show_world_map:
+        if not self.paused and not self.book_reader.is_reading and not self.interaction.menu_open and not self.show_chronicle and not self.show_world_map and not self.show_inventory and not self.show_settings:
             self.overlay.render_crosshair()
 
     def _render_3d_scene(self, p: PlayerController) -> int:
-        """Renders sky, chunks, and 3D humanoids."""
+        """Renders sky, chunks, 3D humanoids, and interaction block outlines."""
         eye_x, eye_y, eye_z = p.get_eye_position()
         sun_dir = self.sky.get_sun_direction()
         sun_col = self.sky.get_sun_color()
@@ -805,6 +899,15 @@ class EngineApp:
                 dist = math.sqrt((p.x - npc.x) ** 2 + (p.z - npc.z) ** 2)
                 if dist < float(self.view_distance * 16):
                     npc.render(self.humanoid_mesh, self.shader, self.camera)
+
+        # 3. Render Block Highlight Outline, Face Normal, and Ghost Preview (if not wireframe)
+        if not self.chunk_mgr.wireframe:
+            hit = p.raycast_block(self.chunk_mgr, 5.0)
+            if hit:
+                (hx, hy, hz), (nx, ny, nz), _ = hit
+                active_item = p.inventory.get_active_item()
+                preview_bid = active_item.block_id if active_item else None
+                self.highlight_renderer.render_highlight(self.camera, (hx, hy, hz), (nx, ny, nz), preview_bid)
 
         return draw_calls
 

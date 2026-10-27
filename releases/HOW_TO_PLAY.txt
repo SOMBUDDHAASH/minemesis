@@ -13,41 +13,70 @@ Zero external engine dependencies. Pure self-hosted procedural technology.
 CONTROLS & SHORTCUTS:
 ----------------------------------------------------------------------
   [W, A, S, D]      Move character (Forward, Left, Backward, Right)
-  [Space]           Jump (0.5m automatic stair-stepping built-in)
+  [Space]           Jump (Automatic 1.1m slope & stair-stepping built-in)
   [Left Shift]      Sprint
-  [Mouse Look]      First-person camera rotation (Pitch & Yaw)
+  [Mouse Look]      First-person camera rotation (Raw input + smoothing)
   [Mouse Left]      Mine / Break targeted voxel block
   [Mouse Right]     Place active hand block against targeted face
   [1 to 9]          Select hotbar item
   [Mouse Wheel]     Scroll through hotbar items
+  [I] / [Tab]       Toggle Minemesis Inventory & Equipment Panel
+  [O]               Toggle Settings Menu (Sensitivity, Smoothing, FOV)
+  [F]               Toggle Debug Free-Flight Mode (Terrestrial gravity default)
   [E]               Speak / Interact with living NPC in front of you
   [R]               Read Ancient Chronicle when targeting Bookshelf / Lectern
   [M]               Continental World Map overlay (settlements & defenses)
   [J]               Historical Chronicle overlay (living events ledger)
+  [T]               Advance Diurnal Time (+6 hours)
   [Esc]             Pause Game Menu / Toggle Cursor / Close Overlays
   [F3]              Toggle Debug & Profiling HUD
+  [F4]              Toggle Wireframe Rendering Mode
+  [F5]              Toggle Chunk Color Diagnostics
+
+----------------------------------------------------------------------
+MOMENT-TO-MOMENT PLAYABILITY PILLARS:
+----------------------------------------------------------------------
+1. TERRAIN-CONFORMING CITIZENS:
+   - NPCs are physically grounded to the voxel surface with gravity,
+     step-up and step-down slope physics. No floating, no burying.
+2. TERRESTRIAL PLAYER PHYSICS:
+   - Player is bound by continuous gravity (32.0 m/s^2), swept AABB
+     voxel collision, and automatic 1.1m step-up on slopes and ledges.
+3. MINEMESIS INVENTORY v1:
+   - Features standard ItemStack mechanics (up to 64 count), 9-slot
+     quick hotbar, 27-slot main storage (3x9 grid), and equipment slots.
+4. SOFT CONE AIM ASSIST & INTERACTION UX:
+   - Primary raycast is backed by an interaction cone to prevent pixel
+     misses when mining block edges.
+   - Targeted blocks show a crisp bounding box wireframe outline.
+   - Targeted face normal is highlighted with a translucent indicator.
+   - Placed blocks display a translucent ghost placement preview box.
+5. RESPONSIVE MOUSE DYNAMICS & SETTINGS:
+   - GLFW raw mouse input bypasses OS hardware acceleration.
+   - Exponential camera delta smoothing eliminates high-DPI mouse jitter.
+   - In-game Settings Menu [O] allows on-the-fly sensitivity cycling
+     (0.05 - 0.30), FOV adjustments (65° - 95°), and inverted Y-axis.
 
 ----------------------------------------------------------------------
 LIVING CIVILIZATION INTERACTIONS:
 ----------------------------------------------------------------------
 - NPCs follow real 24-hour daily schedules:
-  * 00:00 - 06:00: Sleeping at Home
-  * 06:00 - 12:00: Morning Labor at Workshops / Fields / Archives
-  * 12:00 - 14:00: Socializing at Village Well / Market
-  * 14:00 - 18:00: Afternoon Crafting & Guard Duty
-  * 18:00 - 22:00: Evening Worship at Village Shrine
-  * 22:00 - 24:00: Returning to Cottage Hearth
+  * 00:00 - 06:00: Sleeping at Home (Night Curfew enforced by Guards)
+  * 06:00 - 09:00: Morning Gathering at Village Well
+  * 09:00 - 17:00: Day Labor at Workshops / Fields / Anvils
+  * 17:00 - 21:00: Evening Fellowship at Tavern or Shrine Worship
+  * 21:00 - 24:00: Night Lantern Watch & Bedtime
 - Approach any villager and press [E]:
   * [1] Talk: Context-sensitive dialogue with the citizen
   * [2] Trade: Trade regional goods
   * [3] Gift: Increase affinity (+15)
-  * [4] Help: Learn of settlement fortification needs
+  * [4] Help: Learn of settlement fortification needs (+Reputation)
   * [5] Steal: Attempt pickpocketing (Beware: screams alert guards!)
-  * [6] Attack: Engage in combat (Witnesses scream, guards hunt you down!)
+  * [6] Attack: Engage in combat (Kinship grief, succession, outcast branding!)
 - Building Fortifications:
   * Placing stone bricks, cobblestone, or palisade walls near settlements
     increases their Defensibility Score.
-  * Villages adapt: morale rises, guards man the battlements, and
+  * Villages adapt: morale rises, guards patrol the perimeter, and
     citizens express gratitude for your walls!
 - Sleeping:
   * Open Pause Menu [Esc] and select [5] Sleep Until Morning to skip time

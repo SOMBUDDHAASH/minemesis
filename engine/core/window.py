@@ -75,7 +75,17 @@ class Window:
         self.input.mouse_captured = capture
         if capture:
             glfw.set_input_mode(self.handle, glfw.CURSOR, glfw.CURSOR_DISABLED)
+            try:
+                if hasattr(glfw, "raw_mouse_motion_supported") and glfw.raw_mouse_motion_supported():
+                    glfw.set_input_mode(self.handle, glfw.RAW_MOUSE_MOTION, glfw.TRUE)
+            except Exception:
+                pass
         else:
+            try:
+                if hasattr(glfw, "raw_mouse_motion_supported") and glfw.raw_mouse_motion_supported():
+                    glfw.set_input_mode(self.handle, glfw.RAW_MOUSE_MOTION, glfw.FALSE)
+            except Exception:
+                pass
             glfw.set_input_mode(self.handle, glfw.CURSOR, glfw.CURSOR_NORMAL)
 
     def poll_events(self) -> None:

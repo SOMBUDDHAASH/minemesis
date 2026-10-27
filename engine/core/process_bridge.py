@@ -270,7 +270,7 @@ class SimulationBridge:
             "yaw": app.player.yaw,
             "pitch": app.player.pitch,
             "selected_slot": app.player.selected_slot,
-            "inventory": app.player.inventory,
+            "inventory_v1": app.player.inventory.to_dict(),
             "hotbar": app.player.hotbar,
             "time_of_day": app.sky.time_of_day,
             "world_seed": self.seed_pair.world,
@@ -318,8 +318,10 @@ class SimulationBridge:
         app.player.yaw = player_data["yaw"]
         app.player.pitch = player_data["pitch"]
         app.player.selected_slot = player_data.get("selected_slot", 0)
-        app.player.inventory = {int(k): v for k, v in player_data.get("inventory", {}).items()}
-        app.player.hotbar = [int(x) for x in player_data.get("hotbar", [19, 51, 52, 89, 90, 97, 100, 101, 136])]
+        if "inventory_v1" in player_data:
+            app.player.inventory.from_dict(player_data["inventory_v1"])
+        else:
+            app.player.hotbar = [int(x) for x in player_data.get("hotbar", [19, 51, 52, 89, 90, 97, 100, 101, 136])]
         app.sky.time_of_day = player_data.get("time_of_day", 12.0)
 
         # Load deltas

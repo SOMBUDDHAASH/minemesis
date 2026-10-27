@@ -79,6 +79,24 @@ class ChunkManager:
         chunk = self.get_chunk(cx, cz)
         return chunk.get_block(lx, by, lz)
 
+    def get_highest_solid_y(self, x: float, z: float, max_y: int = 250) -> float:
+        """
+        Returns the Y coordinate of the top surface of the highest solid block at (x, z).
+        Scans downwards through the chunk voxel column.
+        """
+        bx = int(math.floor(x))
+        bz = int(math.floor(z))
+        cx = bx // 16
+        cz = bz // 16
+        lx = bx % 16
+        lz = bz % 16
+        chunk = self.get_chunk(cx, cz)
+        for y in range(min(255, max_y), -1, -1):
+            bid = chunk.get_block(lx, y, lz)
+            if bid != 0 and registry.is_solid(bid):
+                return float(y + 1)
+        return float(self.generator.get_interpolated_height(bx, bz) + 1)
+
     def set_block_at(self, bx: int, by: int, bz: int, block_id: int) -> bool:
         if by < 0 or by >= 256:
             return False

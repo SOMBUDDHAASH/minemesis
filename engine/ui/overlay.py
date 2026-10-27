@@ -202,6 +202,67 @@ class OverlayRenderer:
         # Restore depth testing
         self.ctx.enable(moderngl.DEPTH_TEST)
 
+    def render_inventory_gui(self, inv: any) -> None:
+        """Renders the Minemesis Inventory GUI: Equipment, 27-slot Storage, and 9-slot Hotbar."""
+        lines = [
+            "=== MINEMESIS INVENTORY & EQUIPMENT ===",
+            "Equipment:",
+        ]
+        eq_head = inv.equipment.get("head")
+        eq_chest = inv.equipment.get("chest")
+        eq_legs = inv.equipment.get("legs")
+        eq_off = inv.equipment.get("offhand")
+        lines.append(
+            f"  [Head]: {eq_head.name if eq_head else 'Empty':<14} | [Chest]: {eq_chest.name if eq_chest else 'Empty':<14} | [Legs]: {eq_legs.name if eq_legs else 'Empty':<14} | [Offhand]: {eq_off.name if eq_off else 'Empty':<14}"
+        )
+        lines.append("--------------------------------------------------------------------------------")
+        lines.append("Main Storage (3x9 Grid):")
+        for row in range(3):
+            row_slots = []
+            for col in range(9):
+                idx = row * 9 + col
+                item = inv.main_grid[idx]
+                if item:
+                    short_name = (item.name[:6] + ".") if len(item.name) > 7 else item.name
+                    row_slots.append(f"[{idx+1:02d}:{short_name}x{item.count}]")
+                else:
+                    row_slots.append(f"[{idx+1:02d}:Empty ]")
+            lines.append("  " + " ".join(row_slots[:5]))
+            lines.append("    " + " ".join(row_slots[5:]))
+
+        lines.append("--------------------------------------------------------------------------------")
+        lines.append("Active Hotbar:")
+        hotbar_slots = []
+        for i in range(inv.HOTBAR_SIZE):
+            item = inv.hotbar[i]
+            prefix = ">>" if i == inv.selected_slot else "  "
+            suffix = "<<" if i == inv.selected_slot else "  "
+            if item:
+                hotbar_slots.append(f"{prefix}[{i+1}:{item.name} x{item.count}]{suffix}")
+            else:
+                hotbar_slots.append(f"{prefix}[{i+1}:Empty]{suffix}")
+        lines.append("  " + " | ".join(hotbar_slots[:5]))
+        lines.append("  " + " | ".join(hotbar_slots[5:]))
+        lines.append("--------------------------------------------------------------------------------")
+        lines.append("Controls: [1-9] Select Hotbar Slot | [Esc / Tab / I] Return to Game")
+        self.render_centered_overlay(lines, title_color=(0.2, 0.85, 1.0, 1.0))
+
+    def render_settings_menu(self, settings: any) -> None:
+        """Renders the Settings Menu for mouse sensitivity, smoothing, FOV, and fly mode."""
+        lines = [
+            "=== MINEMESIS SETTINGS & CONTROLS ===",
+            "Configure mouse response, visual presentation, and movement dynamics.",
+            "--------------------------------------------------------------------------------",
+            f" [1] Mouse Sensitivity:   {settings.mouse_sensitivity:.2f}   (Press [1] to cycle: 0.05 -> 0.08 -> 0.12 -> 0.16 -> 0.22 -> 0.30)",
+            f" [2] Camera Smoothing:    {'ENABLED (Exponential)' if settings.camera_smoothing else 'DISABLED (Raw Motion)'}   (Press [2] to toggle)",
+            f" [3] Field of View (FOV): {settings.fov:.0f} deg   (Press [3] to cycle: 65 -> 75 -> 85 -> 95)",
+            f" [4] Invert Y Axis:       {'ENABLED' if settings.invert_y else 'DISABLED'}   (Press [4] to toggle)",
+            f" [5] Debug Fly Mode:      {'ENABLED (Free Flight)' if settings.fly_mode else 'DISABLED (Terrestrial Gravity)'}   (Press [5] to toggle)",
+            "--------------------------------------------------------------------------------",
+            "[Esc / O] Save and Return to Game",
+        ]
+        self.render_centered_overlay(lines, title_color=(1.0, 0.85, 0.25, 1.0))
+
     def render_centered_overlay(
         self,
         lines: list[str],
@@ -252,3 +313,64 @@ class OverlayRenderer:
             self.vao.render(moderngl.TRIANGLES, vertices=len(text_verts) // 8)
 
         self.ctx.enable(moderngl.DEPTH_TEST)
+
+    def render_inventory_gui(self, inv: any) -> None:
+        """Renders the Minemesis Inventory GUI: Equipment, 27-slot Storage, and 9-slot Hotbar."""
+        lines = [
+            "=== MINEMESIS INVENTORY & EQUIPMENT ===",
+            "Equipment:",
+        ]
+        eq_head = inv.equipment.get("head")
+        eq_chest = inv.equipment.get("chest")
+        eq_legs = inv.equipment.get("legs")
+        eq_off = inv.equipment.get("offhand")
+        lines.append(
+            f"  [Head]: {eq_head.name if eq_head else 'Empty':<14} | [Chest]: {eq_chest.name if eq_chest else 'Empty':<14} | [Legs]: {eq_legs.name if eq_legs else 'Empty':<14} | [Offhand]: {eq_off.name if eq_off else 'Empty':<14}"
+        )
+        lines.append("--------------------------------------------------------------------------------")
+        lines.append("Main Storage (3x9 Grid):")
+        for row in range(3):
+            row_slots = []
+            for col in range(9):
+                idx = row * 9 + col
+                item = inv.main_grid[idx]
+                if item:
+                    short_name = (item.name[:6] + ".") if len(item.name) > 7 else item.name
+                    row_slots.append(f"[{idx+1:02d}:{short_name}x{item.count}]")
+                else:
+                    row_slots.append(f"[{idx+1:02d}:Empty ]")
+            lines.append("  " + " ".join(row_slots[:5]))
+            lines.append("    " + " ".join(row_slots[5:]))
+
+        lines.append("--------------------------------------------------------------------------------")
+        lines.append("Active Hotbar:")
+        hotbar_slots = []
+        for i in range(inv.HOTBAR_SIZE):
+            item = inv.hotbar[i]
+            prefix = ">>" if i == inv.selected_slot else "  "
+            suffix = "<<" if i == inv.selected_slot else "  "
+            if item:
+                hotbar_slots.append(f"{prefix}[{i+1}:{item.name} x{item.count}]{suffix}")
+            else:
+                hotbar_slots.append(f"{prefix}[{i+1}:Empty]{suffix}")
+        lines.append("  " + " | ".join(hotbar_slots[:5]))
+        lines.append("  " + " | ".join(hotbar_slots[5:]))
+        lines.append("--------------------------------------------------------------------------------")
+        lines.append("Controls: [1-9] Select Hotbar Slot | [Esc / Tab / I] Return to Game")
+        self.render_centered_overlay(lines, title_color=(0.2, 0.85, 1.0, 1.0))
+
+    def render_settings_menu(self, settings: any) -> None:
+        """Renders the Settings Menu for mouse sensitivity, smoothing, FOV, and fly mode."""
+        lines = [
+            "=== MINEMESIS SETTINGS & CONTROLS ===",
+            "Configure mouse response, visual presentation, and movement dynamics.",
+            "--------------------------------------------------------------------------------",
+            f" [1] Mouse Sensitivity:   {settings.mouse_sensitivity:.2f}   (Press [1] to cycle: 0.05 -> 0.08 -> 0.12 -> 0.16 -> 0.22 -> 0.30)",
+            f" [2] Camera Smoothing:    {'ENABLED (Exponential)' if settings.camera_smoothing else 'DISABLED (Raw Motion)'}   (Press [2] to toggle)",
+            f" [3] Field of View (FOV): {settings.fov:.0f} deg   (Press [3] to cycle: 65 -> 75 -> 85 -> 95)",
+            f" [4] Invert Y Axis:       {'ENABLED' if settings.invert_y else 'DISABLED'}   (Press [4] to toggle)",
+            f" [5] Debug Fly Mode:      {'ENABLED (Free Flight)' if settings.fly_mode else 'DISABLED (Terrestrial Gravity)'}   (Press [5] to toggle)",
+            "--------------------------------------------------------------------------------",
+            "[Esc / O] Save and Return to Game",
+        ]
+        self.render_centered_overlay(lines, title_color=(1.0, 0.85, 0.25, 1.0))
