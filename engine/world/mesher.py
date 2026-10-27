@@ -36,6 +36,8 @@ TEXTURE_OVERRIDES = {
     52: ("wood_planks", "wood_planks", "wood_planks"),
     89: ("stone_bricks", "stone_bricks", "stone_bricks"),
     97: ("glass", "glass", "glass"),
+    100: ("wood_planks", "bookshelf", "wood_planks"),
+    101: ("lectern", "wood_planks", "wood_planks"),
     136: ("water", "water", "water"),
 }
 

@@ -16,6 +16,9 @@ from PIL import Image
 
 from engine.core.window import Window
 from engine.core.timer import FrameTimer
+from engine.entities.npc import NPC, VoxelHumanoidMesh
+from engine.entities.interaction import InteractionEngine
+from engine.entities.book_reader import BookReader
 from engine.physics.player import PlayerController
 from engine.render.context import RenderContext
 from engine.render.camera import Camera3D
@@ -138,8 +141,107 @@ class EngineApp:
             if visible:
                 self.window.set_mouse_capture(True)
 
+            # Stage E2: Living Entities, Schedules, and Book Archives
+            self.humanoid_mesh = VoxelHumanoidMesh(self.ctx, self.shader.program, self.atlas)
+            self.interaction = InteractionEngine()
+            self.book_reader = BookReader()
+            self.npcs: list[NPC] = []
+            self._spawn_settlement_npcs()
+
         self.peak_rss_mb: float = 0.0
         self.show_f3: bool = True
+
+    def _alert_nearby_guards(self, victim: NPC) -> None:
+        """Alerts settlement guards if player attacks or steals within hearing range."""
+        if not victim or not self.player:
+            return
+        for npc in self.npcs:
+            if npc.profession == "Guard" and npc.settlement_id == victim.settlement_id:
+                dist = math.sqrt((npc.x - victim.x) ** 2 + (npc.z - victim.z) ** 2)
+                if dist < 50.0:
+                    npc.is_hostile = True
+                    npc.target_pos = (self.player.x, self.player.y, self.player.z)
+                    npc.current_activity = f"HUNTING INTRUDER (Defending {victim.name})!"
+
+    def _spawn_settlement_npcs(self) -> None:
+        """Populates living purpose-driven NPCs into each settlement."""
+        for s in self.world_spec.settlements:
+            bx = float(s.x * 8 + 4)
+            bz = float(s.y * 8 + 4)
+            by = float(self.chunk_mgr.generator.get_interpolated_height(int(bx), int(bz)) + 1)
+
+            # 1. Chief / Elder
+            self.npcs.append(NPC(
+                character_id=f"{s.id}_chief",
+                name=f"Chief {s.name}",
+                profession="Chief",
+                faith="Common Faith",
+                settlement_id=s.name,
+                home_pos=(bx, by, bz),
+                work_pos=(bx + 6.0, by, bz + 4.0),
+                shrine_pos=(bx + 12.0, by, bz + 8.0),
+                well_pos=(bx + 3.0, by, bz + 3.0),
+            ))
+            # 2. Scholar / Scribe
+            self.npcs.append(NPC(
+                character_id=f"{s.id}_scholar",
+                name=f"Scribe Aethelgard of {s.name}",
+                profession="Scholar",
+                faith="Sacred Way",
+                settlement_id=s.name,
+                home_pos=(bx - 4.0, by, bz - 4.0),
+                work_pos=(bx - 8.0, by, bz + 6.0),
+                shrine_pos=(bx + 12.0, by, bz + 8.0),
+                well_pos=(bx + 3.0, by, bz + 3.0),
+            ))
+            # 3. Priest
+            self.npcs.append(NPC(
+                character_id=f"{s.id}_priest",
+                name=f"Priestess Miriel",
+                profession="Priest",
+                faith="Sacred Way",
+                settlement_id=s.name,
+                home_pos=(bx + 8.0, by, bz - 4.0),
+                work_pos=(bx + 12.0, by, bz + 8.0),
+                shrine_pos=(bx + 12.0, by, bz + 8.0),
+                well_pos=(bx + 3.0, by, bz + 3.0),
+            ))
+            # 4. Blacksmith
+            self.npcs.append(NPC(
+                character_id=f"{s.id}_smith",
+                name=f"Thorvald the Smith",
+                profession="Smith",
+                faith="Common Faith",
+                settlement_id=s.name,
+                home_pos=(bx - 6.0, by, bz + 4.0),
+                work_pos=(bx - 10.0, by, bz),
+                shrine_pos=(bx + 12.0, by, bz + 8.0),
+                well_pos=(bx + 3.0, by, bz + 3.0),
+            ))
+            # 5. Master Farmer
+            self.npcs.append(NPC(
+                character_id=f"{s.id}_farmer",
+                name=f"Farmer Brand",
+                profession="Farmer",
+                faith="Common Faith",
+                settlement_id=s.name,
+                home_pos=(bx + 4.0, by, bz + 8.0),
+                work_pos=(bx + 8.0, by, bz + 12.0),
+                shrine_pos=(bx + 12.0, by, bz + 8.0),
+                well_pos=(bx + 3.0, by, bz + 3.0),
+            ))
+            # 6. Town Guard
+            self.npcs.append(NPC(
+                character_id=f"{s.id}_guard",
+                name=f"Warden Kenneth",
+                profession="Guard",
+                faith="Common Faith",
+                settlement_id=s.name,
+                home_pos=(bx, by, bz),
+                work_pos=(bx, by, bz - 8.0),
+                shrine_pos=(bx + 12.0, by, bz + 8.0),
+                well_pos=(bx + 3.0, by, bz + 3.0),
+            ))
 
     def _on_resize(self, width: int, height: int) -> None:
         self.width = width
@@ -222,6 +324,63 @@ class EngineApp:
         p = self.player
         inp = self.window.input
 
+        # Handle modal states first: Book Reader
+        if self.book_reader.is_reading:
+            if inp.is_key_pressed(glfw.KEY_ESCAPE):
+                self.book_reader.close_book()
+                self.window.set_mouse_capture(True)
+            elif inp.is_key_pressed(glfw.KEY_N):
+                self.book_reader.next_page()
+            elif inp.is_key_pressed(glfw.KEY_P):
+                self.book_reader.prev_page()
+
+            # Render 3D scene paused in background
+            self._render_3d_scene(p)
+            # Render Book Reader Overlay
+            self.overlay.render_overlay(self.book_reader.get_current_page_text())
+            return
+
+        # Handle modal states: NPC Interaction Menu
+        if self.interaction.menu_open:
+            active_npc = self.interaction.active_npc
+            if inp.is_key_pressed(glfw.KEY_ESCAPE):
+                self.interaction.close_interaction()
+                self.window.set_mouse_capture(True)
+            elif inp.is_key_pressed(glfw.KEY_1):
+                self.interaction.execute_action("talk", p)
+            elif inp.is_key_pressed(glfw.KEY_2):
+                self.interaction.execute_action("trade", p)
+            elif inp.is_key_pressed(glfw.KEY_3):
+                self.interaction.execute_action("gift", p)
+            elif inp.is_key_pressed(glfw.KEY_4):
+                self.interaction.execute_action("help", p)
+            elif inp.is_key_pressed(glfw.KEY_5):
+                res = self.interaction.execute_action("steal", p)
+                if "CAUGHT" in res:
+                    self._alert_nearby_guards(active_npc)
+            elif inp.is_key_pressed(glfw.KEY_6):
+                self.interaction.execute_action("attack", p)
+                self._alert_nearby_guards(active_npc)
+
+            # Render 3D scene paused in background
+            self._render_3d_scene(p)
+
+            # Render Interaction Menu Overlay
+            if active_npc:
+                menu_lines = [
+                    f"=== INTERACTING WITH {active_npc.name.upper()} ===",
+                    f"Profession: {active_npc.profession} | Faith: {active_npc.faith} | Settlement: {active_npc.settlement_id}",
+                    f"Schedule: {active_npc.current_activity} | Health: {active_npc.health:.1f}/20.0 | Affinity: {active_npc.affinity_to_player:+.0f}",
+                    "--------------------------------------------------",
+                ]
+                for d in self.interaction.dialogue_history[-5:]:
+                    menu_lines.append(d)
+                menu_lines.append("--------------------------------------------------")
+                menu_lines.append("[1] Talk  [2] Trade  [3] Gift  [4] Help  [5] Steal  [6] Attack  [Esc] Leave")
+                self.overlay.render_overlay(menu_lines)
+            return
+
+        # Standard First-Person Game Loop
         # Toggle mouse capture / pause
         if inp.is_key_pressed(glfw.KEY_ESCAPE):
             self.window.set_mouse_capture(not inp.mouse_captured)
@@ -268,6 +427,26 @@ class EngineApp:
             elif inp.is_mouse_pressed(glfw.MOUSE_BUTTON_RIGHT):
                 p.place_block_against_target(self.chunk_mgr)
 
+        # Proximity interaction checking (NPCs and Bookshelves/Lecterns)
+        nearest_npc = None
+        min_npc_dist = 3.5
+        for npc in self.npcs:
+            dist = math.sqrt((p.x - npc.x) ** 2 + (p.y - npc.y) ** 2 + (p.z - npc.z) ** 2)
+            if dist < min_npc_dist:
+                min_npc_dist = dist
+                nearest_npc = npc
+
+        hit = p.raycast_block(self.chunk_mgr, 5.0)
+
+        # Triggers
+        if nearest_npc and inp.is_key_pressed(glfw.KEY_E):
+            self.window.set_mouse_capture(False)
+            self.interaction.open_interaction(nearest_npc)
+        elif hit and hit[2] in (100, 101) and inp.is_key_pressed(glfw.KEY_R):
+            self.window.set_mouse_capture(False)
+            book_data = BookReader.load_random_book_from_disk()
+            self.book_reader.open_book(book_data)
+
         # 1. Physics Tick
         p.tick_physics(self.chunk_mgr, dt=dt, move_fwd=move_fwd, move_strafe=move_strafe)
 
@@ -284,30 +463,15 @@ class EngineApp:
 
         # 4. Advance Day & Night Cycle
         self.sky.tick(dt)
-        sun_dir = self.sky.get_sun_direction()
-        sun_col = self.sky.get_sun_color()
-        ambient_col = self.sky.get_ambient_sky_color()
 
-        # 5. Clear Color & Render Pass
-        self.render_ctx.clear(ambient_col[0], ambient_col[1], ambient_col[2], 1.0)
+        # 5. Advance NPC Schedules and AI
+        for npc in self.npcs:
+            d = math.sqrt((p.x - npc.x) ** 2 + (p.z - npc.z) ** 2)
+            if d < 120.0:
+                npc.update_schedule(self.sky.progress, dt)
 
-        # Configure shader uniforms
-        self.atlas.bind(unit=0)
-        self.shader.set_uniform_int("u_texture", 0)
-        self.shader.set_uniform_mat4("u_proj", self.camera.projection_matrix)
-        self.shader.set_uniform_mat4("u_view", self.camera.get_view_matrix())
-        self.shader.set_uniform_mat4("u_model", np.identity(4, dtype=np.float32))
-
-        self.shader.set_uniform_vec3("u_light_dir", sun_dir[0], sun_dir[1], sun_dir[2])
-        self.shader.set_uniform_vec3("u_light_color", sun_col[0], sun_col[1], sun_col[2])
-        self.shader.set_uniform_vec3("u_ambient_color", ambient_col[0], ambient_col[1], ambient_col[2])
-        self.shader.set_uniform_vec3("u_fog_color", ambient_col[0], ambient_col[1], ambient_col[2])
-        self.shader.set_uniform_float("u_fog_start", 60.0)
-        self.shader.set_uniform_float("u_fog_end", float(self.view_distance * 16))
-        self.shader.set_uniform_vec3("u_camera_pos", eye_x, eye_y, eye_z)
-
-        # 6. Render Voxel Chunks
-        draw_calls = self.chunk_mgr.render(p.x, p.z)
+        # 6. Render 3D Scene
+        draw_calls = self._render_3d_scene(p)
 
         # 7. In-Game HUD Overlay
         if self.show_f3:
@@ -317,13 +481,18 @@ class EngineApp:
             biome_name = BIOME_NAMES[biome_id] if 0 <= biome_id < len(BIOME_NAMES) else "Grassland"
 
             # Targeted block
-            hit = p.raycast_block(self.chunk_mgr, 5.0)
             target_str = "None"
+            action_prompt = ""
             if hit:
                 (hx, hy, hz), (nx, ny, nz), hbid = hit
                 b_def = registry.get_by_id(hbid)
                 bname = b_def.name if b_def else f"Block #{hbid}"
                 target_str = f"{bname} at ({hx}, {hy}, {hz}) [Norm: ({nx},{ny},{nz})]"
+                if hbid in (100, 101):
+                    action_prompt = f" >> PRESS [R] TO READ {bname.upper()} <<"
+
+            if nearest_npc:
+                action_prompt = f" >> PRESS [E] TO SPEAK WITH {nearest_npc.name.upper()} ({nearest_npc.profession}) <<"
 
             # Active Hotbar Block
             sel_bid = p.hotbar[p.selected_slot]
@@ -344,17 +513,54 @@ class EngineApp:
             total_deltas = sum(len(d) for d in self.chunk_mgr.chunk_deltas.values())
 
             lines = [
-                f"MINEMESIS VOXEL ENGINE v0.6.0 [STAGE E1] | FPS: {self.timer.fps:.1f}",
+                f"MINEMESIS VOXEL ENGINE v0.6.0 [STAGE E2] | FPS: {self.timer.fps:.1f}",
                 f"XYZ: {p.x:.2f} / {p.y:.2f} / {p.z:.2f}  (Chunk: [{int(p.x)//16}, {int(p.z)//16}])",
-                f"Facing: Yaw {p.yaw:.1f}° | Pitch {p.pitch:.1f}°",
+                f"Facing: Yaw {p.yaw:.1f}° | Pitch {p.pitch:.1f}° | Time: {self.sky.progress * 24.0:.1f}h",
                 f"Biome: {biome_name} (Tile {tile_x}, {tile_z}) | Elev: {int(p.y)}m",
                 f"Targeting: {target_str}",
                 f"Active Hand [Slot {p.selected_slot + 1}]: {sel_name} ({sel_count}x)",
                 f"Location: {near_set} | Chunks Loaded: {len(self.chunk_mgr.chunks)} (Draw Calls: {draw_calls})",
-                f"Memory RSS: {rss_mb:.1f} MB (Peak: {self.peak_rss_mb:.1f} MB) | Deltas: {total_deltas}",
-                f"Controls: [WASD] Move [Space] Jump [L-Click] Mine [R-Click] Place [1-9] Hotbar [F3] HUD [Esc] Cursor",
+                f"Living NPCs in Valley: {len(self.npcs)} | Memory RSS: {rss_mb:.1f} MB (Peak: {self.peak_rss_mb:.1f} MB)",
             ]
+            if action_prompt:
+                lines.append(action_prompt)
+            lines.append("Controls: [WASD] Move [Space] Jump [L-Click] Mine [R-Click] Place [E] Talk [R] Read [F3] HUD [Esc] Menu")
             self.overlay.render_overlay(lines)
+
+    def _render_3d_scene(self, p: PlayerController) -> int:
+        """Renders sky, chunks, and 3D humanoids."""
+        eye_x, eye_y, eye_z = p.get_eye_position()
+        sun_dir = self.sky.get_sun_direction()
+        sun_col = self.sky.get_sun_color()
+        ambient_col = self.sky.get_ambient_sky_color()
+
+        self.render_ctx.clear(ambient_col[0], ambient_col[1], ambient_col[2], 1.0)
+        self.render_ctx.enable_depth_test(True)
+
+        self.atlas.bind(unit=0)
+        self.shader.set_uniform_int("u_texture", 0)
+        self.shader.set_uniform_mat4("u_proj", self.camera.projection_matrix)
+        self.shader.set_uniform_mat4("u_view", self.camera.get_view_matrix())
+        self.shader.set_uniform_mat4("u_model", np.identity(4, dtype=np.float32))
+
+        self.shader.set_uniform_vec3("u_light_dir", sun_dir[0], sun_dir[1], sun_dir[2])
+        self.shader.set_uniform_vec3("u_light_color", sun_col[0], sun_col[1], sun_col[2])
+        self.shader.set_uniform_vec3("u_ambient_color", ambient_col[0], ambient_col[1], ambient_col[2])
+        self.shader.set_uniform_vec3("u_fog_color", ambient_col[0], ambient_col[1], ambient_col[2])
+        self.shader.set_uniform_float("u_fog_start", 60.0)
+        self.shader.set_uniform_float("u_fog_end", float(self.view_distance * 16))
+        self.shader.set_uniform_vec3("u_camera_pos", eye_x, eye_y, eye_z)
+
+        # 1. Render Chunks
+        draw_calls = self.chunk_mgr.render(p.x, p.z)
+
+        # 2. Render Humanoid NPCs
+        for npc in self.npcs:
+            dist = math.sqrt((p.x - npc.x) ** 2 + (p.z - npc.z) ** 2)
+            if dist < float(self.view_distance * 16):
+                npc.render(self.humanoid_mesh, self.shader, self.camera)
+
+        return draw_calls
 
     def run(self, max_frames: Optional[int] = None) -> None:
         frames = 0

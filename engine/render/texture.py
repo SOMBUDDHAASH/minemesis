@@ -234,3 +234,90 @@ class TextureAtlas:
                     else:
                         d.point((x, y), fill=(160, 200, 230, 45))
         self._draw_tile(15, 0, "glass", paint_glass)
+
+        # === ROW 1: Civil Architecture & NPCs ===
+        # 17. Town Archive Bookshelf
+        def paint_bookshelf(d, s):
+            # Wood plank background
+            for y in range(s):
+                for x in range(s):
+                    d.point((x, y), fill=(140, 100, 60, 255))
+            # Shelf dividers
+            d.rectangle((0, 0, s - 1, 3), fill=(90, 60, 35, 255))
+            d.rectangle((0, 14, s - 1, 17), fill=(90, 60, 35, 255))
+            d.rectangle((0, 28, s - 1, 31), fill=(90, 60, 35, 255))
+            # Book spines on top shelf
+            book_colors = [
+                (180, 40, 40), (40, 80, 180), (30, 140, 50),
+                (190, 160, 30), (120, 50, 150), (160, 90, 40),
+            ]
+            bx = 2
+            for c in book_colors:
+                w = 4
+                d.rectangle((bx, 4, bx + w - 1, 13), fill=(c[0], c[1], c[2], 255))
+                # Gold spine detail
+                d.line((bx, 8, bx + w - 1, 8), fill=(230, 200, 80, 255))
+                bx += w + 1
+            # Book spines on bottom shelf
+            bx = 2
+            for c in reversed(book_colors):
+                w = 4
+                d.rectangle((bx, 18, bx + w - 1, 27), fill=(c[0], c[1], c[2], 255))
+                d.line((bx, 22, bx + w - 1, 22), fill=(230, 200, 80, 255))
+                bx += w + 1
+        self._draw_tile(0, 1, "bookshelf", paint_bookshelf)
+
+        # 18. Scholar Lectern
+        def paint_lectern(d, s):
+            for y in range(s):
+                for x in range(s):
+                    d.point((x, y), fill=(130, 90, 50, 255))
+            # Slanted reading desk
+            d.rectangle((3, 3, s - 4, s - 4), fill=(160, 120, 75, 255))
+            # Open parchment pages
+            d.rectangle((6, 6, 14, 25), fill=(245, 240, 220, 255))
+            d.rectangle((17, 6, 25, 25), fill=(245, 240, 220, 255))
+            # Red bookmark ribbon
+            d.line((15, 4, 16, 28), fill=(200, 30, 30, 255))
+            # Text lines on parchment
+            for ly in [10, 14, 18, 22]:
+                d.line((8, ly, 13, ly), fill=(60, 55, 50, 255))
+                d.line((19, ly, 24, ly), fill=(60, 55, 50, 255))
+        self._draw_tile(1, 1, "lectern", paint_lectern)
+
+        # 19. NPC Skin Tone
+        def paint_skin(d, s):
+            for y in range(s):
+                for x in range(s):
+                    n = ((x * 7 + y * 13) % 15) - 7
+                    d.point((x, y), fill=(225 + n, 185 + n, 150 + n, 255))
+        self._draw_tile(2, 1, "npc_skin", paint_skin)
+
+        # 20. Profession Clothing and Hair
+        professions_meta = {
+            "Chief": {"body": (215, 165, 40), "legs": (65, 40, 25), "hair": (190, 190, 190)},
+            "Scholar": {"body": (50, 90, 165), "legs": (40, 45, 65), "hair": (90, 65, 40)},
+            "Priest": {"body": (205, 215, 230), "legs": (75, 50, 90), "hair": (200, 200, 200)},
+            "Smith": {"body": (115, 90, 65), "legs": (50, 50, 55), "hair": (40, 40, 40)},
+            "Farmer": {"body": (100, 155, 75), "legs": (90, 65, 40), "hair": (130, 90, 50)},
+            "Guard": {"body": (140, 148, 158), "legs": (75, 82, 90), "hair": (50, 40, 25)},
+            "Citizen": {"body": (155, 115, 90), "legs": (65, 55, 50), "hair": (75, 50, 40)},
+        }
+
+        col_idx = 3
+        for prof, pcols in professions_meta.items():
+            # Body cloth
+            bc = pcols["body"]
+            def _pb(c):
+                return lambda d, s: d.rectangle((0, 0, s, s), fill=(c[0], c[1], c[2], 255))
+            self._draw_tile(col_idx, 1, f"npc_body_{prof}", _pb(bc))
+
+            # Legs cloth
+            lc = pcols["legs"]
+            self._draw_tile(col_idx, 2, f"npc_legs_{prof}", _pb(lc))
+
+            # Hair
+            hc = pcols["hair"]
+            self._draw_tile(col_idx, 3, f"npc_hair_{prof}", _pb(hc))
+
+            col_idx += 1
